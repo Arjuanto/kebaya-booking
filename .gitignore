@@ -155,5 +155,5 @@ vite.config.ts.timestamp-*
 .nx/cache
 .nx/workspace-data
 .nx/migrate-runs
-"data/raw/" 
-".env" 
+data/raw/
+.env
