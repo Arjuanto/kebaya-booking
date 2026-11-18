@@ -26,6 +26,7 @@ Berdasarkan tautan dan katalog resmi UMKM (*rentkebayabyariegunarti.my.canva.sit
 
 ### B. Formulir Input Pemesan & Ukuran Badan
 - **Nama Pemesan** (Wajib, teks)
+- **Nomor WhatsApp / HP** (Wajib, nomor kontak untuk konfirmasi admin)
 - **Tanggal Pemakaian** (Wajib, Date picker, divalidasi tidak boleh tanggal lampau)
 - **Tujuan Acara** (Wajib, Dropdown: Wisuda, Lamaran, Pernikahan/Bridesmaid, Hari Kartini, Foto Studio, dll.)
 - **Parameter Ukuran Badan**:
