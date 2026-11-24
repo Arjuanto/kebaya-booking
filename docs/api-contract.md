@@ -1,6 +1,6 @@
 # Kontrak API — Sewa Kebaya By Ariegunarti (A26-CS010)
 
-Status: **DRAFT v0.2** — perlu disepakati FS (Arjuanto, Diva, David) dan AE (Ilham) sebelum pengembangan, sesuai jadwal Minggu 1 (23–29 Nov 2026).
+Status: **DRAFT v0.3** — perlu disepakati FS (Arjuanto, Diva, David) dan AE (Ilham) sebelum pengembangan, sesuai jadwal Minggu 1 (23–29 Nov 2026).
 
 Dokumen ini mencakup dua kontrak:
 
@@ -559,7 +559,11 @@ Di luar tabel:
 | `analytics_results` | id, data_source, payload (JSONB), generated_at |
 | `ai_summaries` | id, status (`success`/`failed`), summary, provider, model, input (JSONB), error_code, created_at |
 
+DDL lengkap: [`backend/db/schema.sql`](../backend/db/schema.sql).
+
 Index: `bookings (kebaya_id, rental_start, rental_end)` untuk cek tumpang tindih.
+
+Anti double booking juga dijaga di database: constraint `bookings_no_overlap` (EXCLUDE GiST, butuh ekstensi `btree_gist`) menolak dua pengajuan berstatus pemblokir pada kebaya yang sama dengan masa sewa tumpang tindih. Backend memetakan SQLSTATE `23P01` ke `409 KEBAYA_NOT_AVAILABLE` dan `23505` pada `kebaya.code` ke `409 DUPLICATE_CODE`.
 
 Tipe kolom: `use_date`, `rental_start`, dan `rental_end` bertipe `date` (tanpa jam dan zona waktu) supaya hitungan H-1/H+1 dan jeda laundry tidak bergeser karena selisih UTC dan WIB. Kolom waktu (`*_at`) bertipe `timestamptz`.
 
@@ -596,3 +600,4 @@ Tidak ada API key di kode atau repositori.
 |---|---|---|
 | 0.1 | 2026-11-24 | Draft awal dari Project Plan |
 | 0.2 | 2026-11-24 | "Hari ini" dihitung di Asia/Jakarta dan kolom tanggal bertipe `date`; batas percobaan login (`429 TOO_MANY_ATTEMPTS`); format error diseragamkan (`data` opsional, `conflictWith` pindah ke `data`, `AI_QUOTA_EXCEEDED` jadi 503) |
+| 0.3 | 2026-11-24 | Skema database di `backend/db/schema.sql`; constraint anti tumpang tindih di level database |
