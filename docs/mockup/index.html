@@ -125,7 +125,10 @@
     /* Berlaku baik di simulator .device-mobile maupun layar HP asli */
     /* ============================================================ */
     .device-mobile .hero-preview-decor,
-    .is-mobile-view .hero-preview-decor,
+    .is-mobile-view .hero-preview-decor {
+      display: none !important;
+    }
+
     @media (max-width: 768px) {
       .hero-preview-decor {
         display: none !important;
