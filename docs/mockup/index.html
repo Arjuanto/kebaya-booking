@@ -162,11 +162,10 @@
       <!-- Frame id 2002:3 / 2002:27: Logo AG, CUSTOMER by Arie Gunarti, Navigation Tabs, User Name -->
       <header class="bg-white/90 backdrop-blur-md border-b border-silk-300 px-6 py-4 sticky top-0 z-40">
         <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <!-- Logo & Title -->
+          <!-- Logo Asli & Title -->
           <div class="flex items-center gap-3 cursor-pointer" onclick="switchTab('beranda')">
-            <div class="w-12 h-12 rounded-xl bg-silk-100 border border-silk-300 flex items-center justify-center font-serif text-2xl font-bold text-charcoal-900 shadow-xs">
-              AG
-            </div>
+            <img src="./assets/logo-ag.jpg" alt="Logo Sewa Kebaya by Ariegunarti"
+              class="w-12 h-12 rounded-xl object-contain border border-silk-300 shadow-xs bg-white p-0.5 shrink-0">
             <div>
               <div class="text-[10px] tracking-[0.25em] uppercase font-bold text-silk-700">CUSTOMER</div>
               <div class="font-serif font-bold text-charcoal-900 text-lg sm:text-xl leading-tight">By Arie Gunarti</div>
@@ -190,14 +189,14 @@
             </button>
           </nav>
 
-          <!-- Customer Identity Sesuai Figma -->
-          <div class="hidden md:flex items-center gap-2.5 text-xs text-charcoal-800">
-            <div class="w-8 h-8 rounded-full bg-silk-300 flex items-center justify-center font-bold text-silk-800">
-              <i data-lucide="user" class="w-4 h-4"></i>
+          <!-- Customer Access (Guest / Tanpa Perlu Login Akun) -->
+          <div class="hidden md:flex items-center gap-2.5 text-xs text-charcoal-800 bg-silk-50/80 px-3 py-1.5 rounded-xl border border-silk-300">
+            <div class="w-7 h-7 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold">
+              <i data-lucide="check-circle" class="w-4 h-4"></i>
             </div>
             <div>
-              <div class="font-semibold" id="header-user-name">Siti Rahmawati</div>
-              <div class="text-[10px] text-silk-700">Customer Aktif</div>
+              <div class="font-semibold text-charcoal-900" id="header-user-name">Siti Rahmawati</div>
+              <div class="text-[10px] text-emerald-700 font-medium">Booking Cepat (Tanpa Login)</div>
             </div>
           </div>
         </div>
@@ -687,9 +686,19 @@
         <!-- TAB 3: PENGAJUAN SAYA (Customer · Pengajuan saya — 2002:18) -->
         <!-- ========================================== -->
         <section id="view-pengajuan-saya" class="hidden space-y-6 animate-in fade-in duration-200">
-          <div>
-            <h1 class="font-serif text-3xl font-bold text-charcoal-900">Pengajuan saya</h1>
-            <p class="text-sm text-charcoal-700 mt-1">Pantau proses sewa mulai dari verifikasi admin hingga pengembalian kebaya.</p>
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h1 class="font-serif text-3xl font-bold text-charcoal-900">Pengajuan saya</h1>
+              <p class="text-sm text-charcoal-700 mt-1">Pantau proses sewa secara instan tanpa perlu registrasi akun atau login.</p>
+            </div>
+            <!-- Lacak Cepat Tanpa Login (Cukup No. WA / Kode Booking) -->
+            <div class="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-silk-300 shadow-xs">
+              <i data-lucide="search" class="w-4 h-4 text-silk-600"></i>
+              <input type="text" placeholder="Lacak via No. WA / Kode Booking"
+                value="AG-0261"
+                class="text-xs bg-transparent outline-none w-48 sm:w-56 text-charcoal-900 font-medium">
+              <button onclick="bukaDetailPengajuan()" class="btn-ag-primary px-3 py-1 rounded-lg text-[11px] font-semibold">Lacak</button>
+            </div>
           </div>
 
           <!-- Tab Status Aktif vs Riwayat Sesuai Figma (2002:355 & 2002:357) -->

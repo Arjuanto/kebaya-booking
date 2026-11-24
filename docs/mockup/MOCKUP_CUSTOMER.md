@@ -13,8 +13,29 @@ Berdasarkan file Figma resmi dari tim UI/UX dan identitas otentik UMKM *Sewa Keb
 - **Tipografi:**
   - *Serif*: **Cormorant Garamond** & **Playfair Display** untuk judul besar, monogram AG, dan aksen kemewahan kebaya.
   - *Sans*: **Plus Jakarta Sans** untuk teks isi, formulir, label tombol, dan keterbacaan tinggi di desktop maupun mobile.
-- **Logo Resmi:** Monogram **AG** + **CUSTOMER By Arie Gunarti**.
+- **Logo Resmi:** Menggunakan asset logo asli monokrom elegan **AG BY ARIE GUNARTI** (`assets/logo-ag.jpg`).
 - **Footer Resmi:** `BY_ARIEGUNARTI · CUSTOMER`.
+
+---
+
+## 2. Analisis Arsitektur: Apakah Customer Perlu Login?
+Pertanyaan arsitektural: *Apakah customer perlu login seperti admin?*
+**Jawabannya: TIDAK PERLU login dengan akun & password.**
+
+Berikut pertimbangan teknis dan bisnis (*UX & Business Rationale*):
+1. **Zero-Friction Booking (Mencegah Drop-off Pelanggan):**
+   - Calon penyewa kebaya biasanya datang langsung dari tautan media sosial (Instagram Bio, TikTok, atau status WhatsApp).
+   - Memaksa customer untuk mendaftar akun, mengingat password, dan verifikasi email akan menciptakan friksi besar (*high bounce rate*), sehingga pelanggan malas dan beralih ke penyewaan lain.
+2. **Model Guest Booking Berbasis Nomor WhatsApp:**
+   - Di sektor UMKM busana/sewa, **Nomor WhatsApp** adalah *primary identifier* yang paling valid dan akurat di Indonesia.
+   - Saat mengisi form penyewaan (Data Diri + Ukuran Badan + Jadwal), nomor WhatsApp pelanggan otomatis menjadi identitas pemesan.
+3. **Mekanisme Pelacakan Status Pesanan Tanpa Login:**
+   - **Kode Pengajuan Unik (Booking Reference):** Setiap pengajuan sewa menghasilkan kode unik (misal: `AG-0261`).
+   - **Pelacakan Cepat:** Pada tab *Pengajuan Saya*, customer cukup memasukkan nomor WhatsApp atau kode booking untuk melihat status tanpa perlu memasukkan password.
+   - **Direct WhatsApp Notification:** Admin mengirim link pelacak pesanan langsung ke WhatsApp customer begitu status berubah (Fitting / Disetujui / DP).
+4. **Perbedaan dengan Akun Admin:**
+   - **Admin:** **WAJIB LOGIN** dengan autentikasi ketat (Role-Based Access Control / RBAC) karena memiliki akses ke database keuangan, verifikasi DP, kalender kebaya seluruh customer, dan manajemen inventaris.
+   - **Customer:** Cukup bertindak sebagai *Guest User* dengan akses terbatas ke kode pesanannya sendiri.
 
 ---
 
