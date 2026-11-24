@@ -1,74 +1,114 @@
-# Mockup & Alur Halaman Pemesanan Customer
+# Mockup & Alur Halaman Portal Customer
 **Proyek:** Sistem Booking Sewa Kebaya By Ariegunarti (Capstone A26-CS010)  
 **Penanggung Jawab:** David Balbo (AI Full-Stack Developer)  
 **Referensi Tugas:** Issue #5 / #15 — Mockup Halaman Customer  
-**Tema Visual:** Identitas Resmi UMKM *Sewa Kebaya By Ariegunarti* (Canva / Bio Link Asli)
+**Sumber Desain Tim:** Figma Embed Official (`Sewa Kebaya (Copy)` / Node `0:1` *Dekstop & Mobile*)
 
 ---
 
-## 1. Identitas Visual & Palette Warna (Sesuai Aslinya)
-Berdasarkan tautan dan katalog resmi UMKM (*rentkebayabyariegunarti.my.canva.site*), mockup ini mengadopsi tema visual otentik:
-- **Latar Belakang (Silk Texture / Champagne Cream):** `#F8F3EB` – `#EBDDC8` (tekstur lembut kain sutra satin champagne dengan lipatan lembut).
-- **Warna Aksen Tombol (Warm Taupe Pill):** Gradien `#BAA591` ke `#A48D77` berbentuk *pill-rounded* khas UMKM.
-- **Tipografi:** Kombinasi *Playfair Display* (Serif mewah untuk judul & logo) dan *Plus Jakarta Sans* (Sans-serif bersih untuk formulir & keterbacaan di ponsel).
-- **Logo Resmi:** Monogram **AG BY ARIE GUNARTI**.
-- **Tagline Asli UMKM:**
-  - *"pretty attire for graduation, engagement, prewedding and special occasion. Let's check our collection!"*
-  - *"Timeless tradition in modern glamour exclusively rent by_ariegunarti"*
+## 1. Identitas Visual & Palette Warna (Sesuai Desain Figma Tim)
+Berdasarkan file Figma resmi dari tim UI/UX dan identitas otentik UMKM *Sewa Kebaya By Ariegunarti*:
+- **Latar Belakang (Silk Texture / Champagne Cream):** `#FAF7F2` – `#ECE0D1` (kain sutra satin champagne mewah dengan aksen gradasi lembut).
+- **Warna Aksen Tombol Utama:** Gradien taupe `#BAA591` ke `#A48D77` dan `#23201D` (dark charcoal).
+- **Tipografi:**
+  - *Serif*: **Cormorant Garamond** & **Playfair Display** untuk judul besar, monogram AG, dan aksen kemewahan kebaya.
+  - *Sans*: **Plus Jakarta Sans** untuk teks isi, formulir, label tombol, dan keterbacaan tinggi di desktop maupun mobile.
+- **Logo Resmi:** Monogram **AG** + **CUSTOMER By Arie Gunarti**.
+- **Footer Resmi:** `BY_ARIEGUNARTI · CUSTOMER`.
 
 ---
 
-## 2. Struktur Komponen Layar (Customer Page)
+## 2. Struktur Layar Sesuai Frame Figma Tim
 
-### A. Header & Branding Otentik
-- Monogram logo AG & ilustrasi kebaya khas UMKM.
-- Tagline resmi dan indikator sistem booking otomatis aktif (*Anti Double-Booking*).
+Mockup customer mencakup seluruh perjalanan pengguna (*End-to-End Customer Journey*) sesuai frame Figma tim:
 
-### B. Formulir Input Pemesan & Ukuran Badan
-- **Nama Pemesan** (Wajib, teks)
-- **Nomor WhatsApp / HP** (Wajib, nomor kontak untuk konfirmasi admin)
-- **Tanggal Pemakaian** (Wajib, Date picker, divalidasi tidak boleh tanggal lampau)
-- **Tujuan Acara** (Wajib, Dropdown: Wisuda, Lamaran, Pernikahan/Bridesmaid, Hari Kartini, Foto Studio, dll.)
-- **Parameter Ukuran Badan**:
-  - `LD` (Lingkar Dada dlm cm, min 60, max 140)
-  - `TB` (Tinggi Badan dlm cm, min 100, max 210)
-  - `BB` (Berat Badan dlm kg, min 30, max 150)
-- **Tombol Aksi:** *"Cek Ketersediaan Kebaya & Ukuran"* (dengan styling pill taupe khas Canva UMKM).
+### A. Customer · Beranda (Figma `2002:2` & `2002:26`)
+1. **Header Customer:**
+   - Monogram logo AG & teks identitas `CUSTOMER By Arie Gunarti`.
+   - Navigasi tab: **Beranda**, **Katalog**, dan **Pengajuan saya**.
+   - Identitas customer: `Siti Rahmawati`.
+2. **Banner Sambutan:**
+   - Slogan: *"Kebaya pilihan untuk momen istimewamu."*
+   - Subtitle: *"Temukan koleksi favorit, ajukan sewa, dan siapkan penampilan terbaikmu."*
+   - Tombol aksi: `Jelajahi katalog →`.
+3. **Pilihan Untukmu:**
+   - Rekomendasi busana utama:
+     - **Kebaya Ayu Ivory (`KBY-001`)** · Ivory · Ukuran M · Rp750.000 / sewa.
+     - **Kebaya Laras Sage (`KBY-002`)** · Sage · Ukuran S · Rp650.000 / sewa.
+4. **Banner Status Pengajuan Terbaru:**
+   - Menampilkan ringkasan pesanan aktif (contoh: `AG-0261` - Menunggu konfirmasi admin) dengan tombol `Pantau pengajuan →`.
 
-### C. State Interaksi & Indikator Respons
-- **State Memproses (Loading):** Menampilkan animasi loading saat sistem menghitung periode ketersediaan (H-1 s.d H+1 + jeda laundry) dan perkiraan ukuran.
-- **State Error / Validasi:** Menolak input jika tanggal lampau, nama kosong, atau angka LD/TB/BB di luar batas fisik manusia dengan pesan kesalahan yang jelas dan manusiawi.
+### B. Customer · Katalog (Figma `2002:6` & `2002:30`)
+1. **Pencarian & Filter:**
+   - Kolom pencarian: *"Cari nama atau kode kebaya…"*
+   - Tanggal pemakaian: Kalender filter ketersediaan.
+   - Filter ukuran: *Ukuran · Semua (S, M, L, XL)*.
+   - Kategori filter pills: *Semua koleksi, Wisuda, Lamaran, Pernikahan*.
+2. **Katalog Grid:**
+   - **Kebaya Ayu Ivory (`KBY-001`)** · Ivory · M · Rp750.000.
+   - **Kebaya Laras Sage (`KBY-002`)** · Sage · S · Rp650.000.
+   - **Kebaya Kirana Rose (`KBY-003`)** · Dusty rose · M · Rp850.000.
+3. **Aksi:** Tombol `Lihat detail →` dan `Ajukan sewa`.
 
-### D. Hasil Rekomendasi Ukuran (Rule-Based Tabel Owner)
-| Rentang LD (Lingkar Dada) | Rekomendasi Ukuran | Status Fitting |
-| :--- | :---: | :--- |
-| $\le$ 86 cm | **S** | Tersedia Siap Pakai |
-| 87 – 92 cm | **M** | Tersedia Siap Pakai |
-| 93 – 98 cm | **L** | Tersedia Siap Pakai |
-| 99 – 106 cm | **XL** | Tersedia Siap Pakai |
-| 107 – 116 cm | **XXL** | Tersedia Siap Pakai |
-| > 116 cm atau < 60 cm | **Custom** | Wajib Fitting / Hubungi Admin |
+### C. Customer · Detail Kebaya (Figma `2002:10` & `2002:34`)
+1. **Breadcrumb:** `Katalog / Kebaya Ayu Ivory`.
+2. **Pratinjau Busana:** Foto real pict kebaya & badge ketersediaan.
+3. **Spesifikasi & Ukuran Fisik:**
+   - Kode & Nama: `KBY-001 · KOLEKSI WISUDA`.
+   - Ukuran: `Ukuran M` (Lingkar dada 90 cm · Tinggi referensi 160 cm).
+   - Biaya sewa: `Rp750.000 / sewa`.
+4. **Cek Tanggal Pemakaian:** Kalender cek tanggal acara + catatan edukasi customer bahwa pengajuan sewa belum mengunci kebaya sebelum diverifikasi admin.
+5. **Tombol Aksi:** `Ajukan sewa →`.
 
-### E. Katalog Kebaya yang Tersedia
-- Menampilkan kartu kebaya: Foto kebaya, Kode Kebaya (misal `KB-012`), Nama Kebaya, Ukuran asli, Keterangan kecocokan dengan ukuran customer, dan Harga sewa.
-- Tombol **"Ajukan Sewa Kebaya Ini"**.
+### D. Customer · Ajukan Sewa (Figma `2002:14` & `2002:38`)
+1. **01 · Data Pelanggan:**
+   - Nama lengkap: `Siti Rahmawati`
+   - WhatsApp: `0812 3456 7890`
+   - Parameter fisik: Lingkar dada (`LD`), Tinggi badan (`TB`), Berat badan (`BB`).
+2. **02 · Jadwal Penyewaan (H-1 s.d H+1):**
+   - Tanggal ambil (H-1): Otomatis dihitung H-1 dari tanggal pakai.
+   - Tanggal pakai (H): Tanggal hari H acara.
+   - Tanggal kembali (H+1): Otomatis dihitung H+1 dari tanggal pakai.
+   - Keperluan: Dropdown (Wisuda, Lamaran, Pernikahan, Foto Studio, dll.).
+   - Catatan untuk admin.
+3. **Ringkasan Pengajuan (Sidebar / Summary Box):**
+   - Rincian kebaya & ukuran terpilih.
+   - Total sewa: `Rp750.000`.
+   - Rencana DP 50%: `Rp375.000`.
+   - Ketentuan: *Pembayaran dilakukan setelah pengajuan disetujui admin. Pengajuan belum mengunci kebaya.*
+   - Tombol Aksi: `Kirim pengajuan →`.
 
-### F. Modal Konfirmasi & Pengiriman Pengajuan
-- Ringkasan pesanan sebelum dikirim.
-- Catatan edukasi customer: *Pengajuan masih berstatus menunggu dan kebaya baru resmi terkunci setelah DP disetujui admin.*
+### E. Customer · Pengajuan Saya (Figma `2002:18` & `2002:44`)
+1. **Tab Status:** `Aktif · 1` dan `Riwayat`.
+2. **Kartu Pengajuan Aktif:**
+   - Nomor pengajuan: `AG-0261` (Diajukan 23 Nov 2026).
+   - Status badge: `Menunggu admin`.
+   - Rincian: Kebaya Ayu Ivory, Ukuran M · Wisuda, Periode sewa 26–28 Nov 2026.
+   - Total: `Rp750.000`.
+   - Tombol: `Lihat detail →`.
+3. **Kartu Panduan:** *"Apa selanjutnya?"* (3 langkah alur konfirmasi, fitting, dan pembayaran DP).
 
-### G. State Berhasil (Success Confirmation)
-- Menampilkan pesan sukses dengan **Kode Pengajuan** (contoh: `BK-20261119-089`).
-- Status: **Menunggu Tinjauan Admin**.
-- Penjelasan langkah berikutnya: Admin akan meninjau ketersediaan fisik, fitting, dan pencatatan DP.
+### F. Customer · Detail Pengajuan / Tracking Timeline (Figma `2002:22`)
+1. **Header:** `Detail pengajuan` | `AG-0261` · Diajukan 23 Nov 2026.
+2. **Stepper Timeline (Perjalanan Sewamu):**
+   - `01 · Tinjau pengajuan` (Sedang ditinjau admin - Status: Aktif)
+   - `02 · Fitting` (Menunggu tahap sebelumnya)
+   - `03 · Pembayaran DP` (Menunggu tahap sebelumnya)
+   - `04 · Pelunasan` (Menunggu tahap sebelumnya)
+   - `05 · Pengambilan` (Menunggu tahap sebelumnya)
+   - `06 · Pengembalian` (Menunggu tahap sebelumnya)
+3. **Ringkasan Sewa & Hubungi Admin:**
+   - Detail sewa dan tanggal jadwal.
+   - Status pembayaran: `DP belum dibayar`.
+   - Tombol: `Hubungi admin` (Direct WhatsApp link).
 
 ---
 
 ## 3. Cara Menjalankan & Menguji Mockup Interaktif
 
-File prototipe interaktif telah dibuat dalam format standalone HTML/Tailwind CSS:
-- Buka file [index.html](file:///c:/laragon/www/kebaya-booking/docs/mockup/index.html) langsung di web browser (Chrome, Edge, Firefox, atau Safari).
-- Di bagian atas terdapat toggle switcher:
-  - **Ponsel / Mobile:** Menampilkan simulasi tampilan smartphone (responsif).
-  - **Desktop:** Menampilkan simulasi tampilan layar penuh laptop/PC.
-- Silakan coba isi formulir, klik tombol pencarian, pilih kebaya, dan kirim pengajuan untuk melihat seluruh alur state UI.
+File prototipe interaktif tersedia dalam format standalone HTML/Tailwind CSS:
+- Buka file [index.html](file:///c:/laragon/www/kebaya-booking/docs/mockup/index.html) di browser (Chrome, Edge, Firefox, atau Safari).
+- Gunakan switcher di pojok kanan atas:
+  - **Desktop:** Menampilkan simulasi tampilan layar penuh laptop/PC (1200px) sesuai frame Desktop di Figma tim.
+  - **Ponsel:** Menampilkan simulasi smartphone (430px) sesuai frame Mobile di Figma tim.
+- Semua navigasi tab (Beranda, Katalog, Detail Kebaya, Ajukan Sewa, Pengajuan Saya, Detail Pengajuan) berfungsi secara interaktif.
