@@ -192,11 +192,13 @@
           <!-- Customer Access (Guest / Tanpa Perlu Login Akun) -->
           <div class="hidden md:flex items-center gap-2.5 text-xs text-charcoal-800 bg-silk-50/80 px-3 py-1.5 rounded-xl border border-silk-300">
             <div class="w-7 h-7 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold">
-              <i data-lucide="check-circle" class="w-4 h-4"></i>
+              <i data-lucide="user-check" class="w-4 h-4"></i>
             </div>
             <div>
-              <div class="font-semibold text-charcoal-900" id="header-user-name">Siti Rahmawati</div>
-              <div class="text-[10px] text-emerald-700 font-medium">Booking Cepat (Tanpa Login)</div>
+              <div class="font-semibold text-charcoal-900" id="header-user-name">Tamu Pelanggan</div>
+              <div class="text-[10px] text-emerald-700 font-medium flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Booking Cepat (Tanpa Login)
+              </div>
             </div>
           </div>
         </div>
@@ -210,7 +212,7 @@
         <!-- ========================================== -->
         <section id="view-beranda" class="space-y-6 animate-in fade-in duration-200">
           <!-- Welcome Banner -->
-          <div class="text-xs uppercase tracking-widest font-bold text-silk-700">SELAMAT DATANG, SITI</div>
+          <div class="text-xs uppercase tracking-widest font-bold text-silk-700" id="hero-greeting">SELAMAT DATANG DI SEWA KEBAYA BY ARIE GUNARTI</div>
 
           <!-- Hero Sambutan Customer (Figma 2002:60) -->
           <div class="bg-gradient-to-br from-white/95 via-silk-50 to-silk-100 rounded-3xl border border-silk-300 p-6 sm:p-8 relative overflow-hidden shadow-sm">
@@ -562,12 +564,12 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label class="block text-xs font-semibold text-charcoal-800 mb-1">Nama lengkap <span class="text-rose-600">*</span></label>
-                    <input type="text" id="form-nama" value="Siti Rahmawati" required
+                    <input type="text" id="form-nama" placeholder="Contoh: Siti Rahmawati / Nama Anda" oninput="updateNamaCustomer(this.value)" required
                       class="w-full text-xs px-3.5 py-2.5 rounded-xl border border-silk-300 bg-silk-50/50 focus:bg-white focus:ring-2 focus:ring-silk-500 outline-none">
                   </div>
                   <div>
                     <label class="block text-xs font-semibold text-charcoal-800 mb-1">WhatsApp <span class="text-rose-600">*</span></label>
-                    <input type="tel" id="form-telepon" value="0812 3456 7890" required
+                    <input type="tel" id="form-telepon" placeholder="Contoh: 081234567890" required
                       class="w-full text-xs px-3.5 py-2.5 rounded-xl border border-silk-300 bg-silk-50/50 focus:bg-white focus:ring-2 focus:ring-silk-500 outline-none">
                   </div>
                 </div>
@@ -1082,6 +1084,20 @@
       const opts = { day: 'numeric', month: 'short', year: 'numeric' };
       document.getElementById('form-tgl-ambil').value = ambil.toLocaleDateString('id-ID', opts);
       document.getElementById('form-tgl-kembali').value = kembali.toLocaleDateString('id-ID', opts);
+    }
+
+    // Update Nama Customer Secara Dinamis Real-Time
+    function updateNamaCustomer(nama) {
+      const clean = (nama || '').trim();
+      const elHeader = document.getElementById('header-user-name');
+      const elHero = document.getElementById('hero-greeting');
+      if (clean) {
+        if (elHeader) elHeader.innerText = clean;
+        if (elHero) elHero.innerText = `SELAMAT DATANG, ${clean.toUpperCase()}`;
+      } else {
+        if (elHeader) elHeader.innerText = "Tamu Pelanggan";
+        if (elHero) elHero.innerText = "SELAMAT DATANG DI SEWA KEBAYA BY ARIE GUNARTI";
+      }
     }
 
     // Submit Form Pengajuan Sewa
