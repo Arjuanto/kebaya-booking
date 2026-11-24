@@ -100,13 +100,15 @@ Mockup customer mencakup seluruh perjalanan pengguna (*End-to-End Customer Journ
    - Tombol Aksi: `Kirim pengajuan →`.
 
 ### E. Customer · Pengajuan Saya (Figma `2002:18` & `2002:44`)
-1. **Tab Status:** `Aktif · 1` dan `Riwayat`.
+1. **Dinamika State Pengajuan:**
+   - **Kondisi Default (Pelanggan Baru / Belum Pesan):** Menampilkan *Empty State* ramah bertuliskan *"Belum Ada Pengajuan Sewa"*, ajakan melihat katalog, dan counter `Aktif · 0` tanpa dot oranye.
+   - **Kondisi Setelah Mengirim Formulir:** Otomatis menghasilkan nomor pesanan baru, counter `Aktif · 1`, menyalakan dot notifikasi pada navigasi, dan merender kartu pesanan aktif.
+   - **Opsi Demo / Lacak Manual:** Tersedia tombol simulasi demo pesanan serta kolom input pelacakan instan via Nomor WhatsApp atau Kode Booking.
 2. **Kartu Pengajuan Aktif:**
-   - Nomor pengajuan: `AG-0261` (Diajukan 23 Nov 2026).
+   - Nomor pengajuan: `AG-xxxx` / `AG-0261`.
    - Status badge: `Menunggu admin`.
-   - Rincian: Kebaya Ayu Ivory, Ukuran M · Wisuda, Periode sewa 26–28 Nov 2026.
-   - Total: `Rp750.000`.
-   - Tombol: `Lihat detail →`.
+   - Rincian: Nama kebaya, ukuran, keperluan acara, dan rentang tanggal jadwal sewa.
+   - Total sewa & tombol `Lihat detail →`.
 3. **Kartu Panduan:** *"Apa selanjutnya?"* (3 langkah alur konfirmasi, fitting, dan pembayaran DP).
 
 ### F. Customer · Detail Pengajuan / Tracking Timeline (Figma `2002:22`)
