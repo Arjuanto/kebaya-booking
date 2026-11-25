@@ -1,0 +1,10 @@
+# Berlaku untuk folder ml-service saja.
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.env
+.pytest_cache/
+models/*.joblib
+models/*.json
+!models/.gitkeep

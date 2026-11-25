@@ -1,0 +1,14 @@
+{
+  "table_version": "sementara-1",
+  "sumber": "BELUM DIKONFIRMASI. Rentang diturunkan dari kolom perkiraan_ukuran pada dataset tim Data Science. Tanyakan ke Data Science apakah angka ini berasal dari katalog owner atau dibuat tim, lalu perbarui field ini.",
+  "catatan": "Tabel resmi dari owner belum tersedia. Ganti berkas ini begitu owner menjawab, tanpa mengubah kode.",
+  "ranges": [
+    { "ld_min": 80, "ld_max": 83, "size": "XS" },
+    { "ld_min": 84, "ld_max": 88, "size": "S" },
+    { "ld_min": 89, "ld_max": 94, "size": "M" },
+    { "ld_min": 95, "ld_max": 100, "size": "L" },
+    { "ld_min": 101, "ld_max": 108, "size": "XL" },
+    { "ld_min": 109, "ld_max": 116, "size": "XXL" },
+    { "ld_min": 117, "ld_max": 124, "size": "XXXL" }
+  ]
+}
