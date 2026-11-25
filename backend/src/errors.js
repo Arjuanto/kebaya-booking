@@ -11,9 +11,33 @@ class AppError extends Error {
 const unauthorized = (message = 'Silakan login terlebih dahulu') =>
   new AppError(401, 'UNAUTHORIZED', message);
 
+// Pesan Joi berbahasa Indonesia untuk semua schema; {#label} = nama field yang ramah pengguna.
+// Pesan yang ditulis di schema sendiri (mis. login) tetap menang.
+const joiPrefs = {
+  errors: { wrap: { label: false, array: false } },
+  messages: {
+    'object.base': 'Data harus berupa objek JSON',
+    'any.required': '{#label} wajib diisi',
+    'string.empty': '{#label} wajib diisi',
+    'string.base': '{#label} harus berupa teks',
+    'string.max': '{#label} maksimal {#limit} karakter',
+    'string.uri': '{#label} harus berupa URL http/https yang valid',
+    'string.uriCustomScheme': '{#label} harus berupa URL http/https yang valid',
+    'any.only': '{#label} harus salah satu dari: {#valids}',
+    'boolean.base': '{#label} harus bernilai true atau false',
+    'number.base': '{#label} harus berupa angka',
+    'number.integer': '{#label} harus bilangan bulat',
+    'number.min': '{#label} minimal {#limit}',
+    'number.max': '{#label} maksimal {#limit}',
+    'number.positive': '{#label} harus lebih dari 0',
+    'date.base': '{#label} harus berupa tanggal yang valid',
+    'date.format': '{#label} harus berupa waktu ISO 8601, mis. 2026-12-01T10:15:00+07:00',
+  },
+};
+
 // Validasi Joi -> 400 VALIDATION_ERROR dengan daftar field.
 function validate(schema, value) {
-  const { error, value: clean } = schema.validate(value, { abortEarly: false, stripUnknown: true });
+  const { error, value: clean } = schema.validate(value, { abortEarly: false, stripUnknown: true, ...joiPrefs });
   if (error) {
     throw new AppError(400, 'VALIDATION_ERROR', 'Data yang dikirim tidak valid', {
       errors: error.details.map((d) => ({ field: d.path.join('.'), message: d.message })),

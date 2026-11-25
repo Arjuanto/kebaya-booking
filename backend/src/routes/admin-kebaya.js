@@ -6,22 +6,6 @@ const { AppError, validate } = require('../errors');
 const CATEGORIES = ['kebaya', 'kemeja_couple'];
 const SIZES = ['S', 'M', 'L', 'XL', 'XXL', 'ALL_SIZE'];
 
-// Pesan Joi berbahasa Indonesia; {#label} = nama field yang ramah pengguna.
-const prefs = {
-  errors: { wrap: { label: false, array: false } },
-  messages: {
-    'object.base': 'Data harus berupa objek JSON',
-    'any.required': '{#label} wajib diisi',
-    'string.empty': '{#label} wajib diisi',
-    'string.base': '{#label} harus berupa teks',
-    'string.max': '{#label} maksimal {#limit} karakter',
-    'string.uri': '{#label} harus berupa URL http/https yang valid',
-    'string.uriCustomScheme': '{#label} harus berupa URL http/https yang valid',
-    'any.only': '{#label} harus salah satu dari: {#valids}',
-    'boolean.base': '{#label} harus bernilai true atau false',
-  },
-};
-
 // Kontrak 2.1. isActive sengaja tanpa default di sini: POST memakai true, PUT mempertahankan nilai lama.
 const kebayaSchema = Joi.object({
   // Disimpan huruf besar supaya "kb-013" bentrok dengan "KB-013" di constraint unik.
@@ -32,18 +16,18 @@ const kebayaSchema = Joi.object({
   photoUrl: Joi.string().trim().uri({ scheme: ['http', 'https'] }).required().label('URL foto'),
   description: Joi.string().trim().max(500).allow(null).empty('').default(null).label('Deskripsi'),
   isActive: Joi.boolean().label('Status aktif'),
-}).prefs(prefs);
+});
 
 const activeSchema = Joi.object({
   isActive: Joi.boolean().required().label('Status aktif'),
-}).prefs(prefs);
+});
 
 // Nilai kosong (mis. ?category=) berarti tanpa filter.
 const listSchema = Joi.object({
   isActive: Joi.boolean().empty('').label('Filter status'),
   category: Joi.string().valid(...CATEGORIES).empty('').label('Filter kategori'),
   q: Joi.string().trim().max(100).empty('').label('Kata kunci'),
-}).prefs(prefs);
+});
 
 const notFound = () => new AppError(404, 'NOT_FOUND', 'Kebaya tidak ditemukan');
 
