@@ -1,5 +1,5 @@
 -- Skema database Sewa Kebaya By Ariegunarti (A26-CS010)
--- Target: PostgreSQL (Neon). Sumber aturan: docs/api-contract.md (bagian 2 dan 6).
+-- Target: PostgreSQL (Neon). Sumber aturan: docs/api-contract.md v0.4 (bagian 2, 4, 5, dan 6).
 -- Jalankan: psql "$DATABASE_URL" -f backend/db/schema.sql
 -- Enum memakai text + CHECK (bukan CREATE TYPE) supaya mudah diubah saat tabel ukuran owner final.
 
@@ -44,13 +44,15 @@ CREATE TABLE bookings (
   id             integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   kebaya_id      integer      NOT NULL REFERENCES kebaya (id),  -- tanpa CASCADE: riwayat harus utuh
   customer_name  varchar(100) NOT NULL CHECK (btrim(customer_name) <> ''),
+  customer_contact varchar(50),                            -- opsional (WhatsApp/Instagram); saat demo hanya data contoh
   use_date       date         NOT NULL,
   event_purpose  text         NOT NULL
                  CHECK (event_purpose IN ('wisuda', 'kartini', 'pernikahan', 'lamaran', 'lainnya')),
   ld             numeric(4,1) NOT NULL CHECK (ld BETWEEN 60 AND 150),
   tb             numeric(4,1) NOT NULL CHECK (tb BETWEEN 130 AND 200),
   bb             numeric(4,1) NOT NULL CHECK (bb BETWEEN 30 AND 150),
-  estimated_size text         CHECK (estimated_size IN ('S', 'M', 'L', 'XL', 'XXL', 'ALL_SIZE')),  -- null jika model gagal
+  estimated_size text         CHECK (estimated_size IN ('S', 'M', 'L', 'XL', 'XXL', 'ALL_SIZE')),  -- null jika model gagal atau di luar tabel ukuran
+  size_table_version varchar(30),                          -- tableVersion dari layanan model, mis. 'sementara-1'; null jika model gagal
   status         text         NOT NULL DEFAULT 'pending'
                  CHECK (status IN ('pending', 'rejected', 'dp_paid', 'paid_off', 'handed_over', 'returned', 'cancelled')),
   needs_fitting  boolean,                                   -- null = belum diputuskan admin
@@ -67,6 +69,9 @@ CREATE TABLE bookings (
   updated_at     timestamptz  NOT NULL DEFAULT now(),
 
   CHECK (rental_start <= use_date AND use_date <= rental_end),
+  -- Perkiraan ukuran selalu dicatat bersama versi tabel ukuran yang menghitungnya (kontrak 5).
+  -- Di luar tabel: estimated_size null, size_table_version tetap terisi.
+  CONSTRAINT bookings_size_has_table_version CHECK (estimated_size IS NULL OR size_table_version IS NOT NULL),
   -- Setiap status setelah DP wajib punya data DP; tiap tahap wajib punya waktunya.
   CHECK (status IN ('pending', 'rejected') OR (dp_amount IS NOT NULL AND dp_paid_at IS NOT NULL)),
   CHECK (status NOT IN ('paid_off', 'handed_over', 'returned') OR paid_off_at IS NOT NULL),
@@ -96,7 +101,11 @@ CREATE TABLE analytics_results (
   id           integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   data_source  text        NOT NULL CHECK (data_source IN ('asli', 'contoh', 'campuran')),
   payload      jsonb       NOT NULL,
-  generated_at timestamptz NOT NULL DEFAULT now()
+  generated_at timestamptz NOT NULL DEFAULT now(),
+
+  -- Aturan Asah (kontrak 4): rekomendasi bisnis hanya boleh disusun dari data asli.
+  CONSTRAINT analytics_recommendations_only_asli
+    CHECK (data_source = 'asli' OR COALESCE(payload -> 'recommendations', '[]'::jsonb) = '[]'::jsonb)
 );
 
 -- Riwayat ringkasan AI, termasuk percobaan gagal.
@@ -106,7 +115,7 @@ CREATE TABLE ai_summaries (
   summary    text,
   provider   varchar(30) NOT NULL,
   model      varchar(60) NOT NULL,
-  input      jsonb       NOT NULL,                          -- { from, to, targetMonth }
+  input      jsonb       NOT NULL,                          -- { targetMonth }
   error_code text        CHECK (error_code IN ('AI_UNAVAILABLE', 'AI_QUOTA_EXCEEDED', 'AI_TIMEOUT')),
   created_at timestamptz NOT NULL DEFAULT now(),
 
