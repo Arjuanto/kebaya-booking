@@ -1,6 +1,6 @@
 # Kontrak API — Sewa Kebaya By Ariegunarti (A26-CS010)
 
-Status: **DRAFT v0.3** — perlu disepakati FS (Arjuanto, Diva, David) dan AE (Ilham) sebelum pengembangan, sesuai jadwal Minggu 1 (23–29 Nov 2026).
+Status: **DRAFT v0.4** — perlu disepakati FS (Arjuanto, Diva, David) dan AE (Ilham) sebelum pengembangan, sesuai jadwal Minggu 1 (23–29 Nov 2026).
 
 Dokumen ini mencakup dua kontrak:
 
@@ -113,12 +113,14 @@ Website (React) ──Axios──▶ Backend Express /api/v1 ──▶ PostgreSQ
 {
   "id": 45,
   "customerName": "Sinta",
+  "customerContact": "0812-0000-0000",
   "useDate": "2026-12-20",
   "eventPurpose": "wisuda",
   "ld": 88,
   "tb": 158,
   "bb": 52,
   "estimatedSize": "M",
+  "sizeTableVersion": "sementara-1",
   "kebaya": { "id": 12, "code": "KB-012", "name": "Kebaya Kutubaru Hijau Sage" },
   "status": "pending",
   "needsFitting": null,
@@ -139,6 +141,7 @@ Website (React) ──Axios──▶ Backend Express /api/v1 ──▶ PostgreSQ
 | Field | Aturan validasi |
 |---|---|
 | `customerName` | wajib, 2–100 karakter, tidak boleh hanya spasi |
+| `customerContact` | opsional, maks 50 karakter (nomor WhatsApp atau akun Instagram). Saat demo hanya diisi data contoh |
 | `useDate` | wajib, format tanggal valid, **tidak boleh hari ini atau lampau** (dibandingkan dengan tanggal hari ini di Asia/Jakarta) |
 | `eventPurpose` | wajib, enum: `wisuda` \| `kartini` \| `pernikahan` \| `lamaran` \| `lainnya` |
 | `ld` (lingkar dada, cm) | wajib, angka 60–150 |
@@ -237,6 +240,7 @@ Daftar kebaya tersedia pada tanggal pemakaian + perkiraan ukuran.
 ```
 
 - `kebaya` diurutkan: `sizeMatch: true` dulu.
+- `sizeMatch` bernilai `true` jika `size` kebaya sama dengan `sizeEstimate.size` atau `size` kebaya `ALL_SIZE`, `false` jika berbeda, dan `null` jika `sizeEstimate.size` bernilai `null` (layanan model gagal atau ukuran di luar tabel).
 - Jika layanan model gagal/timeout, endpoint **tetap 200**: `sizeEstimate` = `{ "available": false, "size": null, "inRange": null, "message": "Perkiraan ukuran sedang tidak tersedia, silakan hubungi admin untuk fitting" }` dan `sizeMatch` = `null`. Ketersediaan tidak bergantung pada model.
 - Jika di luar tabel ukuran: `inRange: false`, `size: null`, `message` meminta customer menghubungi admin / fitting.
 
@@ -258,6 +262,7 @@ Kirim pengajuan pemesanan.
 ```json
 {
   "customerName": "Sinta",
+  "customerContact": "0812-0000-0000",
   "useDate": "2026-12-20",
   "eventPurpose": "wisuda",
   "ld": 88,
@@ -288,7 +293,7 @@ Kirim pengajuan pemesanan.
 - `404 NOT_FOUND` — `kebayaId` tidak ada
 - `409 KEBAYA_NOT_AVAILABLE` — kebaya sudah DP pada periode tumpang tindih atau nonaktif (mencegah kirim langsung lewat API)
 
-`estimatedSize` diisi backend dari layanan model; `null` jika model gagal (pengajuan tetap tersimpan).
+`estimatedSize` diisi backend dari layanan model, dan `tableVersion` dari respons yang sama disimpan sebagai `sizeTableVersion`. Keduanya `null` jika model gagal (pengajuan tetap tersimpan).
 
 ---
 
@@ -410,9 +415,9 @@ Contoh:
 
 ### Analisis, prediksi, ringkasan AI
 
-#### `GET /admin/analytics?from=&to=`
+#### `GET /admin/analytics`
 
-Hasil analisis riwayat pemesanan (dari tim DS). Sumber datanya: tabel hasil analisis yang di-*seed* dari output notebook DS (format disepakati dengan Noera/Syahidah).
+Hasil analisis riwayat pemesanan dari tim DS: baris terbaru di tabel `analytics_results`, yang di-*seed* dari output notebook DS (format disepakati dengan Noera/Syahidah). Angka sengaja tidak dihitung ulang dari `bookings`, supaya sama dengan angka di notebook DS. Karena datanya statis, endpoint ini tidak menerima filter.
 
 **200**
 ```json
@@ -420,7 +425,7 @@ Hasil analisis riwayat pemesanan (dari tim DS). Sumber datanya: tabel hasil anal
   "status": "success",
   "data": {
     "dataSource": "asli",
-    "period": { "from": "2025-01-01", "to": "2026-10-31" },
+    "period": { "from": "2026-06-01", "to": "2026-11-08" },
     "topKebaya": [ { "code": "KB-012", "name": "Kebaya Kutubaru Hijau Sage", "count": 18 } ],
     "busyPeriods": [ { "label": "Wisuda Oktober", "month": "2026-10", "count": 41 } ],
     "recommendations": [ "Siapkan ukuran M dan L lebih banyak menjelang wisuda Oktober" ],
@@ -428,36 +433,42 @@ Hasil analisis riwayat pemesanan (dari tim DS). Sumber datanya: tabel hasil anal
   }
 }
 ```
-`dataSource`: `asli` \| `contoh` \| `campuran` — wajib tampil di UI (aturan label data).
+- `dataSource`: `asli` \| `contoh` \| `campuran` — wajib tampil di UI (aturan label data).
+- `recommendations` hanya diisi jika `dataSource` = `asli`; selain itu `[]`. Rekomendasi bisnis tidak boleh disusun dari data buatan tim (aturan Asah).
 
-#### `GET /admin/predictions?targetMonth=2027-04`
+#### `GET /admin/predictions?targetMonth=2026-12`
 
-Backend meneruskan ke layanan model `POST /v1/predict/demand`.
+Backend meneruskan ke layanan model `POST /v1/predict/demand` dan mengembalikan responsnya apa adanya di `data` (arti tiap field: §5).
 
 **200**
 ```json
 {
   "status": "success",
   "data": {
-    "targetMonth": "2027-04",
-    "model": { "name": "random_forest", "version": "1.0.0" },
+    "targetMonth": "2026-12",
+    "model": { "name": "random_forest", "version": "1.0.0", "maeValidasi": 6.8 },
     "dataSource": "campuran",
+    "totalPredicted": 31.0,
+    "sizeBreakdown": "proporsi_historis",
+    "note": null,
     "predictions": [
-      { "size": "M", "predictedCount": 12 },
-      { "size": "L", "predictedCount": 9 }
+      { "size": "S", "predictedCount": 6.2 },
+      { "size": "M", "predictedCount": 14.0 },
+      { "size": "L", "predictedCount": 10.8 }
     ]
   }
 }
 ```
+Halaman admin menampilkan angka ini sebagai perkiraan, bukan angka pasti: `totalPredicted` bersama `maeValidasi` (mis. "sekitar 31 pemesanan, rata-rata meleset ±7 per minggu"), label `dataSource`, isi `note` jika ada, dan keterangan bahwa angka per ukuran dibagi dari proporsi historis.
 **502 ML_SERVICE_ERROR / 504 ML_TIMEOUT** — halaman admin tetap terbuka dan menampilkan `message` ("Prediksi sedang tidak tersedia").
 
 #### `POST /admin/ai-summaries`
 
-Buat ringkasan temuan baru. Backend menyusun prompt terstruktur dari `analytics` + `predictions`, memanggil API AI generatif, lalu **menyimpan hasilnya ke database**.
+Buat ringkasan temuan baru. Backend menyusun prompt terstruktur dari hasil `GET /admin/analytics` dan `GET /admin/predictions`, memanggil API AI generatif, lalu **menyimpan hasilnya ke database**. Ringkasan wajib menyebut asal data (`dataSource`) dan tidak boleh memuat rekomendasi bisnis selain isi `recommendations` (yang hanya ada untuk data asli).
 
 **Request**
 ```json
-{ "from": "2025-01-01", "to": "2026-10-31", "targetMonth": "2027-04" }
+{ "targetMonth": "2026-12" }
 ```
 
 **201**
@@ -470,7 +481,7 @@ Buat ringkasan temuan baru. Backend menyusun prompt terstruktur dari `analytics`
     "summary": "Permintaan tertinggi terjadi saat wisuda Oktober...",
     "provider": "gemini",
     "model": "gemini-x",
-    "input": { "from": "2025-01-01", "to": "2026-10-31", "targetMonth": "2027-04" },
+    "input": { "targetMonth": "2026-12" },
     "createdAt": "2026-12-10T14:00:00+07:00"
   }
 }
@@ -499,13 +510,23 @@ Ringkasan berhasil terakhir. **404** jika belum pernah ada.
 
 ## 5. Kontrak layanan model (FastAPI) — internal backend ↔ AE
 
-Base URL: `https://<ml-service>.onrender.com`. Dipanggil hanya oleh backend; dilindungi header `X-API-Key` (disimpan di env kedua layanan).
+Base URL: `https://<ml-service>.onrender.com`. Dipanggil hanya oleh backend. Semua jalur berawalan `/v1`, dan semua kecuali `/v1/health` wajib header `X-API-Key` (disimpan di env kedua layanan).
 
-Format error mengikuti format 1.2 (`status`, `code`, `message`, `errors`) — handler 422 bawaan FastAPI di-*override* agar seragam.
+**Format respons.** Respons sukses dikirim polos, tanpa amplop `status`/`data` seperti di 1.1. Respons gagal memakai amplop error 1.2 (`status`, `code`, `message`, dan `errors` untuk `VALIDATION_ERROR`); handler 422 bawaan FastAPI di-*override* menjadi `400 VALIDATION_ERROR`. Perbedaan ini disengaja: layanan ini internal dan hanya dibaca backend.
 
-Timeout dari backend: **10 detik** (Render free tier bisa *cold start* ±50 detik — panggil `/health` sebelum demo).
+| HTTP | `code` | Kapan |
+|---|---|---|
+| 400 | `VALIDATION_ERROR` | Input kosong, salah format, atau di luar rentang |
+| 401 | `UNAUTHORIZED` | `X-API-Key` hilang atau salah |
+| 500 | `INTERNAL_ERROR` | Kesalahan tak terduga di layanan model |
 
-### `GET /health`
+Backend tidak meneruskan kode-kode ini ke website. Semua kegagalan layanan model, termasuk `401`, dipetakan ke `502 ML_SERVICE_ERROR` atau `504 ML_TIMEOUT`, atau ke perilaku cadangan di §3. `401` dari layanan model berarti `ML_API_KEY` salah konfigurasi, jadi dicatat di log backend. Kalau diteruskan apa adanya, website akan mengira token admin kedaluwarsa.
+
+**Timeout dan cold start.** Timeout dari backend tetap **10 detik**, tanpa retry. Supaya panggilan tidak kena *cold start* Render (±50 detik), backend memanggil `GET /v1/health` saat backend start dan setiap 10 menit selama backend hidup, tanpa menunggu hasilnya dan mengabaikan error. Render menidurkan layanan setelah 15 menit tanpa request, jadi ping ini menjaga layanan model tetap bangun selama backend bangun. Panggilan yang tetap kena cold start (mis. tepat setelah backend bangun) gagal dengan anggun sesuai §3 dan §4. Sebelum demo, buka `GET /health` backend beberapa menit lebih awal.
+
+### `GET /v1/health`
+
+Tanpa `X-API-Key`.
 ```json
 { "status": "ok", "models": { "sizeEstimator": "1.0.0", "demand": "1.0.0" } }
 ```
@@ -521,31 +542,51 @@ Berbasis aturan tabel ukuran owner, bukan model terlatih.
 
 **200**
 ```json
-{ "size": "M", "inRange": true, "message": "Perkiraan ukuran M berdasarkan tabel ukuran" }
+{ "size": "M", "inRange": true, "message": "Perkiraan ukuran M berdasarkan tabel ukuran", "tableVersion": "sementara-1" }
 ```
 Di luar tabel:
 ```json
-{ "size": null, "inRange": false, "message": "Ukuran di luar tabel, silakan hubungi admin untuk fitting" }
+{ "size": null, "inRange": false, "message": "Ukuran di luar tabel, silakan hubungi admin untuk fitting", "tableVersion": "sementara-1" }
 ```
-**400 VALIDATION_ERROR** jika nilai kosong/negatif/bukan angka.
+`tableVersion` adalah versi tabel ukuran yang dipakai. Selama tabel ukuran owner belum ada, layanan model memakai rentang sementara berbasis lingkar dada (`sementara-1`). Backend menyimpan nilainya di `bookings.size_table_version`, supaya pengajuan yang dihitung dengan tabel lama bisa dikenali.
+
+**400 VALIDATION_ERROR** jika nilai kosong, bukan angka, atau di luar rentang kewajaran di 2.2.
 
 ### `POST /v1/predict/demand`
 
 **Request**
 ```json
-{ "targetMonth": "2027-04" }
+{ "targetMonth": "2026-12" }
 ```
-> Fitur input lain (mis. jumlah event, musim wisuda) **ditentukan bersama Syahidah/Ilham** setelah dataset siap model (paling lambat 1 Des 2026). Bentuk request boleh bertambah, bentuk response di bawah dipertahankan.
+
+**Cara angka dihitung.** Data asli hanya mencakup 1 Jun–8 Nov 2026: per bulan hanya ±5 titik data, per minggu 23. Karena itu model dilatih **per minggu** (minggu mulai Senin). Angka bulanan adalah jumlah prediksi mingguan untuk minggu-minggu yang Seninnya jatuh di `targetMonth`. Angka per ukuran **bukan** keluaran model: total bulanan dipecah memakai proporsi ukuran historis dari data latih.
+
+Bentuk request boleh bertambah, bentuk response di bawah dipertahankan. Kalender minggu acara (jika dipakai model) disimpan di layanan model sebagai berkas konfigurasi, jadi request tetap seperti di atas.
 
 **200**
 ```json
 {
-  "targetMonth": "2027-04",
-  "model": { "name": "random_forest", "version": "1.0.0" },
+  "targetMonth": "2026-12",
+  "model": { "name": "random_forest", "version": "1.0.0", "maeValidasi": 6.8 },
   "dataSource": "campuran",
-  "predictions": [ { "size": "M", "predictedCount": 12 } ]
+  "totalPredicted": 31.0,
+  "sizeBreakdown": "proporsi_historis",
+  "note": null,
+  "predictions": [
+    { "size": "S", "predictedCount": 6.2 },
+    { "size": "M", "predictedCount": 14.0 },
+    { "size": "L", "predictedCount": 10.8 }
+  ]
 }
 ```
+
+| Field | Arti |
+|---|---|
+| `totalPredicted`, `predictedCount` | Perkiraan jumlah pemesanan pada bulan itu, desimal 1 digit |
+| `model.maeValidasi` | Rata-rata selisih prediksi **mingguan** pada data uji. `null` jika belum ada model terlatih |
+| `dataSource` | Asal data latih: `asli` \| `contoh` \| `campuran` |
+| `sizeBreakdown` | `proporsi_historis`: angka per ukuran dibagi dari proporsi historis. `tiruan`: model belum dilatih dan angkanya contoh, tidak boleh dipakai saat demo |
+| `note` | Keterangan untuk ditampilkan ke admin, mis. bahwa bulan target hanya berisi data contoh. `null` jika tidak ada |
 
 ---
 
@@ -555,7 +596,7 @@ Di luar tabel:
 |---|---|
 | `admins` | id, username (unik), password_hash, created_at |
 | `kebaya` | id, code (unik), name, category, size, photo_url, description, is_active, created_at, updated_at |
-| `bookings` | id, kebaya_id (FK), customer_name, use_date, event_purpose, ld, tb, bb, estimated_size, status, needs_fitting, rental_start, rental_end, dp_amount, dp_paid_at, paid_off_at, handed_over_at, returned_at, admin_note, created_at, updated_at |
+| `bookings` | id, kebaya_id (FK), customer_name, customer_contact, use_date, event_purpose, ld, tb, bb, estimated_size, size_table_version, status, needs_fitting, rental_start, rental_end, dp_amount, dp_paid_at, paid_off_at, handed_over_at, returned_at, admin_note, created_at, updated_at |
 | `analytics_results` | id, data_source, payload (JSONB), generated_at |
 | `ai_summaries` | id, status (`success`/`failed`), summary, provider, model, input (JSONB), error_code, created_at |
 
@@ -585,14 +626,18 @@ Tidak ada API key di kode atau repositori.
 
 ---
 
-## 8. Pertanyaan terbuka (perlu disepakati)
+## 8. Pertanyaan terbuka
 
-1. **Kontak customer** — form di plan tidak meminta nomor WhatsApp. Bagaimana admin menghubungi customer untuk fitting/DP? Usul: tambah `contact` opsional (data contoh saja saat demo).
-2. **Tabel ukuran owner** — daftar ukuran (`S`–`XXL`?) dan rentang LD/TB/BB per ukuran.
-3. **Masa sewa & jeda laundry** — konfirmasi H-1 s.d. H+1 dan jeda 2 hari.
-4. **Satuan prediksi** — prediksi per ukuran, per kategori, atau per kebaya?
-5. **Format output analisis DS** — JSON sesuai `GET /admin/analytics` di atas, atau perlu dihitung langsung dari tabel `bookings`?
-6. **Foto kebaya** — cukup URL (MVP) atau perlu unggah file?
+Status per v0.4, setelah review AE (Ilham).
+
+| No | Pertanyaan | Status |
+|---|---|---|
+| 1 | **Kontak customer** untuk fitting dan DP | Diterapkan: field opsional `customerContact` (2.2). Saat demo hanya diisi data contoh; tidak boleh ada kontak pelanggan asli di repositori atau video demo |
+| 2 | **Tabel ukuran owner** | Belum dijawab owner. Sementara layanan model memakai rentang berbasis lingkar dada (`tableVersion: "sementara-1"`, §5). Ilham menanyakan ulang ke owner: "ukuran S, M, L di katalog kira-kira lingkar dada berapa?" |
+| 3 | **Masa sewa & jeda laundry** | Belum dikonfirmasi owner. Bahan dari data asli (temuan Ilham): default `1 / 1 / 2` memblokir 5 hari, padahal kebaya yang sama tercatat disewa lagi dengan jeda 2–4 hari pada 16 pasangan pemesanan. Default kemungkinan terlalu longgar |
+| 4 | **Satuan prediksi** | Diterapkan: model mingguan, dijumlah per bulan; angka per ukuran dibagi dari proporsi historis (§5) |
+| 5 | **Format output analisis DS** | Diterapkan: tetap lewat tabel `analytics_results`, tidak dihitung dari `bookings` (§4) |
+| 6 | **Foto kebaya** | Tetap URL saja untuk MVP, sesuai scope Project Plan |
 
 ## Riwayat perubahan
 
@@ -601,3 +646,4 @@ Tidak ada API key di kode atau repositori.
 | 0.1 | 2026-11-24 | Draft awal dari Project Plan |
 | 0.2 | 2026-11-24 | "Hari ini" dihitung di Asia/Jakarta dan kolom tanggal bertipe `date`; batas percobaan login (`429 TOO_MANY_ATTEMPTS`); format error diseragamkan (`data` opsional, `conflictWith` pindah ke `data`, `AI_QUOTA_EXCEEDED` jadi 503) |
 | 0.3 | 2026-11-24 | Skema database di `backend/db/schema.sql`; constraint anti tumpang tindih di level database |
+| 0.4 | 2026-11-25 | Review AE (Ilham): prediksi mingguan dijumlah per bulan (`totalPredicted`, `sizeBreakdown`, `note`, `model.maeValidasi`); `tableVersion` perkiraan ukuran disimpan di `bookings.size_table_version`; layanan model memakai `/v1/health`, format respons dan kode error-nya ditulis eksplisit, dan diping tiap 10 menit untuk menghindari cold start; `recommendations` hanya untuk data asli; filter `from`/`to` analisis dihapus; aturan `sizeMatch` untuk `ALL_SIZE`; field opsional `customerContact`; status pertanyaan terbuka diperbarui |
