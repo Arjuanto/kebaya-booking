@@ -24,7 +24,8 @@ const prefs = {
 
 // Kontrak 2.1. isActive sengaja tanpa default di sini: POST memakai true, PUT mempertahankan nilai lama.
 const kebayaSchema = Joi.object({
-  code: Joi.string().trim().max(20).required().label('Kode'),
+  // Disimpan huruf besar supaya "kb-013" bentrok dengan "KB-013" di constraint unik.
+  code: Joi.string().trim().uppercase().max(20).required().label('Kode'),
   name: Joi.string().trim().max(100).required().label('Nama'),
   category: Joi.string().valid(...CATEGORIES).required().label('Kategori'),
   size: Joi.string().valid(...SIZES).required().label('Ukuran'),

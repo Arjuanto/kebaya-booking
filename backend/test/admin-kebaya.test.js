@@ -150,6 +150,13 @@ test('POST valid -> 201, input dinormalisasi, isActive default true', async () =
   assert.deepEqual(queries, [[...inputParams, true]]);
 });
 
+test('POST kode huruf kecil -> dikirim ke database dalam huruf besar', async () => {
+  reply = () => ({ rows: [row] });
+  const res = await api('POST', '', { ...input, code: 'kb-013' });
+  assert.equal(res.status, 201);
+  assert.equal(queries[0][0], 'KB-013');
+});
+
 test('POST tidak valid -> 400 per field dengan pesan bahasa Indonesia', async () => {
   const res = await api('POST', '', {
     code: 'K'.repeat(21),
