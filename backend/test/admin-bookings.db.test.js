@@ -360,6 +360,20 @@ describe('pengajuan admin dengan PostgreSQL', { skip: !testDb && 'TEST_DATABASE_
     assert.deepEqual(res.body, conflict(z, '21–25 Des 2026'));
   });
 
+  test('DP untuk kebaya nonaktif -> 409 KEBAYA_NOT_AVAILABLE, status tetap pending', async () => {
+    const id = await book();
+    await db.query('UPDATE kebaya SET is_active = false WHERE id = $1', [kb]);
+    const res = await api('PATCH', `/${id}/status`, { status: 'dp_paid', dpAmount: 50000 });
+    assert.equal(res.status, 409);
+    assert.deepEqual(res.body, {
+      status: 'fail',
+      code: 'KEBAYA_NOT_AVAILABLE',
+      message: 'KB-012 sedang nonaktif. DP tidak dapat dicatat.',
+      data: { conflictWith: [] },
+    });
+    assert.equal(await statusOf(id), 'pending');
+  });
+
   test('DP tidak bentrok dengan pending/rejected/cancelled, kebaya lain, atau masa sewa yang hanya berdekatan', async () => {
     await book({ useDate: '2026-12-20' });
     await book({ useDate: '2026-12-20', status: 'rejected' });

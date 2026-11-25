@@ -1,7 +1,7 @@
 const express = require('express');
 const Joi = require('joi');
 const db = require('../db');
-const { AppError, validate } = require('../errors');
+const { AppError, checkId, validate } = require('../errors');
 
 // Kontrak 2.3: label status di UI dan transisi yang sah.
 const LABEL = {
@@ -150,11 +150,7 @@ async function conflictError(client, b) {
 function adminBookingRoutes() {
   const router = express.Router();
 
-  // id yang bukan integer Postgres pasti tidak ada; tanpa cek ini database melempar error (500).
-  router.param('id', (req, res, next, id) => {
-    if (!/^\d{1,10}$/.test(id) || Number(id) > MAX_INT) return next(notFound());
-    next();
-  });
+  router.param('id', checkId(notFound));
 
   // Kontrak tidak mengatur urutan: pengajuan terbaru dulu, id sebagai penentu jika waktunya sama.
   router.get('/', async (req, res) => {
@@ -222,7 +218,15 @@ function adminBookingRoutes() {
       }
       if (target === 'dp_paid') {
         // Kontrak 2.4: row lock pada kebaya, jadi dua pencatatan DP bersamaan diperiksa bergantian.
-        await client.query('SELECT 1 FROM kebaya WHERE id = $1 FOR UPDATE', [b.kebaya_id]);
+        const { rows: [kebaya] } = await client.query('SELECT code, is_active FROM kebaya WHERE id = $1 FOR UPDATE', [
+          b.kebaya_id,
+        ]);
+        // Kontrak 1.3: KEBAYA_NOT_AVAILABLE juga untuk kebaya nonaktif; bentuk data sama dengan kasus bentrok.
+        if (!kebaya.is_active) {
+          throw new AppError(409, 'KEBAYA_NOT_AVAILABLE', `${kebaya.code} sedang nonaktif. DP tidak dapat dicatat.`, {
+            data: { conflictWith: [] },
+          });
+        }
         const conflict = await conflictError(client, b);
         if (conflict) throw conflict;
       }

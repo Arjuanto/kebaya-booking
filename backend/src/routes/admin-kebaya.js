@@ -1,7 +1,7 @@
 const express = require('express');
 const Joi = require('joi');
 const db = require('../db');
-const { AppError, validate } = require('../errors');
+const { AppError, checkId, validate } = require('../errors');
 
 const CATEGORIES = ['kebaya', 'kemeja_couple'];
 const SIZES = ['S', 'M', 'L', 'XL', 'XXL', 'ALL_SIZE'];
@@ -55,11 +55,7 @@ const toKebaya = (r) => ({
 function adminKebayaRoutes() {
   const router = express.Router();
 
-  // id yang bukan integer Postgres pasti tidak ada; tanpa cek ini database melempar error (500).
-  router.param('id', (req, res, next, id) => {
-    if (!/^\d{1,10}$/.test(id) || Number(id) > 2147483647) return next(notFound());
-    next();
-  });
+  router.param('id', checkId(notFound));
 
   router.get('/', async (req, res) => {
     const { isActive = null, category = null, q = null } = validate(listSchema, req.query);
