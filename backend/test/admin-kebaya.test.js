@@ -228,6 +228,22 @@ test('POST foto lebih dari 2 MB -> 400; body di atas batas 3 MB juga 400 field p
   assert.equal(queries.length, 0);
 });
 
+test('POST tanpa token dengan body besar -> 401, body tidak diproses dulu', async () => {
+  // Di atas batas 3 MB: kalau body dibaca sebelum token dicek, jawabannya 400 "terlalu besar".
+  const huge = await api('POST', '', { ...input, photo: `data:image/jpeg;base64,${'A'.repeat(3.5 * 1024 * 1024)}` }, {});
+  assert.equal(huge.status, 401);
+  assert.equal((await huge.json()).code, 'UNAUTHORIZED');
+
+  // JSON rusak di atas 100 KB: kalau body di-parse sebelum token dicek, jawabannya 400 "Format JSON tidak valid".
+  const broken = await fetch(base, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: `{${'x'.repeat(200 * 1024)}`,
+  });
+  assert.equal(broken.status, 401);
+  assert.equal((await broken.json()).code, 'UNAUTHORIZED');
+});
+
 test('PUT valid -> 200; tanpa isActive, parameternya null (status aktif tidak diubah)', async () => {
   reply = () => ({ rows: [row] });
   const res = await api('PUT', '/12', input);
