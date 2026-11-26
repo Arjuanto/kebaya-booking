@@ -95,8 +95,13 @@ python -m src.train --data ../data/raw/<berkas>.csv --cutoff 2026-10-01
 python -m src.train --data ../data/raw/<berkas>.csv --cutoff 2026-10-01 --sumber semua
 ```
 
+Model terbaik dipilih dari evaluasi pada data uji, lalu konfigurasi yang sama dilatih
+ulang pada **semua** minggu sebelum disimpan, supaya model yang di-deploy juga belajar dari
+minggu terbaru. `maeValidasi` tetap berasal dari evaluasi sebelum pelatihan ulang. Tambahkan
+`--tanpa-refit` untuk menyimpan model versi evaluasi saja.
+
 Proporsi ukuran untuk memecah prediksi bulanan dihitung dari kolom `perkiraan_ukuran`
-pada baris latih (ubah dengan `--kolom-ukuran`). **TODO:** pastikan ke tim Data Science
+pada baris yang dipelajari model final (ubah dengan `--kolom-ukuran`). **TODO:** pastikan ke tim Data Science
 apakah kolom lingkar dada pada data asli memang dari spreadsheet owner atau dilengkapi
 tim (dataset punya kolom `atribut_dilengkapi`). Kalau dilengkapi tim, tulis di sini bahwa
 pecahan per ukuran berasal dari atribut buatan tim.
@@ -126,7 +131,7 @@ Endpoint:
 
 | Endpoint | Kunci | Fungsi |
 |---|---|---|
-| `GET /health` | tidak | Cek layanan hidup, dipakai membangunkan layanan sebelum demo |
+| `GET /v1/health` | tidak | Cek layanan hidup. Backend memanggilnya saat menyala dan tiap 10 menit agar layanan tidak tertidur |
 | `POST /v1/size-estimate` | `X-API-Key` | Perkiraan ukuran dari tabel ukuran (aturan, bukan model) |
 | `POST /v1/predict/demand` | `X-API-Key` | Prediksi jumlah pemesanan untuk satu bulan |
 
@@ -149,9 +154,13 @@ minggu-minggu yang Seninnya jatuh di bulan itu. Angka per ukuran **bukan** kelua
 model: total bulanan dipecah memakai proporsi ukuran historis dari data latih, dan
 response menandainya lewat `sizeBreakdown: "proporsi_historis"`.
 
-Field `model.maeValidasi`, `totalPredicted`, `sizeBreakdown`, `note`, dan `tableVersion`
-adalah tambahan opsional di luar kontrak v0.3 (usulan review kontrak). Pemanggil yang
-belum memakainya tidak terpengaruh.
+`note` bernilai `null`, kecuali bulan target tidak ada di data asli yang dipelajari model.
+Dalam kasus itu `note` berisi peringatan bahwa angkanya hanya gambaran kasar. Jika kolom
+ukuran tidak tersedia saat pelatihan, `sizeBreakdown` bernilai `tidak_tersedia` dan
+`predictions` hanya berisi satu baris `TOTAL`.
+
+`/health` (tanpa versi) masih dijawab sebagai alias tersembunyi, hanya supaya pengaturan
+health check Render yang lama tidak gagal. Pengaturan Render sebaiknya diganti ke `/v1/health`.
 
 Semua error memakai format kontrak bagian 1.2:
 

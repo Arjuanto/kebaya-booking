@@ -1,4 +1,4 @@
-"""Satu bentuk error untuk semua endpoint, mengikuti docs/api-contract.md v0.3 bagian 1.2.
+"""Satu bentuk error untuk semua endpoint, mengikuti docs/api-contract.md v0.4 bagian 1.2.
 
     {
       "status": "fail",              # 4xx = "fail", 5xx = "error"

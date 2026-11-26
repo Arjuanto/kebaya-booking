@@ -1,11 +1,10 @@
-"""Skema request dan response, mengikuti docs/api-contract.md v0.3 bagian 5.
+"""Skema request dan response, mengikuti docs/api-contract.md v0.4 bagian 5.
 
 Nama field di JSON memakai camelCase sesuai konvensi kontrak (bagian 1). Di kode
 Python tetap snake_case; konversinya diurus alias generator Pydantic.
 
-Field bertanda "TAMBAHAN" belum ada di kontrak v0.3. Semuanya opsional dan hanya
-menambah, jadi tidak merusak pemanggil yang belum memakainya. Usulannya ada di
-review kontrak (B1, B2, A1).
+Field bertanda "TAMBAHAN" berasal dari review kontrak (B1, B2, A1) dan sudah
+masuk kontrak v0.4.
 """
 
 from __future__ import annotations

@@ -1,14 +1,16 @@
-"""Uji layanan model terhadap docs/api-contract.md v0.3 bagian 5.
+"""Uji layanan model terhadap docs/api-contract.md v0.4 bagian 5.
 
 Jalankan dari folder ml-service: pytest -q
 Mencakup skenario Rencana Pengujian di Project Plan: input valid, input tidak
 lengkap, nilai di luar tabel ukuran, dan kunci antar layanan yang salah.
 """
 
+import numpy as np
 import pytest
 from fastapi.testclient import TestClient
 
-from app.main import app
+import app.main as main_mod
+from app.main import NOTE_BULAN_TANPA_DATA_ASLI, app
 
 
 @pytest.fixture
@@ -27,14 +29,20 @@ def assert_format_error(body: dict, code: str, status: str = "fail"):
     assert set(body) <= {"status", "code", "message", "errors", "data"}
 
 
-# ---------- /health ----------
+# ---------- /v1/health ----------
 
 def test_health(client):
-    r = client.get("/health")
+    r = client.get("/v1/health")
     assert r.status_code == 200
     body = r.json()
     assert body["status"] == "ok"
     assert set(body["models"]) == {"sizeEstimator", "demand"}
+
+
+def test_health_alias_lama_tetap_jalan(client):
+    """/health dipertahankan sebagai alias supaya health check Render lama tidak gagal."""
+    assert client.get("/health").status_code == 200
+    assert "/health" not in client.get("/openapi.json").json()["paths"]
 
 
 # ---------- /v1/size-estimate ----------
@@ -145,10 +153,58 @@ def test_health_tanpa_kunci_tetap_bisa(monkeypatch):
     """Backend memakai /health untuk membangunkan layanan, jadi tidak perlu kunci."""
     monkeypatch.setenv("API_KEY", "kunci-benar")
     with TestClient(app) as c:
-        assert c.get("/health").status_code == 200
+        assert c.get("/v1/health").status_code == 200
 
 
 def test_endpoint_tidak_ada_404(client):
     r = client.get("/v1/tidak-ada")
     assert r.status_code == 404
     assert_format_error(r.json(), "NOT_FOUND")
+
+
+# ---------- jalur model sungguhan (pipeline tiruan) ----------
+
+class PipelineTiruan:
+    """Selalu memprediksi 1 pemesanan per minggu, supaya hasil bulanan mudah dihitung."""
+
+    def predict(self, X):
+        return np.ones(len(X))
+
+
+@pytest.fixture
+def client_model(client):
+    main_mod.state["pipeline"] = PipelineTiruan()
+    main_mod.state["meta"] = {
+        "name": "ridge",
+        "version": "1.0.0",
+        "mae_validasi": 6.8,
+        "data_source": "asli",
+        "size_proportions": {"M": 0.5, "S": 0.25, "L": 0.25},
+        "bulan_data_asli": [6, 7, 8, 9, 10, 11],
+    }
+    yield client
+    main_mod.state["pipeline"] = None
+    main_mod.state["meta"] = None
+
+
+def test_predict_jumlah_mingguan_per_bulan(client_model):
+    # Oktober 2026 punya 4 hari Senin (5, 12, 19, 26), jadi totalnya 4 x 1 pemesanan.
+    body = client_model.post("/v1/predict/demand", json={"targetMonth": "2026-10"}).json()
+    assert body["totalPredicted"] == 4.0
+    assert body["sizeBreakdown"] == "proporsi_historis"
+    assert body["model"]["maeValidasi"] == 6.8
+    assert body["dataSource"] == "asli"
+    per_ukuran = {p["size"]: p["predictedCount"] for p in body["predictions"]}
+    assert per_ukuran == {"S": 1.0, "M": 2.0, "L": 1.0}
+    # Urutan mengikuti tabel ukuran (kecil ke besar), bukan urutan proporsi.
+    assert [p["size"] for p in body["predictions"]] == ["S", "M", "L"]
+
+
+def test_predict_note_null_untuk_bulan_yang_ada_di_data_asli(client_model):
+    body = client_model.post("/v1/predict/demand", json={"targetMonth": "2026-10"}).json()
+    assert body["note"] is None
+
+
+def test_predict_note_terisi_untuk_bulan_tanpa_data_asli(client_model):
+    body = client_model.post("/v1/predict/demand", json={"targetMonth": "2026-12"}).json()
+    assert body["note"] == NOTE_BULAN_TANPA_DATA_ASLI

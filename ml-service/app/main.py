@@ -1,9 +1,9 @@
 """Layanan model (FastAPI) untuk Capstone A26-CS010.
 
-Mengikuti docs/api-contract.md v0.3 bagian 5. Dipanggil HANYA oleh backend Express,
+Mengikuti docs/api-contract.md v0.4 bagian 5. Dipanggil HANYA oleh backend Express,
 dilindungi header X-API-Key.
 
-    GET  /health                cek layanan hidup (tanpa kunci)
+    GET  /v1/health             cek layanan hidup (tanpa kunci)
     POST /v1/size-estimate      perkiraan ukuran dari tabel ukuran (aturan, bukan model)
     POST /v1/predict/demand     prediksi jumlah pemesanan untuk satu bulan
 
@@ -59,6 +59,11 @@ STUB_NOTE = (
 # Angka tiruan per ukuran, hanya dipakai selama model belum ada.
 STUB_COUNTS = {"S": 3.0, "M": 8.0, "L": 6.0, "XL": 2.0}
 
+NOTE_BULAN_TANPA_DATA_ASLI = (
+    "Bulan ini tidak ada di data asli UMKM, jadi angkanya bersandar pada pola bulan lain "
+    "atau data contoh. Anggap sebagai gambaran kasar, bukan perkiraan yang bisa diandalkan."
+)
+
 state: dict = {"pipeline": None, "meta": None, "size_table": None, "event_weeks": set()}
 
 
@@ -87,9 +92,12 @@ app = FastAPI(
 register_error_handlers(app)
 
 
-@app.get("/health", response_model=HealthResponse, tags=["umum"])
+@app.get("/v1/health", response_model=HealthResponse, tags=["umum"])
+# Alias tanpa versi, disembunyikan dari dokumentasi. Hanya supaya pengaturan health check
+# Render yang lama (/health) tidak gagal; pemanggil baru memakai /v1/health.
+@app.get("/health", response_model=HealthResponse, include_in_schema=False)
 async def health() -> HealthResponse:
-    """Cek layanan hidup. Dipakai backend untuk membangunkan layanan sebelum demo."""
+    """Cek layanan hidup. Backend memanggilnya saat menyala dan tiap 10 menit (kontrak v0.4 bagian 5)."""
     meta = state.get("meta") or {}
     table: SizeTable | None = state.get("size_table")
     if state.get("pipeline") is not None:
@@ -169,6 +177,12 @@ async def predict_demand(req: PredictRequest) -> PredictResponse:
         predictions = [PredictionItem(size="TOTAL", predicted_count=round(total, 1))]
         breakdown = "tidak_tersedia"
 
+    # Kontrak v0.4: note hanya diisi bila ada hal yang perlu diketahui admin, selain itu null.
+    note = None
+    bulan_asli = meta.get("bulan_data_asli")
+    if bulan_asli is not None and int(req.target_month[5:7]) not in bulan_asli:
+        note = NOTE_BULAN_TANPA_DATA_ASLI
+
     return PredictResponse(
         target_month=req.target_month,
         model=ModelInfo(
@@ -180,5 +194,5 @@ async def predict_demand(req: PredictRequest) -> PredictResponse:
         predictions=predictions,
         total_predicted=round(total, 1),
         size_breakdown=breakdown,
-        note=meta.get("data_note"),
+        note=note,
     )
