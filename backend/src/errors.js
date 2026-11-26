@@ -20,6 +20,10 @@ function checkId(notFound) {
   };
 }
 
+// YYYY-MM-DD yang ada di kalender. Date JS menggeser 2026-02-30 jadi 2 Maret, jadi hasilnya dibandingkan ulang;
+// tahun 0000 juga ditolak karena Postgres tidak mengenalnya (500).
+const isDate = (v) => /^[1-9]\d{3}-\d{2}-\d{2}$/.test(v) && new Date(`${v}T00:00:00Z`).toJSON()?.startsWith(v);
+
 // Pesan Joi berbahasa Indonesia untuk semua schema; {#label} = nama field yang ramah pengguna.
 // Pesan yang ditulis di schema sendiri (mis. login) tetap menang.
 const joiPrefs = {
@@ -29,6 +33,7 @@ const joiPrefs = {
     'any.required': '{#label} wajib diisi',
     'string.empty': '{#label} wajib diisi',
     'string.base': '{#label} harus berupa teks',
+    'string.min': '{#label} minimal {#limit} karakter',
     'string.max': '{#label} maksimal {#limit} karakter',
     'any.only': '{#label} harus salah satu dari: {#valids}',
     'boolean.base': '{#label} harus bernilai true atau false',
@@ -79,4 +84,4 @@ function errorHandler(err, req, res, next) {
   res.status(500).json({ status: 'error', code: 'INTERNAL_ERROR', message: 'Terjadi kesalahan pada server' });
 }
 
-module.exports = { AppError, unauthorized, checkId, validate, errorHandler };
+module.exports = { AppError, unauthorized, checkId, isDate, validate, errorHandler };

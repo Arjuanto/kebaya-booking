@@ -163,4 +163,4 @@ function adminKebayaRoutes() {
   return router;
 }
 
-module.exports = { adminKebayaRoutes, toKebaya, KEBAYA_COLUMNS };
+module.exports = { adminKebayaRoutes, toKebaya, KEBAYA_COLUMNS, CATEGORIES, SIZES };
