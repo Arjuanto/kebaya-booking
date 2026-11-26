@@ -12,16 +12,18 @@ const db = require('../src/db');
 const { createApp } = require('../src/app');
 
 const token = jwt.sign({ sub: '1', username: 'admin' }, process.env.JWT_SECRET, { algorithm: 'HS256', expiresIn: 60 });
+// Awal file PNG sungguhan; validasi hanya melihat byte awal.
+const png = Buffer.from('89504e470d0a1a0a0000000d49484452', 'hex');
 const input = {
   code: 'KB-001',
   name: 'Kebaya Encim Putih Gading',
   category: 'kebaya',
   size: 'M',
-  photoUrl: 'https://img.example/kb-001b.jpg',
+  photo: `data:image/png;base64,${png.toString('base64')}`,
 };
 
 describe('katalog admin dengan PostgreSQL', { skip: !testDb && 'TEST_DATABASE_URL kosong' }, () => {
-  let server, base;
+  let server, base, publicBase;
   before(async () => {
     await testDb.create();
     // Pengaman: TRUNCATE di bawah hanya boleh mengenai database tes.
@@ -29,6 +31,7 @@ describe('katalog admin dengan PostgreSQL', { skip: !testDb && 'TEST_DATABASE_UR
     server = createApp().listen(0);
     await new Promise((r) => server.once('listening', r));
     base = `http://localhost:${server.address().port}/api/v1/admin/kebaya`;
+    publicBase = `http://localhost:${server.address().port}/api/v1/kebaya`;
   });
   after(async () => {
     server?.close();
@@ -36,14 +39,14 @@ describe('katalog admin dengan PostgreSQL', { skip: !testDb && 'TEST_DATABASE_UR
     await testDb.drop();
   });
 
-  // id 1-3 sesuai urutan; KB-001 nonaktif; updated_at sengaja di masa lalu.
+  // id 1-3 sesuai urutan; KB-001 nonaktif; foto JPEG 4 byte; updated_at sengaja di masa lalu.
   beforeEach(() =>
     db.query(`
       TRUNCATE kebaya RESTART IDENTITY CASCADE;
-      INSERT INTO kebaya (code, name, category, size, photo_url, is_active, created_at, updated_at) VALUES
-        ('KB-001', 'Kebaya Encim Putih', 'kebaya', 'S', 'https://img.example/kb-001.jpg', false, '2000-01-01T00:00:00Z', '2000-01-01T00:00:00Z'),
-        ('KB-002', 'Kebaya Kutubaru Hijau Sage', 'kebaya', 'M', 'https://img.example/kb-002.jpg', true, '2000-01-01T00:00:00Z', '2000-01-01T00:00:00Z'),
-        ('KC-010', 'Kemeja Couple Batik 100%', 'kemeja_couple', 'ALL_SIZE', 'https://img.example/kc-010.jpg', true, '2000-01-01T00:00:00Z', '2000-01-01T00:00:00Z')`),
+      INSERT INTO kebaya (code, name, category, size, photo, photo_type, is_active, created_at, updated_at) VALUES
+        ('KB-001', 'Kebaya Encim Putih', 'kebaya', 'S', decode('ffd8ffe0', 'hex'), 'image/jpeg', false, '2000-01-01T00:00:00Z', '2000-01-01T00:00:00Z'),
+        ('KB-002', 'Kebaya Kutubaru Hijau Sage', 'kebaya', 'M', decode('ffd8ffe0', 'hex'), 'image/jpeg', true, '2000-01-01T00:00:00Z', '2000-01-01T00:00:00Z'),
+        ('KC-010', 'Kemeja Couple Batik 100%', 'kemeja_couple', 'ALL_SIZE', decode('ffd8ffe0', 'hex'), 'image/jpeg', true, '2000-01-01T00:00:00Z', '2000-01-01T00:00:00Z')`),
   );
 
   const api = (method, path = '', body) =>
@@ -75,10 +78,12 @@ describe('katalog admin dengan PostgreSQL', { skip: !testDb && 'TEST_DATABASE_UR
       name: 'Kebaya Encim Putih Gading',
       category: 'kebaya',
       size: 'M',
-      photoUrl: 'https://img.example/kb-001b.jpg',
+      photoUrl: `/kebaya/4/foto?v=${Math.floor(Date.parse(updatedAt) / 1000)}`,
       description: null,
       isActive: true,
     });
+    const { rows } = await db.query('SELECT photo, photo_type FROM kebaya WHERE id = 4');
+    assert.deepEqual(rows[0], { photo: png, photo_type: 'image/png' });
 
     const dup = await api('POST', '', { ...input, code: 'kb-002' });
     assert.equal(dup.status, 409);
@@ -96,6 +101,15 @@ describe('katalog admin dengan PostgreSQL', { skip: !testDb && 'TEST_DATABASE_UR
 
     const withActive = await api('PUT', '/2', { ...input, code: 'KB-002', isActive: false });
     assert.equal((await withActive.json()).data.isActive, false);
+  });
+
+  test('PUT tanpa foto -> foto lama tetap; foto bisa dibuka publik, termasuk kebaya nonaktif', async () => {
+    assert.equal((await api('PUT', '/1', { ...input, photo: undefined })).status, 200);
+    const foto = await fetch(`${publicBase}/1/foto`); // KB-001 nonaktif, tanpa token
+    assert.equal(foto.status, 200);
+    assert.equal(foto.headers.get('content-type'), 'image/jpeg');
+    assert.deepEqual(Buffer.from(await foto.arrayBuffer()), Buffer.from('ffd8ffe0', 'hex'));
+    assert.equal((await fetch(`${publicBase}/99/foto`)).status, 404);
   });
 
   test('PUT ke kode kebaya lain (beda huruf) -> 409, data tidak berubah', async () => {
