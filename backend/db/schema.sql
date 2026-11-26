@@ -1,5 +1,5 @@
 -- Skema database Sewa Kebaya By Ariegunarti (A26-CS010)
--- Target: PostgreSQL (Neon). Sumber aturan: docs/api-contract.md v0.4 (bagian 2, 4, 5, dan 6).
+-- Target: PostgreSQL (Neon). Sumber aturan: docs/api-contract.md v0.5 (bagian 2, 4, 5, dan 6).
 -- Jalankan: psql "$DATABASE_URL" -f backend/db/schema.sql
 -- Enum memakai text + CHECK (bukan CREATE TYPE) supaya mudah diubah saat tabel ukuran owner final.
 
@@ -30,7 +30,8 @@ CREATE TABLE kebaya (
   name        varchar(100) NOT NULL,
   category    text         NOT NULL CHECK (category IN ('kebaya', 'kemeja_couple')),
   size        text         NOT NULL CHECK (size IN ('S', 'M', 'L', 'XL', 'XXL', 'ALL_SIZE')),
-  photo_url   text         NOT NULL,
+  photo       bytea        NOT NULL,                       -- isi file foto; hanya dibaca GET /kebaya/:id/foto
+  photo_type  text         NOT NULL CHECK (photo_type IN ('image/jpeg', 'image/png', 'image/webp')),
   description varchar(500),
   is_active   boolean      NOT NULL DEFAULT true,          -- tidak ada DELETE, hanya nonaktif
   created_at  timestamptz  NOT NULL DEFAULT now(),

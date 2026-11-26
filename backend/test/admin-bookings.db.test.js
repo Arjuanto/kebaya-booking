@@ -107,9 +107,9 @@ describe('pengajuan admin dengan PostgreSQL', { skip: !testDb && 'TEST_DATABASE_
   beforeEach(async () => {
     const [, { rows }] = await db.query(`
       TRUNCATE bookings, kebaya RESTART IDENTITY;
-      INSERT INTO kebaya (code, name, category, size, photo_url) VALUES
-        ('KB-012', 'Kebaya Kutubaru Hijau Sage', 'kebaya', 'M', 'https://img.example/kb-012.jpg'),
-        ('KB-013', 'Kebaya Encim Putih', 'kebaya', 'S', 'https://img.example/kb-013.jpg')
+      INSERT INTO kebaya (code, name, category, size, photo, photo_type) VALUES
+        ('KB-012', 'Kebaya Kutubaru Hijau Sage', 'kebaya', 'M', decode('ffd8ffe0', 'hex'), 'image/jpeg'),
+        ('KB-013', 'Kebaya Encim Putih', 'kebaya', 'S', decode('ffd8ffe0', 'hex'), 'image/jpeg')
       RETURNING id`);
     [kb, kb2] = rows.map((r) => r.id);
   });

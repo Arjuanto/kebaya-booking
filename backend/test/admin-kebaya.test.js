@@ -13,7 +13,6 @@ const row = {
   name: 'Kebaya Kutubaru Hijau Sage',
   category: 'kebaya',
   size: 'M',
-  photo_url: 'https://img.example/kb-012.jpg',
   description: 'Brokat, cocok untuk wisuda',
   is_active: true,
   created_at: new Date('2026-11-25T02:00:00Z'),
@@ -26,7 +25,7 @@ const json = {
   name: 'Kebaya Kutubaru Hijau Sage',
   category: 'kebaya',
   size: 'M',
-  photoUrl: 'https://img.example/kb-012.jpg',
+  photoUrl: '/kebaya/12/foto?v=1795572000', // v = updated_at dalam detik
   description: 'Brokat, cocok untuk wisuda',
   isActive: true,
   createdAt: '2026-11-25T02:00:00.000Z',
@@ -51,11 +50,12 @@ const duplicateCode = () => {
   });
 };
 
-let server, base;
+let server, base, publicBase;
 before(async () => {
   server = createApp().listen(0);
   await new Promise((r) => server.once('listening', r));
   base = `http://localhost:${server.address().port}/api/v1/admin/kebaya`;
+  publicBase = `http://localhost:${server.address().port}/api/v1/kebaya`;
 });
 after(() => server.close());
 
@@ -68,16 +68,19 @@ const api = (method, path = '', body, headers = { authorization: `Bearer ${token
   });
 const errorFields = async (res) => (await res.json()).errors.map((e) => e.field).sort();
 
+// Awal file JPEG sungguhan (FF D8 FF); validasi hanya melihat byte awal, bukan seluruh gambar.
+const jpeg = Buffer.from('ffd8ffe000104a464946', 'hex');
+const dataUrl = (type, bytes) => `data:${type};base64,${bytes.toString('base64')}`;
 const input = {
   code: ' KB-013 ',
   name: 'Kebaya Encim Putih',
   category: 'kebaya',
   size: 'S',
-  photoUrl: 'https://img.example/kb-013.jpg',
+  photo: dataUrl('image/jpeg', jpeg),
   description: '  ',
 };
-// Parameter query untuk input di atas: sudah di-trim, deskripsi kosong jadi null.
-const inputParams = ['KB-013', 'Kebaya Encim Putih', 'kebaya', 'S', 'https://img.example/kb-013.jpg', null];
+// Parameter query untuk input di atas: sudah di-trim, foto jadi isi file + jenisnya, deskripsi kosong jadi null.
+const inputParams = ['KB-013', 'Kebaya Encim Putih', 'kebaya', 'S', jpeg, 'image/jpeg', null];
 
 test('semua endpoint tanpa token -> 401, database tidak disentuh', async () => {
   for (const [method, path, body] of [
@@ -101,7 +104,9 @@ test('GET daftar -> semua kebaya (aktif dan nonaktif) dalam camelCase', async ()
   assert.deepEqual(await res.json(), {
     status: 'success',
     message: 'Ditemukan 2 kebaya',
-    data: { kebaya: [json, { ...json, id: 13, code: 'KB-013', isActive: false }] },
+    data: {
+      kebaya: [json, { ...json, id: 13, code: 'KB-013', photoUrl: '/kebaya/13/foto?v=1795572000', isActive: false }],
+    },
   });
   assert.deepEqual(queries, [[null, null, null]]);
 });
@@ -162,7 +167,7 @@ test('POST tidak valid -> 400 per field dengan pesan bahasa Indonesia', async ()
     code: 'K'.repeat(21),
     category: 'gaun',
     size: 'XS',
-    photoUrl: 'javascript:alert(1)',
+    photo: 'javascript:alert(1)',
     description: 'd'.repeat(501),
     isActive: 'ya',
   });
@@ -175,7 +180,7 @@ test('POST tidak valid -> 400 per field dengan pesan bahasa Indonesia', async ()
     'description',
     'isActive',
     'name',
-    'photoUrl',
+    'photo',
     'size',
   ]);
   assert.deepEqual(body.errors.find((e) => e.field === 'name'), { field: 'name', message: 'Nama wajib diisi' });
@@ -189,6 +194,40 @@ test('POST kode sudah dipakai -> 409 DUPLICATE_CODE', async () => {
   assert.equal((await res.json()).code, 'DUPLICATE_CODE');
 });
 
+test('POST tanpa foto, bukan JPEG/PNG/WebP, atau isinya tidak cocok -> 400 field photo', async () => {
+  const wrongType = 'Foto harus berupa file JPEG, PNG, atau WebP';
+  for (const [photo, message] of [
+    [undefined, 'Foto wajib diisi'],
+    ['https://img.example/kb-013.jpg', wrongType], // URL seperti kontrak v0.4
+    [dataUrl('image/gif', Buffer.from('GIF89a')), wrongType],
+    [dataUrl('image/png', jpeg), wrongType], // label PNG, isinya JPEG
+    [12345, wrongType],
+  ]) {
+    const res = await api('POST', '', { ...input, photo });
+    assert.equal(res.status, 400, String(photo));
+    assert.deepEqual((await res.json()).errors, [{ field: 'photo', message }], String(photo));
+  }
+  assert.equal(queries.length, 0);
+});
+
+test('POST foto lebih dari 2 MB -> 400; body di atas batas 3 MB juga 400 field photo', async () => {
+  const big = Buffer.alloc(2 * 1024 * 1024 + 1);
+  jpeg.copy(big);
+  const tooBig = await api('POST', '', { ...input, photo: dataUrl('image/jpeg', big) });
+  assert.equal(tooBig.status, 400);
+  assert.deepEqual((await tooBig.json()).errors, [{ field: 'photo', message: 'Foto maksimal 2 MB' }]);
+
+  const huge = await api('POST', '', { ...input, photo: `data:image/jpeg;base64,${'A'.repeat(3.5 * 1024 * 1024)}` });
+  assert.equal(huge.status, 400);
+  assert.deepEqual(await huge.json(), {
+    status: 'fail',
+    code: 'VALIDATION_ERROR',
+    message: 'Data yang dikirim terlalu besar',
+    errors: [{ field: 'photo', message: 'Foto maksimal 2 MB' }],
+  });
+  assert.equal(queries.length, 0);
+});
+
 test('PUT valid -> 200; tanpa isActive, parameternya null (status aktif tidak diubah)', async () => {
   reply = () => ({ rows: [row] });
   const res = await api('PUT', '/12', input);
@@ -200,6 +239,13 @@ test('PUT valid -> 200; tanpa isActive, parameternya null (status aktif tidak di
     [...inputParams, null, '12'],
     [...inputParams, false, '12'],
   ]);
+});
+
+test('PUT tanpa foto -> parameter foto null, jadi foto lama tetap dipakai', async () => {
+  reply = () => ({ rows: [row] });
+  const res = await api('PUT', '/12', { ...input, photo: undefined });
+  assert.equal(res.status, 200);
+  assert.deepEqual(queries, [['KB-013', 'Kebaya Encim Putih', 'kebaya', 'S', null, null, null, null, '12']]);
 });
 
 test('PUT tidak valid -> 400, id tidak ada -> 404, kode bentrok -> 409', async () => {
@@ -239,4 +285,24 @@ test('PATCH active tanpa isActive -> 400, id tidak ada -> 404', async () => {
   assert.deepEqual(await errorFields(invalid), ['isActive']);
 
   assert.equal((await api('PATCH', '/99/active', { isActive: false })).status, 404);
+});
+
+test('GET /kebaya/:id/foto -> file foto tanpa token, boleh di-cache lama, nosniff', async () => {
+  reply = () => ({ rows: [{ photo: jpeg, photo_type: 'image/jpeg' }] });
+  const res = await fetch(`${publicBase}/12/foto`);
+  assert.equal(res.status, 200);
+  assert.equal(res.headers.get('content-type'), 'image/jpeg');
+  assert.equal(res.headers.get('cache-control'), 'public, max-age=31536000, immutable');
+  assert.equal(res.headers.get('x-content-type-options'), 'nosniff');
+  assert.deepEqual(Buffer.from(await res.arrayBuffer()), jpeg);
+  assert.deepEqual(queries, [['12']]);
+});
+
+test('GET /kebaya/:id/foto id tidak ada / bukan angka / di luar integer -> 404 NOT_FOUND', async () => {
+  for (const path of ['/99/foto', '/abc/foto', '/99999999999/foto']) {
+    const res = await fetch(publicBase + path);
+    assert.equal(res.status, 404, path);
+    assert.deepEqual(await res.json(), { status: 'fail', code: 'NOT_FOUND', message: 'Kebaya tidak ditemukan' });
+  }
+  assert.deepEqual(queries, [['99']]); // id yang mustahil ada tidak dikirim ke database
 });

@@ -30,8 +30,6 @@ const joiPrefs = {
     'string.empty': '{#label} wajib diisi',
     'string.base': '{#label} harus berupa teks',
     'string.max': '{#label} maksimal {#limit} karakter',
-    'string.uri': '{#label} harus berupa URL http/https yang valid',
-    'string.uriCustomScheme': '{#label} harus berupa URL http/https yang valid',
     'any.only': '{#label} harus salah satu dari: {#valids}',
     'boolean.base': '{#label} harus bernilai true atau false',
     'number.base': '{#label} harus berupa angka',
@@ -66,6 +64,16 @@ function errorHandler(err, req, res, next) {
   }
   if (err.type === 'entity.parse.failed') {
     return res.status(400).json({ status: 'fail', code: 'VALIDATION_ERROR', message: 'Format JSON tidak valid' });
+  }
+  // Body melebihi batas express.json. Hanya katalog admin yang menerima body besar, dan di sana penyebabnya foto.
+  if (err.type === 'entity.too.large') {
+    const photo = req.originalUrl.startsWith('/api/v1/admin/kebaya');
+    return res.status(400).json({
+      status: 'fail',
+      code: 'VALIDATION_ERROR',
+      message: 'Data yang dikirim terlalu besar',
+      ...(photo && { errors: [{ field: 'photo', message: 'Foto maksimal 2 MB' }] }),
+    });
   }
   console.error(err);
   res.status(500).json({ status: 'error', code: 'INTERNAL_ERROR', message: 'Terjadi kesalahan pada server' });
