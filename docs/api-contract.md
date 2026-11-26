@@ -1,6 +1,6 @@
 # Kontrak API — Sewa Kebaya By Ariegunarti (A26-CS010)
 
-Status: **DRAFT v0.4** — perlu disepakati FS (Arjuanto, Diva, David) dan AE (Ilham) sebelum pengembangan, sesuai jadwal Minggu 1 (23–29 Nov 2026).
+Status: **DRAFT v0.5** — perlu disepakati FS (Arjuanto, Diva, David) dan AE (Ilham) sebelum pengembangan, sesuai jadwal Minggu 1 (23–29 Nov 2026).
 
 Dokumen ini mencakup dua kontrak:
 
@@ -21,7 +21,7 @@ Website (React) ──Axios──▶ Backend Express /api/v1 ──▶ PostgreSQ
 | Hal | Aturan |
 |---|---|
 | Base URL backend | `https://<backend>.onrender.com/api/v1` |
-| Format | JSON (`Content-Type: application/json`) |
+| Format | JSON (`Content-Type: application/json`), kecuali `GET /kebaya/:id/foto` yang mengembalikan file gambar |
 | Tanggal | `YYYY-MM-DD`, tanpa jam. "Hari ini" selalu dihitung di zona Asia/Jakarta, **bukan** dari jam server (server Render memakai UTC, 7 jam di belakang WIB) |
 | Waktu | ISO 8601, mis. `2026-12-01T10:15:00+07:00` |
 | Nama field | `camelCase` |
@@ -89,7 +89,7 @@ Website (React) ──Axios──▶ Backend Express /api/v1 ──▶ PostgreSQ
   "name": "Kebaya Kutubaru Hijau Sage",
   "category": "kebaya",
   "size": "M",
-  "photoUrl": "https://.../kb-012.jpg",
+  "photoUrl": "/kebaya/12/foto?v=1795572000",
   "description": "Brokat, cocok untuk wisuda",
   "isActive": true,
   "createdAt": "2026-11-25T09:00:00+07:00",
@@ -103,7 +103,8 @@ Website (React) ──Axios──▶ Backend Express /api/v1 ──▶ PostgreSQ
 | `name` | string | wajib, maks 100 |
 | `category` | enum | `kebaya` \| `kemeja_couple` |
 | `size` | enum | `S` \| `M` \| `L` \| `XL` \| `XXL` \| `ALL_SIZE` (menyesuaikan tabel ukuran owner) |
-| `photoUrl` | string (URL) | wajib; unggah file **tidak** termasuk MVP, admin menempel URL foto |
+| `photo` | string | hanya di request admin, tidak pernah ada di respons. Isi file foto sebagai data URL base64, mis. `data:image/jpeg;base64,/9j/4AAQ...`. Wajib saat tambah, opsional saat ubah (tidak dikirim berarti foto lama tetap dipakai). Hanya JPEG, PNG, atau WebP, maks 2 MB. Website sebaiknya mengecilkan foto lebih dulu (mis. sisi terpanjang 1200 px) |
+| `photoUrl` | string | hanya di respons, dibuat backend. Jalur foto relatif terhadap base URL backend; website menyambungnya dengan base URL yang sama dengan Axios. `v` adalah `updatedAt` dalam detik, supaya browser memuat ulang foto setelah kebaya diubah |
 | `description` | string | opsional, maks 500 |
 | `isActive` | boolean | default `true`; kebaya nonaktif tidak tampil di sisi customer |
 
@@ -231,7 +232,7 @@ Daftar kebaya tersedia pada tanggal pemakaian + perkiraan ukuran.
         "name": "Kebaya Kutubaru Hijau Sage",
         "category": "kebaya",
         "size": "M",
-        "photoUrl": "https://.../kb-012.jpg",
+        "photoUrl": "/kebaya/12/foto?v=1795572000",
         "sizeMatch": true
       }
     ]
@@ -251,6 +252,16 @@ Daftar kebaya tersedia pada tanggal pemakaian + perkiraan ukuran.
 ### `GET /kebaya/:id`
 
 Detail satu kebaya aktif. **404** jika tidak ada atau nonaktif.
+
+---
+
+### `GET /kebaya/:id/foto`
+
+Mengembalikan file foto kebaya (bukan JSON), dengan `Content-Type` sesuai jenis file: `image/jpeg`, `image/png`, atau `image/webp`. Website memakainya langsung di `<img src>` lewat `photoUrl`.
+
+- Tanpa login, juga untuk kebaya nonaktif, karena tag `<img>` tidak bisa mengirim token admin. Foto kebaya bukan data pribadi.
+- `Cache-Control: public, max-age=31536000, immutable`. Aman karena `photoUrl` berubah setiap kali kebaya diubah.
+- **404** `NOT_FOUND` (format error 1.2) jika kebaya tidak ada.
 
 ---
 
@@ -339,12 +350,13 @@ Cek token masih berlaku. **200** → data admin; **401** jika tidak.
 |---|---|---|
 | GET | `/admin/kebaya?isActive=&category=&q=` | Semua kebaya, termasuk nonaktif. `q` cari di kode/nama |
 | GET | `/admin/kebaya/:id` | Detail |
-| POST | `/admin/kebaya` | Tambah (body: field di 2.1 kecuali `id`, `createdAt`, `updatedAt`) → **201** |
-| PUT | `/admin/kebaya/:id` | Ubah (body sama dengan POST) → **200** |
+| POST | `/admin/kebaya` | Tambah (body: field di 2.1 kecuali `id`, `photoUrl`, `createdAt`, `updatedAt`; `photo` wajib) → **201** |
+| PUT | `/admin/kebaya/:id` | Ubah (body sama dengan POST, tapi `photo` opsional: tidak dikirim berarti foto lama tetap dipakai) → **200** |
 | PATCH | `/admin/kebaya/:id/active` | Aktifkan/nonaktifkan, body `{ "isActive": false }` → **200** |
 
 Tidak ada DELETE: kebaya hanya dinonaktifkan agar riwayat pengajuan tetap utuh.
 Error: `400 VALIDATION_ERROR`, `404 NOT_FOUND`, `409 DUPLICATE_CODE`.
+Foto yang bukan JPEG/PNG/WebP atau lebih dari 2 MB, termasuk yang ditolak karena body request terlalu besar, dijawab `400 VALIDATION_ERROR` dengan `field: "photo"`.
 
 ---
 
@@ -519,6 +531,7 @@ Base URL: `https://<ml-service>.onrender.com`. Dipanggil hanya oleh backend. Sem
 | 400 | `VALIDATION_ERROR` | Input kosong, salah format, atau di luar rentang |
 | 401 | `UNAUTHORIZED` | `X-API-Key` hilang atau salah |
 | 500 | `INTERNAL_ERROR` | Kesalahan tak terduga di layanan model |
+| 503 | `MODEL_UNAVAILABLE` | Hanya `POST /v1/predict/demand`: model prediksi belum dilatih atau gagal dimuat, dan jawaban tiruan dimatikan (`ALLOW_STUB=false`) |
 
 Backend tidak meneruskan kode-kode ini ke website. Semua kegagalan layanan model, termasuk `401`, dipetakan ke `502 ML_SERVICE_ERROR` atau `504 ML_TIMEOUT`, atau ke perilaku cadangan di §3. `401` dari layanan model berarti `ML_API_KEY` salah konfigurasi, jadi dicatat di log backend. Kalau diteruskan apa adanya, website akan mengira token admin kedaluwarsa.
 
@@ -585,7 +598,7 @@ Bentuk request boleh bertambah, bentuk response di bawah dipertahankan. Kalender
 | `totalPredicted`, `predictedCount` | Perkiraan jumlah pemesanan pada bulan itu, desimal 1 digit |
 | `model.maeValidasi` | Rata-rata selisih prediksi **mingguan** pada data uji. `null` jika belum ada model terlatih |
 | `dataSource` | Asal data latih: `asli` \| `contoh` \| `campuran` |
-| `sizeBreakdown` | `proporsi_historis`: angka per ukuran dibagi dari proporsi historis. `tiruan`: model belum dilatih dan angkanya contoh, tidak boleh dipakai saat demo |
+| `sizeBreakdown` | `proporsi_historis`: angka per ukuran dibagi dari proporsi historis. `tidak_tersedia`: data latih tidak punya kolom ukuran, jadi `predictions` hanya berisi satu baris `{ "size": "TOTAL", ... }` yang ditampilkan sebagai total, bukan sebagai ukuran. `tiruan`: model belum dilatih dan angkanya contoh, tidak boleh dipakai saat demo |
 | `note` | Keterangan untuk ditampilkan ke admin, mis. bahwa bulan target hanya berisi data contoh. `null` jika tidak ada |
 
 ---
@@ -595,12 +608,14 @@ Bentuk request boleh bertambah, bentuk response di bawah dipertahankan. Kalender
 | Tabel | Kolom utama |
 |---|---|
 | `admins` | id, username (unik), password_hash, created_at |
-| `kebaya` | id, code (unik), name, category, size, photo_url, description, is_active, created_at, updated_at |
+| `kebaya` | id, code (unik), name, category, size, photo (bytea, isi file foto), photo_type (`image/jpeg` \| `image/png` \| `image/webp`), description, is_active, created_at, updated_at |
 | `bookings` | id, kebaya_id (FK), customer_name, customer_contact, use_date, event_purpose, ld, tb, bb, estimated_size, size_table_version, status, needs_fitting, rental_start, rental_end, dp_amount, dp_paid_at, paid_off_at, handed_over_at, returned_at, admin_note, created_at, updated_at |
 | `analytics_results` | id, data_source, payload (JSONB), generated_at |
 | `ai_summaries` | id, status (`success`/`failed`), summary, provider, model, input (JSONB), error_code, created_at |
 
 DDL lengkap: [`backend/db/schema.sql`](../backend/db/schema.sql).
+
+Kolom `kebaya.photo` hanya dibaca oleh `GET /kebaya/:id/foto`. Query daftar dan detail kebaya tidak mengambil kolom ini supaya tetap ringan.
 
 Index: `bookings (kebaya_id, rental_start, rental_end)` untuk cek tumpang tindih.
 
@@ -628,7 +643,7 @@ Tidak ada API key di kode atau repositori.
 
 ## 8. Pertanyaan terbuka
 
-Status per v0.4, setelah review AE (Ilham).
+Status per v0.5.
 
 | No | Pertanyaan | Status |
 |---|---|---|
@@ -637,7 +652,7 @@ Status per v0.4, setelah review AE (Ilham).
 | 3 | **Masa sewa & jeda laundry** | Belum dikonfirmasi owner. Bahan dari data asli (temuan Ilham): default `1 / 1 / 2` memblokir 5 hari, padahal kebaya yang sama tercatat disewa lagi dengan jeda 2–4 hari pada 16 pasangan pemesanan. Default kemungkinan terlalu longgar |
 | 4 | **Satuan prediksi** | Diterapkan: model mingguan, dijumlah per bulan; angka per ukuran dibagi dari proporsi historis (§5) |
 | 5 | **Format output analisis DS** | Diterapkan: tetap lewat tabel `analytics_results`, tidak dihitung dari `bookings` (§4) |
-| 6 | **Foto kebaya** | Tetap URL saja untuk MVP, sesuai scope Project Plan |
+| 6 | **Foto kebaya** | Diubah di v0.5: admin mengunggah file foto (field `photo`), disimpan di database Neon, dan ditampilkan lewat `GET /kebaya/:id/foto`. `schema.sql`, migrasi Neon, dan endpoint katalog admin menyusul |
 
 ## Riwayat perubahan
 
@@ -647,3 +662,4 @@ Status per v0.4, setelah review AE (Ilham).
 | 0.2 | 2026-11-24 | "Hari ini" dihitung di Asia/Jakarta dan kolom tanggal bertipe `date`; batas percobaan login (`429 TOO_MANY_ATTEMPTS`); format error diseragamkan (`data` opsional, `conflictWith` pindah ke `data`, `AI_QUOTA_EXCEEDED` jadi 503) |
 | 0.3 | 2026-11-24 | Skema database di `backend/db/schema.sql`; constraint anti tumpang tindih di level database |
 | 0.4 | 2026-11-25 | Review AE (Ilham): prediksi mingguan dijumlah per bulan (`totalPredicted`, `sizeBreakdown`, `note`, `model.maeValidasi`); `tableVersion` perkiraan ukuran disimpan di `bookings.size_table_version`; layanan model memakai `/v1/health`, format respons dan kode error-nya ditulis eksplisit, dan diping tiap 10 menit untuk menghindari cold start; `recommendations` hanya untuk data asli; filter `from`/`to` analisis dihapus; aturan `sizeMatch` untuk `ALL_SIZE`; field opsional `customerContact`; status pertanyaan terbuka diperbarui |
+| 0.5 | 2026-11-26 | Foto kebaya diunggah admin sebagai data URL base64 (field `photo`, JPEG/PNG/WebP, maks 2 MB) dan disimpan di database (`kebaya.photo` dan `kebaya.photo_type`, menggantikan `photo_url`); `photoUrl` kini dibuat backend dan menunjuk ke endpoint baru `GET /kebaya/:id/foto`. Layanan model, dari review PR #20: `sizeBreakdown` `tidak_tersedia` dengan baris `TOTAL`, dan `503 MODEL_UNAVAILABLE` |
