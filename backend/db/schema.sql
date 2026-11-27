@@ -29,7 +29,7 @@ CREATE TABLE kebaya (
   code        varchar(20)  NOT NULL UNIQUE,                -- bentrok -> 409 DUPLICATE_CODE (SQLSTATE 23505)
   name        varchar(100) NOT NULL,
   category    text         NOT NULL CHECK (category IN ('kebaya', 'kemeja_couple')),
-  size        text         NOT NULL CHECK (size IN ('S', 'M', 'L', 'XL', 'XXL', 'ALL_SIZE')),
+  size        text         NOT NULL CHECK (size IN ('XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL', 'ALL_SIZE')),
   photo       bytea        NOT NULL,                       -- isi file foto; hanya dibaca GET /kebaya/:id/foto
   photo_type  text         NOT NULL CHECK (photo_type IN ('image/jpeg', 'image/png', 'image/webp')),
   description varchar(500),
@@ -52,7 +52,7 @@ CREATE TABLE bookings (
   ld             numeric(4,1) NOT NULL CHECK (ld BETWEEN 60 AND 150),
   tb             numeric(4,1) NOT NULL CHECK (tb BETWEEN 130 AND 200),
   bb             numeric(4,1) NOT NULL CHECK (bb BETWEEN 30 AND 150),
-  estimated_size text         CHECK (estimated_size IN ('S', 'M', 'L', 'XL', 'XXL', 'ALL_SIZE')),  -- null jika model gagal atau di luar tabel ukuran
+  estimated_size text         CHECK (estimated_size IN ('XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL', 'ALL_SIZE')),  -- null jika model gagal atau di luar tabel ukuran
   size_table_version varchar(30),                          -- tableVersion dari layanan model, mis. 'sementara-1'; null jika model gagal
   status         text         NOT NULL DEFAULT 'pending'
                  CHECK (status IN ('pending', 'rejected', 'dp_paid', 'paid_off', 'handed_over', 'returned', 'cancelled')),

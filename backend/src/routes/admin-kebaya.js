@@ -4,7 +4,7 @@ const db = require('../db');
 const { AppError, checkId, validate } = require('../errors');
 
 const CATEGORIES = ['kebaya', 'kemeja_couple'];
-const SIZES = ['S', 'M', 'L', 'XL', 'XXL', 'ALL_SIZE'];
+const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL', 'ALL_SIZE'];
 
 // Kontrak 2.1: foto dikirim sebagai data URL base64, hanya JPEG/PNG/WebP, maks 2 MB setelah di-decode.
 const MAX_PHOTO_BYTES = 2 * 1024 * 1024;
