@@ -4,16 +4,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sewa Kebaya By Ariegunarti - Portal Customer</title>
+  <title>Sewa Kebaya By Ariegunarti - Portal Pelanggan</title>
   <!-- Google Fonts: Cormorant Garamond, Playfair Display & Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
     href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
     rel="stylesheet">
-  <!-- Tailwind CSS CDN (Khusus Prototipe/Mockup) -->
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Lucide Icons (Menggunakan CDN resmi jsDelivr tanpa issue source map) -->
+  <!-- Lucide Icons -->
   <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
   <script>
     tailwind.config = {
@@ -31,7 +31,7 @@
               200: '#EFE2D3',
               300: '#E4D3C0',
               400: '#D5C0AA',
-              500: '#BAA591', /* Warna tombol taupe khas UMKM / Figma */
+              500: '#BAA591', /* Warna tombol taupe khas Figma */
               600: '#A48D77',
               700: '#8A735D',
               800: '#6E5946',
@@ -48,7 +48,6 @@
     }
   </script>
   <style>
-    /* Tipografi Global Mewah & Konsisten Sesuai Figma Tim */
     * {
       font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     }
@@ -58,11 +57,7 @@
       letter-spacing: -0.01em;
     }
 
-    input, select, textarea, button {
-      font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
-    }
-
-    /* Background sutra satin champagne khas UMKM */
+    /* Background sutra satin champagne khas Figma */
     .bg-silk-canva {
       background-color: #F8F3EC;
       background-image:
@@ -72,7 +67,7 @@
         linear-gradient(145deg, #FAF7F2 0%, #F4EBE0 50%, #ECE0D1 100%);
     }
 
-    /* Tombol Utama Khas Figma Tim */
+    /* Tombol Utama Taupe Sesuai Figma */
     .btn-ag-primary {
       background: linear-gradient(135deg, #BAA591 0%, #A48D77 100%);
       color: #FFFFFF;
@@ -86,10 +81,6 @@
       box-shadow: 0 6px 16px rgba(164, 141, 119, 0.35);
     }
 
-    .btn-ag-primary:active {
-      transform: translateY(0);
-    }
-
     .btn-ag-dark {
       background-color: #23201D;
       color: #FFFFFF;
@@ -98,7 +89,6 @@
 
     .btn-ag-dark:hover {
       background-color: #342F2B;
-      transform: translateY(-1px);
     }
 
     /* Frame Simulasi Mobile vs Desktop */
@@ -112,953 +102,557 @@
     }
 
     .device-desktop {
-      max-width: 1200px;
+      max-width: 1120px;
       margin: 1.5rem auto;
       border: 1px solid #D5C0AA;
-      border-radius: 24px;
+      border-radius: 28px;
       overflow: hidden;
-      box-shadow: 0 20px 50px -10px rgba(50, 40, 30, 0.2);
+      box-shadow: 0 20px 50px -10px rgba(50, 40, 30, 0.18);
     }
 
-    /* ============================================================ */
-    /* ATURAN KHUSUS TAMPILAN PONSEL / MOBILE (PRESISI & PROFESIONAL) */
-    /* Berlaku baik di simulator .device-mobile maupun layar HP asli */
-    /* ============================================================ */
-    .device-mobile .hero-preview-decor,
-    .is-mobile-view .hero-preview-decor {
-      display: none !important;
-    }
-
-    @media (max-width: 768px) {
-      .hero-preview-decor {
-        display: none !important;
-      }
-    }
-
-    /* Paksa 1 Kolom Penuh untuk Grid Katalog & Pilihan di Mode Mobile */
-    .device-mobile #grid-katalog,
-    .is-mobile-view #grid-katalog,
-    .device-mobile .grid-pilihan,
-    .is-mobile-view .grid-pilihan,
-    .device-mobile [class*="lg:grid-cols-3"],
-    .device-mobile [class*="md:grid-cols-2"],
-    .is-mobile-view [class*="lg:grid-cols-3"],
-    .is-mobile-view [class*="md:grid-cols-2"] {
+    /* Responsif Mobile Simulation */
+    .device-mobile .grid-cols-3,
+    .device-mobile [class*="lg:grid-cols-"],
+    .device-mobile [class*="md:grid-cols-"] {
       grid-template-columns: 1fr !important;
-      gap: 1rem !important;
     }
 
-    /* Paksa Span Penuh untuk Form & Grid 12 Kolom di Mode Mobile */
-    .device-mobile .grid-cols-12,
-    .is-mobile-view .grid-cols-12 {
-      display: flex !important;
-      flex-direction: column !important;
-      gap: 1rem !important;
-    }
-
-    .device-mobile [class*="md:col-span-"],
-    .device-mobile [class*="lg:col-span-"],
-    .is-mobile-view [class*="md:col-span-"],
-    .is-mobile-view [class*="lg:col-span-"] {
-      width: 100% !important;
-      grid-column: span 12 / span 12 !important;
-    }
-
-    /* Header Mobile: Rapi 2 Baris Tanpa Terpotong */
-    .device-mobile header,
-    .is-mobile-view header {
-      padding: 0.75rem 1rem !important;
-    }
-
-    .device-mobile header .header-container,
-    .is-mobile-view header .header-container {
-      flex-direction: column !important;
-      align-items: stretch !important;
-      gap: 0.75rem !important;
-    }
-
-    .device-mobile header nav,
-    .is-mobile-view header nav {
-      width: 100% !important;
-      display: grid !important;
-      grid-template-columns: 1fr 1fr 1fr !important;
-      gap: 0.25rem !important;
-      padding: 0.25rem !important;
-    }
-
-    .device-mobile header nav button,
-    .is-mobile-view header nav button {
-      padding: 0.5rem 0.25rem !important;
-      font-size: 0.72rem !important;
-      justify-content: center !important;
-      text-align: center !important;
-      white-space: nowrap !important;
-    }
-
-    .device-mobile .kebaya-card,
-    .is-mobile-view .kebaya-card {
-      width: 100% !important;
-    }
-
-    /* Padding Konten Mobile yang Pas */
-    .device-mobile main,
-    .is-mobile-view main {
-      padding: 1rem !important;
-      gap: 1.25rem !important;
-    }
-
-    ::-webkit-scrollbar {
-      width: 4px;
-      height: 4px;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #BAA591;
-      border-radius: 4px;
+    .device-mobile .header-nav {
+      width: 100%;
+      justify-content: space-around;
     }
   </style>
 </head>
 
-<body class="bg-stone-900 text-charcoal-900 font-sans antialiased min-h-screen">
+<body class="bg-stone-900 text-charcoal-900 antialiased min-h-screen py-4 px-2 sm:px-4">
 
-  <!-- Top Preview Bar (Mode Desktop / Mobile) -->
-  <aside aria-label="Mode Tampilan Mockup"
-    class="bg-charcoal-900 text-white px-4 py-2.5 text-xs flex flex-wrap items-center justify-between border-b border-stone-800 sticky top-0 z-50">
+  <!-- ============================================================== -->
+  <!-- TOP CONTROLLER: Preview Bar (Desktop/Ponsel & Simulasi Alur)   -->
+  <!-- ============================================================== -->
+  <aside class="max-w-6xl mx-auto mb-3 px-4 py-2.5 bg-stone-950/90 text-stone-200 rounded-2xl border border-stone-800 flex flex-wrap items-center justify-between gap-3 text-xs shadow-md">
     <div class="flex items-center gap-2">
-      <span
-        class="bg-silk-600 text-white px-2 py-0.5 rounded font-semibold text-[10px] tracking-wider uppercase">Figma Presisi</span>
-      <span class="text-stone-300 font-medium hidden sm:inline">Sewa Kebaya By Ariegunarti · Mockup Customer (Issue #15)</span>
+      <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+      <span class="font-semibold tracking-wide">Figma Presisi · Mockup Portal Pelanggan</span>
+      <span class="hidden sm:inline text-stone-500">|</span>
+      <span class="hidden sm:inline text-stone-400">Alur: Katalog ➔ Detail ➔ Ajukan Sewa ➔ Konfirmasi ➔ Tracking 6 Langkah</span>
     </div>
+
     <div class="flex items-center gap-2">
-      <button id="btn-mode-desktop" onclick="setMode('desktop')"
-        class="px-3 py-1 rounded btn-ag-primary text-white font-medium flex items-center gap-1.5 text-[11px] transition">
-        <i data-lucide="monitor" class="w-3.5 h-3.5"></i> Desktop
-      </button>
-      <button id="btn-mode-mobile" onclick="setMode('mobile')"
-        class="px-3 py-1 rounded bg-stone-800 hover:bg-stone-700 text-stone-300 font-medium flex items-center gap-1.5 text-[11px] transition">
-        <i data-lucide="smartphone" class="w-3.5 h-3.5"></i> Ponsel
-      </button>
+      <!-- Simulasi Status Admin Langsung -->
+      <div class="flex items-center gap-1.5 bg-stone-900 px-2.5 py-1 rounded-lg border border-stone-800 text-[11px]">
+        <span class="text-stone-400 font-medium">Status Demo:</span>
+        <select id="select-status-demo" onchange="changeStatusDemo(this.value)" class="bg-stone-800 text-stone-200 rounded px-1.5 py-0.5 outline-none cursor-pointer">
+          <option value="pending">01. Menunggu Admin</option>
+          <option value="fitting">02. Disetujui & Fitting</option>
+          <option value="dp_paid">03. DP Tercatat (Terkunci)</option>
+          <option value="handed_over">04. Busana Diambil</option>
+          <option value="returned">05. Selesai Dikembalikan</option>
+        </select>
+      </div>
+
+      <!-- Switcher Desktop / Mobile -->
+      <div class="flex items-center gap-1 bg-stone-900 p-1 rounded-lg border border-stone-800">
+        <button id="btn-mode-desktop" onclick="setMode('desktop')"
+          class="px-2.5 py-1 rounded btn-ag-primary text-white font-medium flex items-center gap-1 text-[11px] transition">
+          <i data-lucide="monitor" class="w-3.5 h-3.5"></i> Desktop
+        </button>
+        <button id="btn-mode-mobile" onclick="setMode('mobile')"
+          class="px-2.5 py-1 rounded bg-stone-800 hover:bg-stone-700 text-stone-300 font-medium flex items-center gap-1 text-[11px] transition">
+          <i data-lucide="smartphone" class="w-3.5 h-3.5"></i> Ponsel
+        </button>
+      </div>
     </div>
   </aside>
 
-  <!-- Container Wrapper -->
-  <div id="container-frame"
-    class="device-desktop bg-silk-canva min-h-[900px] flex flex-col justify-between transition-all duration-300">
-
+  <!-- ============================================================== -->
+  <!-- MAIN CONTAINER: Canvas Sutra Champagne Sesuai Desain Figma     -->
+  <!-- ============================================================== -->
+  <div id="container-frame" class="device-desktop bg-silk-canva min-h-[920px] flex flex-col justify-between transition-all duration-300">
     <div>
-      <!-- HEADER CUSTOMER SESUAI FIGMA TIM -->
-      <!-- Frame id 2002:3 / 2002:27: Logo AG, CUSTOMER by Arie Gunarti, Navigation Tabs, User Name -->
-      <header class="bg-white/90 backdrop-blur-md border-b border-silk-300 px-4 sm:px-6 py-3 sm:py-4 sticky top-0 z-40">
-        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 header-container">
-          <!-- Top Row Mobile / Left Desktop -->
-          <div class="header-top-row flex items-center justify-between w-full sm:w-auto">
-            <!-- Logo Asli & Title -->
-            <div class="flex items-center gap-2.5 sm:gap-3 cursor-pointer" onclick="switchTab('beranda')">
-              <img src="./assets/logo-ag.jpg" alt="Logo Sewa Kebaya by Ariegunarti"
-                class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl object-contain border border-silk-300 shadow-xs bg-white p-0.5 shrink-0">
-              <div>
-                <div class="text-[9px] sm:text-[10px] tracking-[0.25em] uppercase font-bold text-silk-700">CUSTOMER</div>
-                <div class="font-serif font-bold text-charcoal-900 text-base sm:text-xl leading-tight">By Arie Gunarti</div>
-              </div>
-            </div>
-
-            <!-- Customer Access (Guest) Mobile Badge -->
-            <div class="flex sm:hidden items-center gap-1.5 text-[10px] bg-emerald-50 text-emerald-800 px-2 py-1 rounded-lg border border-emerald-200">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-              <span class="font-semibold" id="header-user-name-mobile">Tamu</span>
+      <!-- HEADER CUSTOMER RESMI (Persis Screenshot Figma 1, 2, 3, 4, 5) -->
+      <header class="bg-white/95 backdrop-blur-md border-b border-silk-300 px-4 sm:px-8 py-4 sticky top-0 z-40">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+          <!-- Logo Resmi AG By Arie Gunarti -->
+          <div class="flex items-center gap-3 cursor-pointer" onclick="showScreen('katalog')">
+            <img src="./assets/logo-ag.jpg" alt="Logo Sewa Kebaya by Ariegunarti"
+              class="w-11 h-11 rounded-xl object-contain border border-silk-300 shadow-xs bg-white p-0.5 shrink-0">
+            <div>
+              <div class="text-[9px] tracking-[0.25em] uppercase font-bold text-silk-700">CUSTOMER</div>
+              <div class="font-serif font-bold text-charcoal-900 text-xl leading-tight">By Arie Gunarti</div>
             </div>
           </div>
 
-          <!-- Navigation Tabs -->
-          <nav class="flex items-center gap-1 sm:gap-2 bg-silk-100/80 p-1 rounded-xl border border-silk-300 w-full sm:w-auto">
-            <button id="nav-tab-beranda" onclick="switchTab('beranda')"
-              class="px-2.5 sm:px-4 py-2 rounded-lg text-[11px] sm:text-xs font-semibold transition flex items-center justify-center gap-1 bg-white text-charcoal-900 shadow-xs flex-1 sm:flex-none">
-              <i data-lucide="home" class="w-3.5 h-3.5 shrink-0"></i> <span>Beranda</span>
+          <!-- Navigasi Tab Sesuai Figma Tim -->
+          <nav class="flex items-center gap-1.5 sm:gap-2 header-nav">
+            <button id="nav-beranda" onclick="showScreen('beranda')"
+              class="px-4 py-2 rounded-xl text-xs font-semibold text-stone-600 hover:text-charcoal-900 hover:bg-silk-100 transition">
+              Beranda
             </button>
-            <button id="nav-tab-katalog" onclick="switchTab('katalog')"
-              class="px-2.5 sm:px-4 py-2 rounded-lg text-[11px] sm:text-xs font-semibold transition flex items-center justify-center gap-1 text-charcoal-700 hover:text-charcoal-900 flex-1 sm:flex-none">
-              <i data-lucide="grid" class="w-3.5 h-3.5 shrink-0"></i> <span>Katalog</span>
+            <button id="nav-katalog" onclick="showScreen('katalog')"
+              class="px-4 py-2 rounded-xl text-xs font-semibold btn-ag-primary shadow-xs transition">
+              Katalog
             </button>
-            <button id="nav-tab-pengajuan" onclick="switchTab('pengajuan')"
-              class="px-2.5 sm:px-4 py-2 rounded-lg text-[11px] sm:text-xs font-semibold transition flex items-center justify-center gap-1 text-charcoal-700 hover:text-charcoal-900 flex-1 sm:flex-none">
-              <i data-lucide="clock" class="w-3.5 h-3.5 shrink-0"></i> <span>Pengajuan</span>
-              <span id="badge-nav-pengajuan" class="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0"></span>
+            <button id="nav-pengajuan" onclick="showScreen('pengajuan-saya')"
+              class="px-4 py-2 rounded-xl text-xs font-semibold text-stone-600 hover:text-charcoal-900 hover:bg-silk-100 transition relative flex items-center gap-1.5">
+              <span>Pengajuan saya</span>
+              <span id="badge-dot-pengajuan" class="w-2 h-2 rounded-full bg-amber-500"></span>
             </button>
           </nav>
-
-          <!-- Customer Access Desktop Badge -->
-          <div class="hidden sm:flex items-center gap-2.5 text-xs text-charcoal-800 bg-silk-50/80 px-3 py-1.5 rounded-xl border border-silk-300">
-            <div class="w-7 h-7 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold">
-              <i data-lucide="user-check" class="w-4 h-4"></i>
-            </div>
-            <div>
-              <div class="font-semibold text-charcoal-900" id="header-user-name">Tamu Pelanggan</div>
-              <div class="text-[10px] text-emerald-700 font-medium flex items-center gap-1">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Booking Cepat (Tanpa Login)
-              </div>
-            </div>
-          </div>
         </div>
       </header>
 
-      <!-- MAIN CONTENT CONTAINER -->
-      <main class="max-w-6xl mx-auto p-4 sm:p-6 space-y-6">
+      <!-- ============================================================== -->
+      <!-- KONTEN UTAMA: Berganti Antar Layar Interaktif                   -->
+      <!-- ============================================================== -->
+      <main class="max-w-6xl mx-auto p-4 sm:p-8">
 
-        <!-- ========================================== -->
-        <!-- TAB 1: BERANDA (Customer · Beranda — 2002:2) -->
-        <!-- ========================================== -->
-        <section id="view-beranda" class="space-y-6 animate-in fade-in duration-200">
-          <!-- Welcome Banner -->
-          <div class="text-xs uppercase tracking-widest font-bold text-silk-700" id="hero-greeting">SELAMAT DATANG DI SEWA KEBAYA BY ARIE GUNARTI</div>
-
-          <!-- Hero Sambutan Customer (Figma 2002:60) -->
-          <div class="bg-gradient-to-br from-white/95 via-silk-50 to-silk-100 rounded-3xl border border-silk-300 p-6 sm:p-8 relative overflow-hidden shadow-sm">
-            <div class="max-w-xl relative z-10 space-y-4">
-              <h1 class="font-serif text-3xl sm:text-4xl text-charcoal-900 font-bold leading-tight">
-                Kebaya pilihan untuk momen istimewamu.
+        <!-- ============================================================== -->
+        <!-- LAYAR 0: BERANDA (Pengantar Elegan Sesuai Identitas Butik)      -->
+        <!-- ============================================================== -->
+        <section id="screen-beranda" class="hidden space-y-8 animate-in fade-in duration-200">
+          <div class="bg-white/80 rounded-3xl border border-silk-300 p-8 sm:p-14 text-center space-y-4 shadow-xs relative overflow-hidden">
+            <div class="max-w-2xl mx-auto space-y-3 relative z-10">
+              <span class="text-[10px] tracking-widest uppercase font-bold text-silk-700">SEWA KEBAYA BY ARIE GUNARTI</span>
+              <h1 class="font-serif text-3xl sm:text-5xl font-bold text-charcoal-900 leading-tight">
+                Kebaya Pilihan untuk Momen Istimewamu.
               </h1>
-              <p class="text-sm text-charcoal-700 leading-relaxed">
+              <p class="text-xs sm:text-sm text-stone-600 leading-relaxed">
                 Temukan koleksi favorit, ajukan sewa, dan siapkan penampilan terbaikmu dengan fitting presisi dan jaminan anti double-booking.
               </p>
-              <div class="pt-2">
-                <button onclick="switchTab('katalog')"
-                  class="btn-ag-primary px-6 py-3 rounded-xl text-xs font-bold tracking-wide flex items-center gap-2">
-                  <span>Jelajahi katalog</span> <i data-lucide="arrow-right" class="w-4 h-4"></i>
+              <div class="pt-3">
+                <button onclick="showScreen('katalog')" class="btn-ag-primary px-7 py-3 rounded-xl text-xs font-bold tracking-wider uppercase inline-flex items-center gap-2">
+                  <span>Jelajahi Katalog Kebaya</span>
+                  <i data-lucide="arrow-right" class="w-4 h-4"></i>
                 </button>
               </div>
             </div>
-
-            <!-- Preview Gambar Hiasan Sesuai Figma (Otomatis Disembunyikan di Mobile) -->
-            <div class="hero-preview-decor hidden lg:flex items-center gap-3 absolute right-8 top-1/2 -translate-y-1/2 opacity-90">
-              <div class="w-28 h-52 rounded-2xl bg-gradient-to-b from-amber-100 to-silk-200 border border-silk-300 shadow-md flex flex-col items-center justify-center p-3 text-center">
-                <span class="text-4xl mb-2">✨</span>
-                <span class="font-serif font-bold text-xs text-charcoal-900">Kebaya Ivory</span>
-                <span class="text-[9px] text-silk-700 mt-1">KBY-001</span>
-              </div>
-              <div class="w-28 h-52 rounded-2xl bg-gradient-to-b from-emerald-100 to-silk-200 border border-silk-300 shadow-md flex flex-col items-center justify-center p-3 text-center">
-                <span class="text-4xl mb-2">🌿</span>
-                <span class="font-serif font-bold text-xs text-charcoal-900">Kebaya Sage</span>
-                <span class="text-[9px] text-silk-700 mt-1">KBY-002</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Section: Pilihan Untukmu (Figma 2002:67) -->
-          <div class="space-y-4">
-            <div class="flex items-center justify-between">
-              <h2 class="font-serif text-2xl font-bold text-charcoal-900">Pilihan untukmu</h2>
-              <button onclick="switchTab('katalog')" class="text-xs font-semibold text-silk-800 hover:text-charcoal-900 flex items-center gap-1">
-                Lihat semua koleksi <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-              </button>
-            </div>
-
-            <!-- Grid 2 Pilihan Utama Beranda (1 Kolom di Mobile, 2 Kolom di Desktop) -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 grid-pilihan">
-              <!-- Item 1: Kebaya Ayu Ivory (KBY-001) -->
-              <div class="bg-white rounded-2xl border border-silk-300 p-4 flex gap-4 shadow-xs hover:shadow-md transition">
-                <div class="w-28 h-36 rounded-xl bg-gradient-to-br from-amber-50 via-silk-100 to-amber-100 border border-silk-200 flex flex-col items-center justify-center shrink-0">
-                  <span class="text-4xl">👘</span>
-                  <span class="text-[10px] font-bold text-silk-800 mt-1">Ivory Silk</span>
-                </div>
-                <div class="flex flex-col justify-between flex-grow">
-                  <div>
-                    <div class="text-[11px] font-bold text-silk-700">KBY-001 · Ivory · Ukuran M</div>
-                    <h3 class="font-serif font-bold text-lg text-charcoal-900">Kebaya Ayu Ivory</h3>
-                    <div class="font-serif font-bold text-base text-silk-800 mt-1">Rp750.000 / sewa</div>
-                    <p class="text-[11px] text-stone-500 mt-1 flex items-center gap-1">
-                      <i data-lucide="calendar" class="w-3 h-3 text-silk-600"></i> Cek ketersediaan sesuai tanggal
-                    </p>
-                  </div>
-                  <div class="pt-2 flex items-center gap-2">
-                    <button onclick="bukaDetailKebaya('KBY-001')"
-                      class="text-xs font-bold text-charcoal-900 hover:text-silk-700 flex items-center gap-1">
-                      Lihat detail <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-                    </button>
-                    <button onclick="langsungAjukan('KBY-001')"
-                      class="ml-auto btn-ag-primary px-3 py-1.5 rounded-lg text-xs font-semibold">
-                      Ajukan sewa
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Item 2: Kebaya Laras Sage (KBY-002) -->
-              <div class="bg-white rounded-2xl border border-silk-300 p-4 flex gap-4 shadow-xs hover:shadow-md transition">
-                <div class="w-28 h-36 rounded-xl bg-gradient-to-br from-emerald-50 via-silk-100 to-teal-100 border border-silk-200 flex flex-col items-center justify-center shrink-0">
-                  <span class="text-4xl">🧕</span>
-                  <span class="text-[10px] font-bold text-silk-800 mt-1">Sage Brokat</span>
-                </div>
-                <div class="flex flex-col justify-between flex-grow">
-                  <div>
-                    <div class="text-[11px] font-bold text-silk-700">KBY-002 · Sage · Ukuran S</div>
-                    <h3 class="font-serif font-bold text-lg text-charcoal-900">Kebaya Laras Sage</h3>
-                    <div class="font-serif font-bold text-base text-silk-800 mt-1">Rp650.000 / sewa</div>
-                    <p class="text-[11px] text-stone-500 mt-1 flex items-center gap-1">
-                      <i data-lucide="calendar" class="w-3 h-3 text-silk-600"></i> Cek ketersediaan sesuai tanggal
-                    </p>
-                  </div>
-                  <div class="pt-2 flex items-center gap-2">
-                    <button onclick="bukaDetailKebaya('KBY-002')"
-                      class="text-xs font-bold text-charcoal-900 hover:text-silk-700 flex items-center gap-1">
-                      Lihat detail <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-                    </button>
-                    <button onclick="langsungAjukan('KBY-002')"
-                      class="ml-auto btn-ag-primary px-3 py-1.5 rounded-lg text-xs font-semibold">
-                      Ajukan sewa
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Banner Status Pengajuan (Dinamis: Empty vs Active Order) -->
-          <!-- State 1: Ada Pesanan Aktif -->
-          <div id="home-active-banner" class="hidden bg-white rounded-2xl border border-silk-300 p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs">
-            <div class="space-y-1">
-              <div class="text-[10px] tracking-wider font-bold text-silk-700 flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-                <span id="home-banner-code">PENGAJUAN TERBARU · AG-0261</span>
-              </div>
-              <h3 class="font-serif font-bold text-lg text-charcoal-900" id="home-banner-title">Kebaya Ayu Ivory · Menunggu konfirmasi admin</h3>
-              <p class="text-xs text-charcoal-700" id="home-banner-desc">Admin sedang memverifikasi tanggal pemakaian dan kesiapan busana.</p>
-            </div>
-            <button onclick="bukaDetailPengajuan()"
-              class="btn-ag-dark px-5 py-2.5 rounded-xl text-xs font-bold shrink-0 flex items-center gap-1.5">
-              <span>Pantau pengajuan</span> <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-            </button>
-          </div>
-
-          <!-- State 2: Belum Pernah Memesan (Default Pelanggan Baru) -->
-          <div id="home-empty-banner" class="bg-white/80 rounded-2xl border border-silk-300 p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs">
-            <div class="space-y-1">
-              <div class="text-[10px] tracking-wider font-bold text-silk-700 flex items-center gap-1.5">
-                <i data-lucide="sparkles" class="w-3.5 h-3.5 text-silk-600"></i>
-                <span>SISTEM BOOKING CEPAT & ANTI DOUBLE-BOOKING</span>
-              </div>
-              <h3 class="font-serif font-bold text-lg text-charcoal-900">Belum ada pengajuan sewa aktif</h3>
-              <p class="text-xs text-charcoal-700">Pilih kebaya impian Anda di katalog dan ajukan sewa secara online tanpa ribet mendaftar akun.</p>
-            </div>
-            <button onclick="switchTab('katalog')"
-              class="btn-ag-primary px-5 py-2.5 rounded-xl text-xs font-bold shrink-0 flex items-center gap-1.5">
-              <span>Jelajahi Katalog</span> <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-            </button>
           </div>
         </section>
 
-        <!-- ========================================== -->
-        <!-- TAB 2: KATALOG (Customer · Katalog — 2002:6) -->
-        <!-- ========================================== -->
-        <section id="view-katalog" class="hidden space-y-6 animate-in fade-in duration-200">
-          <!-- Judul Katalog -->
-          <div>
-            <h1 class="font-serif text-3xl font-bold text-charcoal-900">Katalog kebaya</h1>
-            <p class="text-sm text-charcoal-700 mt-1">Pilih kebaya yang melengkapi momen spesialmu dengan garansi ketersediaan.</p>
+        <!-- ============================================================== -->
+        <!-- LAYAR 1: KATALOG KEBAYA (Persis Screenshot 1 Figma)            -->
+        <!-- ============================================================== -->
+        <section id="screen-katalog" class="space-y-6 animate-in fade-in duration-200">
+          <!-- Judul Halaman -->
+          <div class="space-y-1">
+            <h1 class="font-serif text-3xl sm:text-4xl font-bold text-charcoal-900">Katalog kebaya</h1>
+            <p class="text-xs text-stone-500">Pilih kebaya yang melengkapi momen spesialmu.</p>
           </div>
 
-          <!-- Filter & Search Bar Sesuai Figma (2002:99 s.d 2002:104) -->
-          <div class="bg-white rounded-2xl border border-silk-300 p-4 space-y-3 shadow-xs">
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
-              <!-- Search -->
-              <div class="md:col-span-6 relative">
-                <i data-lucide="search" class="w-4 h-4 text-silk-600 absolute left-3.5 top-3"></i>
-                <input type="text" id="katalog-search" oninput="filterKatalog()"
-                  placeholder="Cari nama atau kode kebaya (misal: Ayu, KBY-001)..."
-                  class="w-full text-xs pl-10 pr-4 py-2.5 rounded-xl border border-silk-300 bg-silk-50/50 focus:bg-white focus:ring-2 focus:ring-silk-500 outline-none transition">
+          <!-- Search & Filter Bar (Persis Screenshot 1) -->
+          <div class="bg-white rounded-2xl border border-silk-300 p-3 sm:p-4 shadow-xs space-y-3">
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
+              <div class="sm:col-span-6 relative">
+                <i data-lucide="search" class="w-4 h-4 text-stone-400 absolute left-3 top-3"></i>
+                <input type="text" id="filter-search" oninput="applyFilters()" placeholder="Cari nama atau kode kebaya..."
+                  class="w-full text-xs pl-9 pr-3 py-2.5 rounded-xl border border-silk-300 bg-silk-50/50 outline-none focus:bg-white focus:ring-1 focus:ring-silk-500">
               </div>
 
-              <!-- Tanggal Pemakaian -->
-              <div class="md:col-span-3 relative">
-                <i data-lucide="calendar" class="w-4 h-4 text-silk-600 absolute left-3.5 top-3"></i>
-                <input type="date" id="katalog-tanggal" onchange="filterKatalog()"
-                  class="w-full text-xs pl-10 pr-3 py-2.5 rounded-xl border border-silk-300 bg-silk-50/50 focus:bg-white focus:ring-2 focus:ring-silk-500 outline-none transition">
+              <div class="sm:col-span-3">
+                <input type="date" id="filter-date" onchange="applyFilters()"
+                  class="w-full text-xs px-3 py-2.5 rounded-xl border border-silk-300 bg-silk-50/50 outline-none focus:bg-white text-stone-700">
               </div>
 
-              <!-- Filter Ukuran -->
-              <div class="md:col-span-3 relative">
-                <i data-lucide="tag" class="w-4 h-4 text-silk-600 absolute left-3.5 top-3"></i>
-                <select id="katalog-ukuran" onchange="filterKatalog()"
-                  class="w-full text-xs pl-10 pr-3 py-2.5 rounded-xl border border-silk-300 bg-silk-50/50 focus:bg-white focus:ring-2 focus:ring-silk-500 outline-none transition">
+              <div class="sm:col-span-3">
+                <select id="filter-size" onchange="applyFilters()"
+                  class="w-full text-xs px-3 py-2.5 rounded-xl border border-silk-300 bg-silk-50/50 outline-none focus:bg-white text-stone-700 cursor-pointer">
                   <option value="Semua">Ukuran · Semua</option>
-                  <option value="S">Ukuran S (LD 82-86)</option>
-                  <option value="M">Ukuran M (LD 88-92)</option>
-                  <option value="L">Ukuran L (LD 94-98)</option>
-                  <option value="XL">Ukuran XL (LD 100-106)</option>
+                  <option value="S">Ukuran S</option>
+                  <option value="M">Ukuran M</option>
+                  <option value="L">Ukuran L</option>
+                  <option value="XL">Ukuran XL</option>
                 </select>
               </div>
             </div>
 
-            <!-- Category Pills Sesuai Figma (2002:105 & 2002:107) -->
-            <div class="flex items-center gap-2 pt-2 border-t border-silk-200 overflow-x-auto pb-1 text-xs">
-              <button onclick="setKategori('Semua', this)" class="cat-pill px-3.5 py-1.5 rounded-full font-semibold bg-charcoal-900 text-white">Semua koleksi</button>
-              <button onclick="setKategori('Wisuda', this)" class="cat-pill px-3.5 py-1.5 rounded-full font-semibold bg-silk-100 text-charcoal-800 hover:bg-silk-200">Wisuda</button>
-              <button onclick="setKategori('Lamaran', this)" class="cat-pill px-3.5 py-1.5 rounded-full font-semibold bg-silk-100 text-charcoal-800 hover:bg-silk-200">Lamaran</button>
-              <button onclick="setKategori('Pernikahan', this)" class="cat-pill px-3.5 py-1.5 rounded-full font-semibold bg-silk-100 text-charcoal-800 hover:bg-silk-200">Pernikahan</button>
+            <!-- Filter Pills Kategori -->
+            <div class="flex items-center gap-2 pt-1 border-t border-silk-200 overflow-x-auto text-xs">
+              <button onclick="setCategoryFilter('Semua', this)" class="cat-pill px-4 py-1.5 rounded-full text-xs font-semibold btn-ag-dark">
+                Semua koleksi
+              </button>
+              <button onclick="setCategoryFilter('Wisuda', this)" class="cat-pill px-4 py-1.5 rounded-full text-xs font-semibold bg-white border border-silk-300 text-stone-700 hover:bg-silk-100">
+                Wisuda
+              </button>
+              <button onclick="setCategoryFilter('Lamaran', this)" class="cat-pill px-4 py-1.5 rounded-full text-xs font-semibold bg-white border border-silk-300 text-stone-700 hover:bg-silk-100">
+                Lamaran
+              </button>
+              <button onclick="setCategoryFilter('Pernikahan', this)" class="cat-pill px-4 py-1.5 rounded-full text-xs font-semibold bg-white border border-silk-300 text-stone-700 hover:bg-silk-100">
+                Pernikahan
+              </button>
             </div>
           </div>
 
-          <!-- Grid Koleksi Kebaya Figma (Ayu Ivory, Laras Sage, Kirana Rose) -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5" id="grid-katalog">
-            <!-- Card 1: Kebaya Ayu Ivory (Figma 2002:108) -->
-            <div class="kebaya-card bg-white rounded-2xl border border-silk-300 overflow-hidden shadow-xs hover:shadow-md transition flex flex-col justify-between"
-              data-kode="KBY-001" data-nama="Kebaya Ayu Ivory" data-ukuran="M" data-kategori="Wisuda" data-harga="750000">
-              <div>
-                <div class="h-48 bg-gradient-to-br from-amber-50 via-silk-100 to-amber-100 p-4 relative flex flex-col items-center justify-center border-b border-silk-200">
-                  <span class="text-6xl mb-1">👘</span>
-                  <span class="text-xs font-serif font-bold text-charcoal-900">Koleksi Wisuda & Acara Resmi</span>
-                  <span class="absolute top-3 left-3 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">Tersedia</span>
-                  <span class="absolute top-3 right-3 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-white text-charcoal-900 border border-silk-300">Size M</span>
-                </div>
-                <div class="p-4 space-y-2">
-                  <div class="text-[11px] font-bold text-silk-700">KBY-001 · Ivory · Ukuran M</div>
-                  <h3 class="font-serif font-bold text-xl text-charcoal-900">Kebaya Ayu Ivory</h3>
-                  <p class="text-xs text-charcoal-700 line-clamp-2">Kebaya bernuansa ivory dengan detail renda elegan dan payet lembut, cocok untuk wisuda atau acara resmi.</p>
-                  <div class="font-serif font-bold text-lg text-silk-800 pt-1">Rp750.000 / sewa</div>
-                </div>
-              </div>
-              <div class="p-4 bg-silk-50/60 border-t border-silk-200 flex items-center justify-between gap-2">
-                <button onclick="bukaDetailKebaya('KBY-001')" class="text-xs font-bold text-charcoal-900 hover:text-silk-700 flex items-center gap-1">
-                  Lihat detail <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-                </button>
-                <button onclick="langsungAjukan('KBY-001')" class="btn-ag-primary px-3 py-1.5 rounded-lg text-xs font-semibold">
-                  Ajukan sewa
-                </button>
-              </div>
-            </div>
-
-            <!-- Card 2: Kebaya Laras Sage (Figma 2002:114) -->
-            <div class="kebaya-card bg-white rounded-2xl border border-silk-300 overflow-hidden shadow-xs hover:shadow-md transition flex flex-col justify-between"
-              data-kode="KBY-002" data-nama="Kebaya Laras Sage" data-ukuran="S" data-kategori="Lamaran" data-harga="650000">
-              <div>
-                <div class="h-48 bg-gradient-to-br from-emerald-50 via-silk-100 to-teal-100 p-4 relative flex flex-col items-center justify-center border-b border-silk-200">
-                  <span class="text-6xl mb-1">🧕</span>
-                  <span class="text-xs font-serif font-bold text-charcoal-900">Koleksi Lamaran & Hijab</span>
-                  <span class="absolute top-3 left-3 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">Tersedia</span>
-                  <span class="absolute top-3 right-3 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-white text-charcoal-900 border border-silk-300">Size S</span>
-                </div>
-                <div class="p-4 space-y-2">
-                  <div class="text-[11px] font-bold text-silk-700">KBY-002 · Sage · Ukuran S</div>
-                  <h3 class="font-serif font-bold text-xl text-charcoal-900">Kebaya Laras Sage</h3>
-                  <p class="text-xs text-charcoal-700 line-clamp-2">Warna sage pastel anggun dengan sentuhan motif floral kontemporer, sangat cocok untuk prosesi lamaran & tunangan.</p>
-                  <div class="font-serif font-bold text-lg text-silk-800 pt-1">Rp650.000 / sewa</div>
-                </div>
-              </div>
-              <div class="p-4 bg-silk-50/60 border-t border-silk-200 flex items-center justify-between gap-2">
-                <button onclick="bukaDetailKebaya('KBY-002')" class="text-xs font-bold text-charcoal-900 hover:text-silk-700 flex items-center gap-1">
-                  Lihat detail <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-                </button>
-                <button onclick="langsungAjukan('KBY-002')" class="btn-ag-primary px-3 py-1.5 rounded-lg text-xs font-semibold">
-                  Ajukan sewa
-                </button>
-              </div>
-            </div>
-
-            <!-- Card 3: Kebaya Kirana Rose (Figma 2002:120) -->
-            <div class="kebaya-card bg-white rounded-2xl border border-silk-300 overflow-hidden shadow-xs hover:shadow-md transition flex flex-col justify-between"
-              data-kode="KBY-003" data-nama="Kebaya Kirana Rose" data-ukuran="M" data-kategori="Pernikahan" data-harga="850000">
-              <div>
-                <div class="h-48 bg-gradient-to-br from-rose-50 via-silk-100 to-rose-100 p-4 relative flex flex-col items-center justify-center border-b border-silk-200">
-                  <span class="text-6xl mb-1">🌸</span>
-                  <span class="text-xs font-serif font-bold text-charcoal-900">Koleksi Pernikahan & Bridesmaid</span>
-                  <span class="absolute top-3 left-3 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">Tersedia</span>
-                  <span class="absolute top-3 right-3 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-white text-charcoal-900 border border-silk-300">Size M</span>
-                </div>
-                <div class="p-4 space-y-2">
-                  <div class="text-[11px] font-bold text-silk-700">KBY-003 · Dusty rose · Ukuran M</div>
-                  <h3 class="font-serif font-bold text-xl text-charcoal-900">Kebaya Kirana Rose</h3>
-                  <p class="text-xs text-charcoal-700 line-clamp-2">Kebaya kurung modern warna dusty rose dengan aksen manik mutiara premium, pilihan favorit untuk resepsi.</p>
-                  <div class="font-serif font-bold text-lg text-silk-800 pt-1">Rp850.000 / sewa</div>
-                </div>
-              </div>
-              <div class="p-4 bg-silk-50/60 border-t border-silk-200 flex items-center justify-between gap-2">
-                <button onclick="bukaDetailKebaya('KBY-003')" class="text-xs font-bold text-charcoal-900 hover:text-silk-700 flex items-center gap-1">
-                  Lihat detail <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-                </button>
-                <button onclick="langsungAjukan('KBY-003')" class="btn-ag-primary px-3 py-1.5 rounded-lg text-xs font-semibold">
-                  Ajukan sewa
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Status Koleksi & Halaman (Bersih, Elegan & Profesional) -->
-          <div class="pt-4 pb-2 border-t border-silk-200/80 flex flex-col sm:flex-row items-center justify-between gap-2.5 text-xs">
-            <div class="flex items-center gap-2 text-charcoal-800 text-center sm:text-left">
-              <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
-              <span class="font-semibold text-charcoal-900" id="katalog-info-counter">Menampilkan 3 Koleksi Kebaya</span>
-              <span class="text-stone-300">·</span>
-              <span class="text-silk-700 text-[11px]">Real-Time Sesuai Jadwal</span>
-            </div>
-            <div class="flex items-center gap-1.5 text-silk-800 text-[11px] bg-white/80 px-3 py-1 rounded-full border border-silk-300 shadow-2xs font-medium">
-              <span>Halaman 1 dari 1</span>
-            </div>
+          <!-- Grid Koleksi Kebaya (Persis Screenshot 1) -->
+          <div id="grid-katalog-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Di-generate otomatis oleh script di bawah -->
           </div>
         </section>
 
-        <!-- ========================================== -->
-        <!-- VIEW: DETAIL KEBAYA (Customer · Detail kebaya — 2002:10) -->
-        <!-- ========================================== -->
-        <section id="view-detail-kebaya" class="hidden space-y-6 animate-in fade-in duration-200">
+        <!-- ============================================================== -->
+        <!-- LAYAR 2: DETAIL KEBAYA (Persis Screenshot 2 Figma)             -->
+        <!-- ============================================================== -->
+        <section id="screen-detail-kebaya" class="hidden space-y-6 animate-in fade-in duration-200">
           <!-- Breadcrumb -->
-          <div class="flex items-center gap-2 text-xs text-silk-800">
-            <button onclick="switchTab('katalog')" class="hover:underline flex items-center gap-1">
-              <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i> Katalog
-            </button>
+          <nav class="flex items-center gap-2 text-xs text-stone-500">
+            <button onclick="showScreen('katalog')" class="hover:text-charcoal-900 underline">Katalog</button>
             <span>/</span>
-            <span class="font-semibold text-charcoal-900" id="detail-breadcrumb">Kebaya Ayu Ivory</span>
-          </div>
+            <span class="text-charcoal-900 font-semibold" id="detail-breadcrumb">Kebaya Ayu Ivory</span>
+          </nav>
 
-          <div class="bg-white rounded-3xl border border-silk-300 p-6 sm:p-8 shadow-xs">
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
-              <!-- Foto / Visual Box -->
-              <div class="md:col-span-5 bg-gradient-to-br from-silk-100 via-amber-50 to-silk-200 rounded-2xl border border-silk-300 h-96 flex flex-col items-center justify-center p-6 text-center relative overflow-hidden">
-                <span class="text-8xl mb-3" id="detail-icon">👘</span>
-                <span class="font-serif font-bold text-xl text-charcoal-900" id="detail-foto-nama">Kebaya Ayu Ivory</span>
-                <span class="text-xs text-silk-800 mt-1" id="detail-foto-kode">KBY-001 · Foto Real Pict UMKM</span>
-                <span class="absolute top-4 left-4 bg-emerald-100 text-emerald-800 text-[10px] font-bold px-3 py-1 rounded-full border border-emerald-300">Siap Sewa</span>
+          <div class="bg-white rounded-3xl border border-silk-300 p-6 sm:p-8 shadow-xs grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <!-- Foto Besar Kiri (Mannequin Style) -->
+            <div class="lg:col-span-5 bg-gradient-to-b from-silk-100 to-silk-200 rounded-2xl overflow-hidden border border-silk-300 flex items-center justify-center p-4">
+              <img id="detail-image" src="" alt="Foto Kebaya" class="w-full h-[430px] object-cover rounded-xl shadow-xs">
+            </div>
+
+            <!-- Rincian Kanan -->
+            <div class="lg:col-span-7 space-y-5">
+              <div class="space-y-1">
+                <span class="text-[10px] tracking-widest uppercase font-bold text-silk-700" id="detail-code-badge">
+                  KBY-001 · KOLEKSI WISUDA
+                </span>
+                <h1 class="font-serif text-3xl sm:text-4xl font-bold text-charcoal-900" id="detail-name">
+                  Kebaya Ayu Ivory
+                </h1>
+                <div class="font-serif text-xl font-bold text-charcoal-900 pt-1" id="detail-price">
+                  Rp750.000 / sewa
+                </div>
               </div>
 
-              <!-- Info & Booking Action -->
-              <div class="md:col-span-7 space-y-5">
-                <div>
-                  <div class="text-xs font-bold text-silk-700 uppercase tracking-wider" id="detail-koleksi">KBY-001 · KOLEKSI WISUDA</div>
-                  <h1 class="font-serif text-3xl sm:text-4xl font-bold text-charcoal-900 mt-1" id="detail-nama">Kebaya Ayu Ivory</h1>
-                  <div class="font-serif font-bold text-2xl text-silk-800 mt-2" id="detail-harga">Rp750.000 / sewa</div>
-                </div>
+              <p class="text-xs sm:text-sm text-stone-600 leading-relaxed" id="detail-desc">
+                Kebaya bernuansa ivory dengan detail renda anggun untuk melengkapi momen wisudamu.
+              </p>
 
-                <p class="text-xs sm:text-sm text-charcoal-700 leading-relaxed" id="detail-deskripsi">
-                  Kebaya bernuansa ivory dengan detail renda elegan dan payet lembut, cocok untuk wisuda atau acara resmi. Termasuk kain jarik batik wiru dan obi pinggang senada.
+              <!-- Ukuran Spesifikasi -->
+              <div class="bg-silk-50 p-4 rounded-2xl border border-silk-200 space-y-1.5">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-silk-800" id="detail-size-label">Ukuran M</span>
+                <p class="text-xs text-stone-600" id="detail-specs">
+                  Lingkar dada 90 cm · Tinggi referensi 160 cm
                 </p>
+              </div>
 
-                <!-- Spec Ukuran Sesuai Figma (2002:143 & 2002:145) -->
-                <div class="space-y-2 pt-2 border-t border-silk-200">
-                  <div class="flex items-center gap-2">
-                    <span class="px-3 py-1 bg-silk-100 border border-silk-300 rounded-lg text-xs font-bold text-charcoal-900" id="detail-size-badge">Ukuran M</span>
-                    <span class="text-xs text-charcoal-700" id="detail-size-desc">Lingkar dada 90 cm · Tinggi referensi 160 cm</span>
-                  </div>
-                  <p class="text-[11px] text-stone-500 italic">Tersedia layanan fitting dan penyesuaian kancing/peniti halus oleh penjahit kami.</p>
+              <!-- Cek Tanggal Pemakaian -->
+              <div class="space-y-2 pt-2 border-t border-silk-200">
+                <label class="block text-xs font-semibold text-charcoal-800">Cek tanggal pemakaian</label>
+                <input type="date" id="detail-input-date" class="w-full text-xs px-3.5 py-2.5 rounded-xl border border-silk-300 bg-silk-50/50">
+                <div class="text-[11px] text-stone-500 leading-tight space-y-0.5">
+                  <p>Admin akan mengonfirmasi ketersediaan.</p>
+                  <p>Pengajuan belum mengunci jadwal sewa.</p>
                 </div>
+              </div>
 
-                <!-- Cek Tanggal Pemakaian (2002:147 & 2002:148) -->
-                <div class="space-y-2 pt-2 border-t border-silk-200">
-                  <label class="block text-xs font-bold text-charcoal-900">Cek tanggal pemakaian</label>
-                  <div class="flex gap-2">
-                    <input type="date" id="detail-tanggal-input" value="2026-11-27"
-                      class="w-full text-xs px-3.5 py-2.5 rounded-xl border border-silk-300 bg-silk-50/50 focus:bg-white focus:ring-2 focus:ring-silk-500 outline-none">
-                  </div>
-                  <p class="text-[11px] text-silk-800 leading-relaxed">
-                    Admin akan mengonfirmasi ketersediaan. Pengajuan sewa belum mengunci kebaya sampai DP diverifikasi.
-                  </p>
-                </div>
-
-                <!-- CTA Button -->
-                <div class="pt-2">
-                  <button onclick="lanjutAjukanDariDetail()"
-                    class="w-full btn-ag-primary py-3.5 rounded-xl text-xs font-bold tracking-wider uppercase flex items-center justify-center gap-2">
-                    <span>Ajukan sewa</span> <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                  </button>
-                </div>
+              <!-- Tombol Ajukan Sewa -->
+              <div class="pt-3">
+                <button onclick="goToAjukanSewa()" class="w-full btn-ag-primary py-3.5 rounded-xl text-xs font-bold tracking-wider uppercase flex items-center justify-center gap-2">
+                  <span>Ajukan sewa →</span>
+                </button>
               </div>
             </div>
           </div>
         </section>
 
-        <!-- ========================================== -->
-        <!-- VIEW: AJUKAN SEWA (Customer · Ajukan sewa — 2002:14) -->
-        <!-- ========================================== -->
-        <section id="view-ajukan-sewa" class="hidden space-y-6 animate-in fade-in duration-200">
-          <div>
+        <!-- ============================================================== -->
+        <!-- LAYAR 3: AJUKAN SEWA (Persis Screenshot 3 Figma)               -->
+        <!-- ============================================================== -->
+        <section id="screen-ajukan-sewa" class="hidden space-y-6 animate-in fade-in duration-200">
+          <div class="space-y-1">
             <h1 class="font-serif text-3xl font-bold text-charcoal-900">Ajukan sewa</h1>
-            <p class="text-sm text-charcoal-700 mt-1">Lengkapi data untuk ditinjau oleh admin dan pastikan kesesuaian ukuran badan.</p>
+            <p class="text-xs text-stone-500">Lengkapi data untuk ditinjau oleh admin.</p>
           </div>
 
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            <!-- Kolom Kiri: Form Data Pelanggan & Jadwal (2002:307 s.d 2002:338) -->
-            <div class="lg:col-span-7 bg-white rounded-3xl border border-silk-300 p-6 space-y-6 shadow-xs">
-              <!-- Bagian 01 · Data Pelanggan -->
-              <div class="space-y-4">
-                <h2 class="font-serif font-bold text-xl text-charcoal-900 flex items-center gap-2">
-                  <span class="w-7 h-7 rounded-full bg-silk-700 text-white text-xs font-serif flex items-center justify-center">01</span>
-                  Data pelanggan
-                </h2>
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <!-- Kolom Kiri: Formulir 01 & 02 -->
+            <div class="lg:col-span-7 bg-white rounded-3xl border border-silk-300 p-6 sm:p-8 space-y-6 shadow-xs">
+              
+              <!-- 01 · Data Pelanggan -->
+              <div class="space-y-3.5">
+                <h3 class="font-serif font-bold text-lg text-charcoal-900 border-b border-silk-200 pb-2">
+                  01 · Data pelanggan
+                </h3>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label class="block text-xs font-semibold text-charcoal-800 mb-1">Nama lengkap <span class="text-rose-600">*</span></label>
-                    <input type="text" id="form-nama" placeholder="Contoh: Siti Rahmawati / Nama Anda" oninput="updateNamaCustomer(this.value)" required
-                      class="w-full text-xs px-3.5 py-2.5 rounded-xl border border-silk-300 bg-silk-50/50 focus:bg-white focus:ring-2 focus:ring-silk-500 outline-none">
-                  </div>
-                  <div>
-                    <label class="block text-xs font-semibold text-charcoal-800 mb-1">WhatsApp <span class="text-rose-600">*</span></label>
-                    <input type="tel" id="form-telepon" placeholder="Contoh: 081234567890" required
-                      class="w-full text-xs px-3.5 py-2.5 rounded-xl border border-silk-300 bg-silk-50/50 focus:bg-white focus:ring-2 focus:ring-silk-500 outline-none">
-                  </div>
+                <div>
+                  <label class="block text-xs font-semibold text-charcoal-800 mb-1">Nama lengkap</label>
+                  <input type="text" id="form-customer-name" value="Siti Rahmawati" placeholder="Masukkan nama Anda"
+                    class="w-full text-xs px-3.5 py-2.5 rounded-xl border border-silk-300 bg-silk-50/50 focus:bg-white outline-none">
                 </div>
 
-                <!-- Ukuran Fisik Customer (LD, TB, BB) Sesuai Figma -->
-                <div class="grid grid-cols-3 gap-3 pt-2">
+                <div>
+                  <label class="block text-xs font-semibold text-charcoal-800 mb-1">WhatsApp</label>
+                  <input type="text" id="form-customer-wa" value="0812 3456 7890" placeholder="Nomor WhatsApp aktif"
+                    class="w-full text-xs px-3.5 py-2.5 rounded-xl border border-silk-300 bg-silk-50/50 focus:bg-white outline-none">
+                </div>
+
+                <div class="grid grid-cols-3 gap-2.5">
                   <div>
                     <label class="block text-[11px] font-semibold text-charcoal-800 mb-1">Lingkar dada (cm)</label>
-                    <input type="number" id="form-ld" value="90" min="60" max="140"
-                      class="w-full text-xs px-3 py-2.5 rounded-xl border border-silk-300 bg-silk-50/50 focus:bg-white focus:ring-2 focus:ring-silk-500 outline-none">
+                    <input type="number" id="form-ld" value="90" class="w-full text-xs px-3 py-2 rounded-xl border border-silk-300 bg-silk-50/50">
                   </div>
                   <div>
                     <label class="block text-[11px] font-semibold text-charcoal-800 mb-1">Tinggi badan (cm)</label>
-                    <input type="number" id="form-tb" value="160" min="100" max="210"
-                      class="w-full text-xs px-3 py-2.5 rounded-xl border border-silk-300 bg-silk-50/50 focus:bg-white focus:ring-2 focus:ring-silk-500 outline-none">
+                    <input type="number" id="form-tb" value="160" class="w-full text-xs px-3 py-2 rounded-xl border border-silk-300 bg-silk-50/50">
                   </div>
                   <div>
                     <label class="block text-[11px] font-semibold text-charcoal-800 mb-1">Berat badan (kg)</label>
-                    <input type="number" id="form-bb" value="52" min="30" max="150"
-                      class="w-full text-xs px-3 py-2.5 rounded-xl border border-silk-300 bg-silk-50/50 focus:bg-white focus:ring-2 focus:ring-silk-500 outline-none">
+                    <input type="number" id="form-bb" value="52" class="w-full text-xs px-3 py-2 rounded-xl border border-silk-300 bg-silk-50/50">
                   </div>
                 </div>
               </div>
 
-              <!-- Bagian 02 · Jadwal Penyewaan -->
-              <div class="space-y-4 pt-4 border-t border-silk-200">
-                <h2 class="font-serif font-bold text-xl text-charcoal-900 flex items-center gap-2">
-                  <span class="w-7 h-7 rounded-full bg-silk-700 text-white text-xs font-serif flex items-center justify-center">02</span>
-                  Jadwal penyewaan
-                </h2>
+              <!-- 02 · Jadwal Penyewaan -->
+              <div class="space-y-3.5 pt-2">
+                <h3 class="font-serif font-bold text-lg text-charcoal-900 border-b border-silk-200 pb-2">
+                  02 · Jadwal penyewaan
+                </h3>
 
-                <div class="grid grid-cols-3 gap-3">
+                <div class="grid grid-cols-3 gap-2.5">
                   <div>
-                    <label class="block text-[11px] font-semibold text-charcoal-800 mb-1">Tanggal ambil (H-1)</label>
-                    <input type="text" id="form-tgl-ambil" value="26 Nov 2026" readonly
-                      class="w-full text-xs px-3 py-2.5 rounded-xl border border-silk-300 bg-silk-100 text-charcoal-800 outline-none font-medium">
+                    <label class="block text-[11px] font-semibold text-charcoal-800 mb-1">Tanggal ambil</label>
+                    <input type="text" id="form-date-ambil" readonly value="26 Nov 2026" class="w-full text-xs px-3 py-2 rounded-xl border border-silk-200 bg-silk-100 text-stone-600">
                   </div>
                   <div>
-                    <label class="block text-[11px] font-semibold text-charcoal-800 mb-1">Tanggal pakai (H)</label>
-                    <input type="date" id="form-tgl-pakai" value="2026-11-27" onchange="sinkronJadwal()" required
-                      class="w-full text-xs px-3 py-2.5 rounded-xl border border-silk-300 bg-silk-50/50 focus:bg-white focus:ring-2 focus:ring-silk-500 outline-none">
+                    <label class="block text-[11px] font-semibold text-charcoal-800 mb-1">Tanggal pakai</label>
+                    <input type="text" id="form-date-pakai" readonly value="27 Nov 2026" class="w-full text-xs px-3 py-2 rounded-xl border border-silk-300 bg-silk-50 font-bold text-charcoal-900">
                   </div>
                   <div>
-                    <label class="block text-[11px] font-semibold text-charcoal-800 mb-1">Tanggal kembali (H+1)</label>
-                    <input type="text" id="form-tgl-kembali" value="28 Nov 2026" readonly
-                      class="w-full text-xs px-3 py-2.5 rounded-xl border border-silk-300 bg-silk-100 text-charcoal-800 outline-none font-medium">
+                    <label class="block text-[11px] font-semibold text-charcoal-800 mb-1">Tanggal kembali</label>
+                    <input type="text" id="form-date-kembali" readonly value="28 Nov 2026" class="w-full text-xs px-3 py-2 rounded-xl border border-silk-200 bg-silk-100 text-stone-600">
                   </div>
                 </div>
 
                 <div>
-                  <label class="block text-xs font-semibold text-charcoal-800 mb-1">Keperluan <span class="text-rose-600">*</span></label>
-                  <select id="form-keperluan" class="w-full text-xs px-3.5 py-2.5 rounded-xl border border-silk-300 bg-silk-50/50 focus:bg-white focus:ring-2 focus:ring-silk-500 outline-none">
+                  <label class="block text-xs font-semibold text-charcoal-800 mb-1">Keperluan</label>
+                  <select id="form-purpose" class="w-full text-xs px-3.5 py-2.5 rounded-xl border border-silk-300 bg-silk-50/50 cursor-pointer">
                     <option value="Wisuda">Wisuda</option>
-                    <option value="Lamaran">Lamaran / Tunangan</option>
-                    <option value="Pernikahan">Pernikahan / Bridesmaid</option>
-                    <option value="Foto Studio">Foto Studio / Prewedding</option>
+                    <option value="Lamaran">Lamaran</option>
+                    <option value="Pernikahan">Pernikahan</option>
                     <option value="Lainnya">Lainnya</option>
                   </select>
-                </div>
-
-                <div>
-                  <label class="block text-xs font-semibold text-charcoal-800 mb-1">Catatan untuk admin</label>
-                  <textarea id="form-catatan" rows="2" placeholder="Contoh: Saya ingin menjadwalkan fitting terlebih dahulu..."
-                    class="w-full text-xs px-3.5 py-2.5 rounded-xl border border-silk-300 bg-silk-50/50 focus:bg-white focus:ring-2 focus:ring-silk-500 outline-none">Saya ingin menjadwalkan fitting.</textarea>
                 </div>
               </div>
             </div>
 
-            <!-- Kolom Kanan: Ringkasan Pengajuan Sesuai Figma (2002:339 s.d 2002:352) -->
+            <!-- Kolom Kanan: Ringkasan Pengajuan (Persis Screenshot 3) -->
             <div class="lg:col-span-5 space-y-4">
               <div class="bg-white rounded-3xl border border-silk-300 p-6 space-y-4 shadow-xs">
-                <h3 class="font-serif font-bold text-lg text-charcoal-900 border-b border-silk-200 pb-3">Ringkasan pengajuan</h3>
-
-                <!-- Info Kebaya Terpilih -->
-                <div class="flex items-center gap-3">
-                  <div class="w-16 h-20 rounded-xl bg-gradient-to-br from-amber-50 to-silk-200 border border-silk-200 flex items-center justify-center shrink-0 text-3xl" id="summary-icon">
-                    👘
-                  </div>
-                  <div>
-                    <h4 class="font-serif font-bold text-base text-charcoal-900" id="summary-nama">Kebaya Ayu Ivory</h4>
-                    <p class="text-xs text-silk-700" id="summary-kode-ukuran">KBY-001 · Ukuran M</p>
-                    <p class="text-xs font-semibold text-charcoal-900 mt-1" id="summary-harga">Rp750.000 / sewa</p>
+                <!-- Kebaya Ringkas -->
+                <div class="flex items-center gap-3.5">
+                  <img id="form-summary-image" src="" alt="Thumbnail" class="w-16 h-20 object-cover rounded-xl border border-silk-300">
+                  <div class="space-y-0.5">
+                    <h4 class="font-serif font-bold text-base text-charcoal-900" id="form-summary-name">Kebaya Ayu Ivory</h4>
+                    <div class="text-[11px] text-stone-500" id="form-summary-code-size">KBY-001 · Ukuran M</div>
+                    <div class="text-xs font-bold text-charcoal-900" id="form-summary-price">Rp750.000 / sewa</div>
                   </div>
                 </div>
 
                 <div class="border-t border-silk-200 pt-3 space-y-2 text-xs">
-                  <div class="flex justify-between items-center text-charcoal-800">
+                  <div class="flex justify-between font-bold text-charcoal-900">
                     <span>Total sewa:</span>
-                    <span class="font-serif font-bold text-base text-charcoal-900" id="summary-total">Rp750.000</span>
+                    <span id="form-summary-total">Rp750.000</span>
                   </div>
-                  <div class="flex justify-between items-center text-silk-800">
+                  <div class="flex justify-between text-silk-800 font-semibold">
                     <span>Rencana DP 50%:</span>
-                    <span class="font-semibold" id="summary-dp">Rp375.000</span>
+                    <span id="form-summary-dp">Rp375.000</span>
                   </div>
                 </div>
 
-                <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-[11px] text-amber-900 space-y-1.5 leading-relaxed">
-                  <p><strong>Ketentuan Sewa:</strong> Pembayaran dilakukan setelah pengajuan disetujui dan diverifikasi oleh admin.</p>
-                  <p class="text-rose-800 font-semibold">⚠️ Pengajuan belum mengunci kebaya sampai DP dicatat.</p>
+                <div class="bg-silk-50 p-3.5 rounded-2xl border border-silk-200 text-[11px] text-stone-600 space-y-1 leading-relaxed">
+                  <p>Pembayaran dilakukan setelah pengajuan disetujui admin dan jadwal fitting dikonfirmasi.</p>
+                  <p class="font-semibold text-charcoal-900">Pengajuan belum mengunci kebaya.</p>
                 </div>
-
-                <p class="text-[10px] text-stone-500 leading-relaxed">
-                  Dengan mengirim pengajuan, saya menyetujui ketentuan penyewaan dan SOP perawatan kebaya di Sewa Kebaya by Arie Gunarti.
-                </p>
-
-                <button onclick="submitPengajuanSewa()"
-                  class="w-full btn-ag-primary py-3.5 rounded-xl text-xs font-bold tracking-wider uppercase flex items-center justify-center gap-2">
-                  <span>Kirim pengajuan</span> <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                </button>
               </div>
+
+              <!-- Disclaimer & Tombol Kirim -->
+              <p class="text-[10px] text-stone-500 text-center leading-normal px-2">
+                Dengan mengirim pengajuan, saya menyetujui ketentuan penyewaan dan jadwal fitting/pengembalian.
+              </p>
+
+              <!-- Loading Indicator saat mengirim -->
+              <div id="booking-loading" class="hidden text-center py-2 space-y-1">
+                <div class="inline-block animate-spin rounded-full h-5 w-5 border-2 border-silk-600 border-t-transparent"></div>
+                <div class="text-[11px] font-semibold text-charcoal-900">Sedang mengirim pengajuan ke admin...</div>
+              </div>
+
+              <button id="btn-submit-booking" onclick="kirimPengajuanSewa()" class="w-full btn-ag-primary py-3.5 rounded-xl text-xs font-bold tracking-wider uppercase flex items-center justify-center gap-2">
+                <span>Kirim pengajuan →</span>
+              </button>
             </div>
           </div>
         </section>
 
-        <!-- ========================================== -->
-        <!-- TAB 3: PENGAJUAN SAYA (Customer · Pengajuan saya — 2002:18) -->
-        <!-- ========================================== -->
-        <section id="view-pengajuan-saya" class="hidden space-y-6 animate-in fade-in duration-200">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <h1 class="font-serif text-3xl font-bold text-charcoal-900">Pengajuan saya</h1>
-              <p class="text-sm text-charcoal-700 mt-1">Pantau proses sewa secara instan tanpa perlu registrasi akun atau login.</p>
-            </div>
-            <!-- Lacak Cepat Tanpa Login (Cukup No. WA / Kode Booking) -->
-            <div class="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-silk-300 shadow-xs">
-              <i data-lucide="search" class="w-4 h-4 text-silk-600"></i>
-              <input type="text" id="input-lacak-kode" placeholder="Lacak via No. WA / Kode Booking"
-                class="text-xs bg-transparent outline-none w-48 sm:w-60 text-charcoal-900 font-medium">
-              <button onclick="lacakPesananManual()" class="btn-ag-primary px-3 py-1 rounded-lg text-[11px] font-semibold">Lacak</button>
-            </div>
+        <!-- ============================================================== -->
+        <!-- LAYAR 4: PENGAJUAN SAYA (Persis Screenshot 4 Figma)            -->
+        <!-- ============================================================== -->
+        <section id="screen-pengajuan-saya" class="hidden space-y-6 animate-in fade-in duration-200">
+          <div class="space-y-1">
+            <h1 class="font-serif text-3xl font-bold text-charcoal-900">Pengajuan saya</h1>
+            <p class="text-xs text-stone-500">Pantau proses sewa hingga pengembalian kebaya.</p>
           </div>
 
-          <!-- Tab Status Aktif vs Riwayat Sesuai Figma (2002:355 & 2002:357) -->
-          <div class="flex items-center justify-between border-b border-silk-300 pb-2">
-            <div class="flex items-center gap-3">
-              <button class="px-4 py-1.5 rounded-full text-xs font-bold bg-charcoal-900 text-white">Aktif · <span id="count-aktif">0</span></button>
-              <button class="px-4 py-1.5 rounded-full text-xs font-semibold text-charcoal-700 hover:text-charcoal-900">Riwayat</button>
-            </div>
-            <!-- Toggle Simulasi Mockup -->
-            <div class="flex items-center gap-2">
-              <button id="btn-demo-muat" onclick="muatContohDummy()"
-                class="text-[11px] font-semibold text-silk-800 hover:text-charcoal-900 flex items-center gap-1 bg-silk-100 px-2.5 py-1 rounded-lg border border-silk-300 transition">
-                <i data-lucide="sparkles" class="w-3 h-3 text-amber-600"></i> Contoh Demo Pesanan
-              </button>
-              <button id="btn-demo-reset" onclick="resetPengajuan()"
-                class="hidden text-[11px] font-semibold text-rose-700 hover:text-rose-900 flex items-center gap-1 bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-200 transition">
-                <i data-lucide="rotate-ccw" class="w-3 h-3"></i> Kosongkan Pesanan
-              </button>
-            </div>
+          <!-- Pills Status -->
+          <div class="flex items-center gap-2 text-xs">
+            <button class="px-4 py-1.5 rounded-full font-semibold btn-ag-dark">
+              Aktif · 1
+            </button>
+            <button class="px-4 py-1.5 rounded-full font-semibold bg-white border border-silk-300 text-stone-600 hover:bg-silk-100">
+              Riwayat
+            </button>
           </div>
 
-          <!-- State 1: EMPTY STATE (Saat Customer Belum Pernah Memesan) -->
-          <div id="pengajuan-empty-state" class="bg-white rounded-3xl border border-silk-300 p-8 sm:p-12 text-center shadow-xs space-y-4">
-            <div class="w-16 h-16 rounded-2xl bg-silk-100 border border-silk-300 text-silk-700 flex items-center justify-center mx-auto text-3xl">
-              📋
-            </div>
-            <div class="max-w-md mx-auto space-y-1">
-              <h3 class="font-serif font-bold text-xl text-charcoal-900">Belum Ada Pengajuan Sewa</h3>
-              <p class="text-xs text-charcoal-700 leading-relaxed">
-                Anda belum memiliki pengajuan sewa aktif saat ini. Silakan jelajahi katalog kebaya kami dan kirimkan pengajuan sewa busana impian Anda.
-              </p>
-            </div>
-            <div class="pt-2 flex flex-wrap items-center justify-center gap-3">
-              <button onclick="switchTab('katalog')" class="btn-ag-primary px-5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-1.5">
-                <i data-lucide="grid" class="w-3.5 h-3.5"></i> Jelajahi Katalog Kebaya
-              </button>
-            </div>
-          </div>
-
-          <!-- State 2: Card Pengajuan Aktif Sesuai Figma (2002:358 s.d 2002:369) -->
-          <div id="pengajuan-active-card" class="hidden bg-white rounded-3xl border border-silk-300 p-5 sm:p-6 shadow-xs space-y-4">
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-silk-200 pb-3">
-              <div class="flex items-center gap-2">
-                <span class="font-serif font-bold text-base text-charcoal-900" id="order-card-code">AG-0261</span>
-                <span class="text-xs text-stone-500" id="order-card-date">· Diajukan 23 Nov 2026</span>
-              </div>
-              <span class="px-3 py-1 rounded-full text-[11px] font-bold bg-amber-100 text-amber-900 border border-amber-300 flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-                <span id="order-card-status">Menunggu admin</span>
+          <!-- Kartu Pengajuan Aktif (Persis Screenshot 4) -->
+          <div class="bg-white rounded-3xl border border-silk-300 p-5 sm:p-6 shadow-xs space-y-4">
+            <div class="flex items-center justify-between border-b border-silk-200 pb-3 text-xs">
+              <span class="text-stone-500 font-medium">AG-0261 · Diajukan 23 Nov 2026</span>
+              <span id="card-status-badge" class="px-3 py-1 rounded-full text-[11px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
+                Menunggu admin
               </span>
             </div>
 
-            <div class="flex flex-col md:flex-row items-start md:items-center gap-4">
-              <div class="w-20 h-24 rounded-xl bg-gradient-to-br from-amber-50 to-silk-200 border border-silk-300 flex items-center justify-center text-4xl shrink-0" id="order-card-icon">
-                👘
-              </div>
-              <div class="space-y-1 flex-grow">
-                <h3 class="font-serif font-bold text-xl text-charcoal-900" id="order-card-nama">Kebaya Ayu Ivory</h3>
-                <p class="text-xs text-silk-700 font-medium" id="order-card-sub">Ukuran M · Wisuda</p>
-                <p class="text-xs text-charcoal-800 flex items-center gap-1.5 pt-1">
-                  <i data-lucide="calendar" class="w-3.5 h-3.5 text-silk-600"></i>
-                  <span id="order-card-schedule">26–28 Nov 2026 (Pakai: 27 Nov)</span>
-                </p>
-                <p class="text-xs text-stone-500 pt-1">Admin sedang meninjau tanggal dan ketersediaan fisik.</p>
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div class="flex items-center gap-4">
+                <img id="my-booking-image" src="" alt="Kebaya" class="w-16 h-20 object-cover rounded-xl border border-silk-300">
+                <div class="space-y-1">
+                  <h3 class="font-serif font-bold text-lg text-charcoal-900" id="my-booking-name">Kebaya Ayu Ivory</h3>
+                  <div class="text-xs text-stone-500" id="my-booking-meta">Ukuran M · Wisuda</div>
+                  <div class="text-xs font-semibold text-charcoal-800">26–28 Nov 2026</div>
+                  <p class="text-[11px] text-stone-500" id="my-booking-status-text">Admin sedang meninjau tanggal dan ketersediaan.</p>
+                </div>
               </div>
 
-              <div class="md:text-right w-full md:w-auto pt-3 md:pt-0 border-t md:border-t-0 border-silk-200">
-                <div class="text-xs text-stone-500">Total sewa</div>
-                <div class="font-serif font-bold text-xl text-charcoal-900" id="order-card-price">Rp750.000</div>
-                <button onclick="bukaDetailPengajuan()"
-                  class="mt-2 w-full md:w-auto btn-ag-primary px-4 py-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5">
-                  <span>Lihat detail</span> <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+              <div class="text-right sm:self-center w-full sm:w-auto flex sm:flex-col justify-between items-center sm:items-end gap-2 border-t sm:border-0 pt-3 sm:pt-0">
+                <span class="font-bold text-sm text-charcoal-900" id="my-booking-price">Rp750.000</span>
+                <button onclick="showScreen('detail-pengajuan')" class="btn-ag-primary px-4 py-2 rounded-xl text-xs font-semibold">
+                  Lihat detail →
                 </button>
               </div>
             </div>
           </div>
 
-          <!-- Card Bantuan / Langkah Selanjutnya (Figma 2002:370 s.d 2002:372) -->
-          <div class="bg-gradient-to-br from-silk-100/90 to-white rounded-3xl border border-silk-300 p-6 space-y-3">
-            <h3 class="font-serif font-bold text-lg text-charcoal-900">Apa selanjutnya?</h3>
-            <ol class="text-xs text-charcoal-800 space-y-2 list-decimal list-inside leading-relaxed">
-              <li><strong>Admin mengonfirmasi ketersediaan:</strong> Pemeriksaan fisik busana & pencatatan slot anti double-booking.</li>
-              <li><strong>Jadwal fitting atau konfirmasi DP:</strong> Pelanggan dapat mencoba langsung di butik atau konfirmasi jarak jauh.</li>
-              <li><strong>Kunci kebaya dengan DP 50%:</strong> Setelah DP dicatat admin, kebaya resmi terkunci dan status beralih menjadi <em>Dikonfirmasi</em>.</li>
+          <!-- Section "Apa Selanjutnya?" (Persis Screenshot 4) -->
+          <div class="bg-white rounded-3xl border border-silk-300 p-6 space-y-3 shadow-xs">
+            <h4 class="font-serif font-bold text-base text-charcoal-900">Apa selanjutnya?</h4>
+            <ol class="list-decimal list-inside space-y-1.5 text-xs text-stone-600">
+              <li>Admin mengonfirmasi ketersediaan kebaya.</li>
+              <li>Jadwalkan fitting sebelum pengajuan disetujui.</li>
+              <li>Lakukan pembayaran DP sesuai arahan admin.</li>
             </ol>
             <div class="pt-2">
-              <button onclick="switchTab('katalog')"
-                class="text-xs font-semibold text-silk-800 hover:text-charcoal-900 flex items-center gap-1">
-                <span>Temukan kebaya lainnya</span> <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+              <button onclick="showScreen('katalog')" class="text-xs font-bold text-silk-800 hover:text-charcoal-900 flex items-center gap-1">
+                <span>Temukan kebaya lainnya</span>
+                <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
               </button>
             </div>
           </div>
         </section>
 
-        <!-- ========================================== -->
-        <!-- VIEW: DETAIL PENGAJUAN / TRACKING (2002:22) -->
-        <!-- ========================================== -->
-        <section id="view-detail-pengajuan" class="hidden space-y-6 animate-in fade-in duration-200">
-          <!-- Breadcrumb -->
-          <div class="flex items-center gap-2 text-xs text-silk-800">
-            <button onclick="switchTab('pengajuan')" class="hover:underline flex items-center gap-1">
-              <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i> Pengajuan saya
-            </button>
-            <span>/</span>
-            <span class="font-semibold text-charcoal-900" id="detail-order-breadcrumb">Detail Pengajuan AG-0261</span>
-          </div>
-
-          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-            <div>
+        <!-- ============================================================== -->
+        <!-- LAYAR 5: DETAIL PENGAJUAN (Persis Screenshot 5 Figma)          -->
+        <!-- ============================================================== -->
+        <section id="screen-detail-pengajuan" class="hidden space-y-6 animate-in fade-in duration-200">
+          <div class="flex items-center justify-between">
+            <div class="space-y-0.5">
               <h1 class="font-serif text-3xl font-bold text-charcoal-900">Detail pengajuan</h1>
-              <p class="text-xs text-charcoal-700 mt-0.5" id="detail-order-subtitle">AG-0261 · Diajukan 23 Nov 2026</p>
+              <div class="text-xs text-stone-500">AG-0261 · Diajukan 23 Nov 2026</div>
             </div>
-            <span class="px-3.5 py-1.5 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300 flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-              <span id="detail-order-status-badge">Menunggu admin</span>
+
+            <span id="detail-status-pill" class="px-3.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300">
+              Menunggu admin
             </span>
           </div>
 
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            <!-- Kolom Kiri: Tahapan Penyewaan / Perjalanan Sewamu Sesuai Figma (2002:379 s.d 2002:398) -->
-            <div class="lg:col-span-7 bg-white rounded-3xl border border-silk-300 p-6 space-y-5 shadow-xs">
-              <h2 class="font-serif font-bold text-xl text-charcoal-900">Perjalanan sewamu</h2>
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <!-- Kolom Kiri: Stepper Perjalanan Sewamu (Persis Screenshot 5) -->
+            <div class="lg:col-span-7 bg-white rounded-3xl border border-silk-300 p-6 sm:p-8 space-y-5 shadow-xs">
+              <h3 class="font-serif font-bold text-lg text-charcoal-900 border-b border-silk-200 pb-3">
+                Perjalanan sewamu
+              </h3>
 
-              <!-- Stepper List 01 s.d 06 -->
-              <div class="space-y-4">
-                <!-- Step 01 -->
-                <div class="flex items-center gap-4 p-3 bg-amber-50/70 rounded-2xl border border-amber-200">
-                  <div class="w-9 h-9 rounded-xl bg-amber-500 text-white font-serif font-bold text-sm flex items-center justify-center shrink-0">
-                    01
+              <div class="space-y-4 text-xs" id="timeline-stepper">
+                <!-- 01 Tinjau Pengajuan -->
+                <div class="flex items-start justify-between py-1 border-b border-silk-100">
+                  <div class="flex items-center gap-2.5">
+                    <span id="step-num-1" class="w-5 h-5 rounded-full bg-silk-800 text-white flex items-center justify-center text-[10px] font-bold">1</span>
+                    <span class="font-bold text-charcoal-900">01 · Tinjau pengajuan</span>
                   </div>
-                  <div class="flex-grow">
-                    <div class="text-xs font-bold text-charcoal-900">Tinjau pengajuan</div>
-                    <div class="text-[11px] text-amber-800">Sedang ditinjau admin (Ketersediaan fisik & jadwal)</div>
-                  </div>
-                  <span class="text-[10px] font-bold text-amber-700 bg-white px-2 py-0.5 rounded-md border border-amber-300">Aktif</span>
+                  <span id="step-status-1" class="font-semibold text-silk-800">Sedang ditinjau admin</span>
                 </div>
 
-                <!-- Step 02 -->
-                <div class="flex items-center gap-4 p-3 bg-silk-50/50 rounded-2xl border border-silk-200 opacity-70">
-                  <div class="w-9 h-9 rounded-xl bg-silk-200 text-charcoal-800 font-serif font-bold text-sm flex items-center justify-center shrink-0">
-                    02
+                <!-- 02 Fitting -->
+                <div class="flex items-start justify-between py-1 border-b border-silk-100">
+                  <div class="flex items-center gap-2.5">
+                    <span id="step-num-2" class="w-5 h-5 rounded-full bg-silk-200 text-stone-600 flex items-center justify-center text-[10px] font-bold">2</span>
+                    <span class="text-stone-700">02 · Fitting</span>
                   </div>
-                  <div class="flex-grow">
-                    <div class="text-xs font-bold text-charcoal-900">Fitting</div>
-                    <div class="text-[11px] text-stone-500">Menunggu tahap sebelumnya</div>
-                  </div>
+                  <span id="step-status-2" class="text-stone-400">Menunggu tahap sebelumnya</span>
                 </div>
 
-                <!-- Step 03 -->
-                <div class="flex items-center gap-4 p-3 bg-silk-50/50 rounded-2xl border border-silk-200 opacity-70">
-                  <div class="w-9 h-9 rounded-xl bg-silk-200 text-charcoal-800 font-serif font-bold text-sm flex items-center justify-center shrink-0">
-                    03
+                <!-- 03 Pembayaran DP -->
+                <div class="flex items-start justify-between py-1 border-b border-silk-100">
+                  <div class="flex items-center gap-2.5">
+                    <span id="step-num-3" class="w-5 h-5 rounded-full bg-silk-200 text-stone-600 flex items-center justify-center text-[10px] font-bold">3</span>
+                    <span class="text-stone-700">03 · Pembayaran DP</span>
                   </div>
-                  <div class="flex-grow">
-                    <div class="text-xs font-bold text-charcoal-900">Pembayaran DP</div>
-                    <div class="text-[11px] text-stone-500">Menunggu tahap sebelumnya</div>
-                  </div>
+                  <span id="step-status-3" class="text-stone-400">Menunggu tahap sebelumnya</span>
                 </div>
 
-                <!-- Step 04 -->
-                <div class="flex items-center gap-4 p-3 bg-silk-50/50 rounded-2xl border border-silk-200 opacity-70">
-                  <div class="w-9 h-9 rounded-xl bg-silk-200 text-charcoal-800 font-serif font-bold text-sm flex items-center justify-center shrink-0">
-                    04
+                <!-- 04 Pelunasan -->
+                <div class="flex items-start justify-between py-1 border-b border-silk-100">
+                  <div class="flex items-center gap-2.5">
+                    <span id="step-num-4" class="w-5 h-5 rounded-full bg-silk-200 text-stone-600 flex items-center justify-center text-[10px] font-bold">4</span>
+                    <span class="text-stone-700">04 · Pelunasan</span>
                   </div>
-                  <div class="flex-grow">
-                    <div class="text-xs font-bold text-charcoal-900">Pelunasan</div>
-                    <div class="text-[11px] text-stone-500">Menunggu tahap sebelumnya</div>
-                  </div>
+                  <span id="step-status-4" class="text-stone-400">Menunggu tahap sebelumnya</span>
                 </div>
 
-                <!-- Step 05 -->
-                <div class="flex items-center gap-4 p-3 bg-silk-50/50 rounded-2xl border border-silk-200 opacity-70">
-                  <div class="w-9 h-9 rounded-xl bg-silk-200 text-charcoal-800 font-serif font-bold text-sm flex items-center justify-center shrink-0">
-                    05
+                <!-- 05 Pengambilan -->
+                <div class="flex items-start justify-between py-1 border-b border-silk-100">
+                  <div class="flex items-center gap-2.5">
+                    <span id="step-num-5" class="w-5 h-5 rounded-full bg-silk-200 text-stone-600 flex items-center justify-center text-[10px] font-bold">5</span>
+                    <span class="text-stone-700">05 · Pengambilan</span>
                   </div>
-                  <div class="flex-grow">
-                    <div class="text-xs font-bold text-charcoal-900">Pengambilan</div>
-                    <div class="text-[11px] text-stone-500">Menunggu tahap sebelumnya</div>
-                  </div>
+                  <span id="step-status-5" class="text-stone-400">Menunggu tahap sebelumnya</span>
                 </div>
 
-                <!-- Step 06 -->
-                <div class="flex items-center gap-4 p-3 bg-silk-50/50 rounded-2xl border border-silk-200 opacity-70">
-                  <div class="w-9 h-9 rounded-xl bg-silk-200 text-charcoal-800 font-serif font-bold text-sm flex items-center justify-center shrink-0">
-                    06
+                <!-- 06 Pengembalian -->
+                <div class="flex items-start justify-between py-1">
+                  <div class="flex items-center gap-2.5">
+                    <span id="step-num-6" class="w-5 h-5 rounded-full bg-silk-200 text-stone-600 flex items-center justify-center text-[10px] font-bold">6</span>
+                    <span class="text-stone-700">06 · Pengembalian</span>
                   </div>
-                  <div class="flex-grow">
-                    <div class="text-xs font-bold text-charcoal-900">Pengembalian</div>
-                    <div class="text-[11px] text-stone-500">Menunggu tahap sebelumnya</div>
-                  </div>
+                  <span id="step-status-6" class="text-stone-400">Menunggu tahap sebelumnya</span>
                 </div>
               </div>
             </div>
 
-            <!-- Kolom Kanan: Ringkasan Sewa & Kontak Admin (2002:399 s.d 2002:410) -->
+            <!-- Kolom Kanan: Ringkasan Sewa & Card Status Admin -->
             <div class="lg:col-span-5 space-y-4">
-              <div class="bg-white rounded-3xl border border-silk-300 p-6 space-y-4 shadow-xs">
-                <h3 class="font-serif font-bold text-lg text-charcoal-900 border-b border-silk-200 pb-3">Ringkasan sewa</h3>
-
-                <div class="flex items-center gap-3">
-                  <div class="w-16 h-20 rounded-xl bg-gradient-to-br from-amber-50 to-silk-200 border border-silk-200 flex items-center justify-center shrink-0 text-3xl" id="detail-order-icon">
-                    👘
-                  </div>
-                  <div>
-                    <h4 class="font-serif font-bold text-base text-charcoal-900" id="detail-order-nama">Kebaya Ayu Ivory</h4>
-                    <p class="text-xs text-silk-700" id="detail-order-sub">KBY-001 · Ukuran M · Wisuda</p>
+              <div class="bg-white rounded-3xl border border-silk-300 p-6 space-y-3.5 shadow-xs">
+                <div class="flex items-center gap-3.5">
+                  <img id="detail-track-image" src="" alt="Thumbnail" class="w-16 h-20 object-cover rounded-xl border border-silk-300">
+                  <div class="space-y-0.5">
+                    <h4 class="font-serif font-bold text-base text-charcoal-900" id="detail-track-name">Kebaya Ayu Ivory</h4>
+                    <div class="text-[11px] text-stone-500" id="detail-track-code-size">KBY-001 · Ukuran M</div>
                   </div>
                 </div>
 
-                <div class="border-t border-silk-200 pt-3 space-y-2 text-xs text-charcoal-800">
-                  <div class="flex items-center gap-2">
-                    <i data-lucide="calendar" class="w-4 h-4 text-silk-600"></i>
-                    <span id="detail-order-schedule">Ambil 26 Nov · Pakai 27 Nov · Kembali 28 Nov</span>
-                  </div>
-                  <div class="flex justify-between items-center pt-2 border-t border-silk-100">
-                    <span>Total sewa:</span>
-                    <span class="font-serif font-bold text-base text-charcoal-900" id="detail-order-price">Rp750.000</span>
-                  </div>
-                  <div class="flex justify-between items-center text-rose-700 text-[11px] font-semibold">
-                    <span>Status pembayaran:</span>
-                    <span>DP belum dibayar</span>
-                  </div>
+                <div class="border-t border-silk-200 pt-3 text-xs space-y-1">
+                  <div class="text-stone-600">Ambil: 26 Nov · Pakai: 27 Nov · Kembali: 28 Nov</div>
+                  <div class="font-bold text-charcoal-900" id="detail-track-price">Total sewa: Rp750.000 · DP belum dibayar</div>
                 </div>
+              </div>
 
-                <!-- Notifikasi Status -->
-                <div class="bg-silk-50 border border-silk-300 rounded-xl p-3.5 space-y-1">
-                  <div class="text-xs font-bold text-charcoal-900">Pengajuan sedang ditinjau</div>
-                  <p class="text-[11px] text-charcoal-700 leading-relaxed">
-                    Belum ada pembayaran yang perlu dilakukan. Admin akan menghubungi Anda via WhatsApp setelah verifikasi jadwal selesai.
+              <!-- Card Status Action (Persis Screenshot 5) -->
+              <div class="bg-white rounded-3xl border border-silk-300 p-6 space-y-3.5 shadow-xs">
+                <div class="space-y-1">
+                  <h4 class="font-serif font-bold text-base text-charcoal-900" id="action-box-title">Pengajuan sedang ditinjau</h4>
+                  <p class="text-xs text-stone-600 leading-relaxed" id="action-box-desc">
+                    Belum ada pembayaran yang perlu dilakukan. Admin akan menghubungi Anda untuk konfirmasi ketersediaan dan jadwal fitting.
                   </p>
                 </div>
 
-                <!-- Button Hubungi Admin -->
-                <a href="https://wa.me/6281234567890?text=Halo%20Admin%20Sewa%20Kebaya%20Ariegunarti,%20saya%20ingin%20menanyakan%20pengajuan%20AG-0261"
-                  target="_blank"
-                  class="w-full btn-ag-primary py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2">
-                  <i data-lucide="message-circle" class="w-4 h-4"></i>
+                <button onclick="hubungiAdminWA()" class="w-full py-2.5 bg-white border border-silk-400 hover:bg-silk-50 text-charcoal-900 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition">
+                  <i data-lucide="message-circle" class="w-3.5 h-3.5 text-emerald-600"></i>
                   <span>Hubungi admin</span>
-                </a>
+                </button>
               </div>
             </div>
           </div>
@@ -1067,388 +661,427 @@
       </main>
     </div>
 
-    <!-- FOOTER CUSTOMER SESUAI FIGMA (Frame 2002:5 / 2002:58) -->
-    <footer class="mt-8 border-t border-silk-300/80 bg-white/70 backdrop-blur-xs py-4 px-6 text-center text-xs text-charcoal-700">
+    <!-- FOOTER RESMI UMKM -->
+    <footer class="border-t border-silk-300/80 bg-white/70 backdrop-blur-xs py-4 px-6 text-center text-xs text-charcoal-700 mt-12">
       <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
         <span class="font-mono text-[11px] tracking-widest uppercase font-semibold text-silk-800">BY_ARIEGUNARTI · CUSTOMER</span>
-        <span class="text-[11px] text-stone-500">Capstone Project A26-CS010 · Sistem Booking Sewa Kebaya</span>
+        <span class="text-[11px] text-stone-500">Sistem Booking Sewa Kebaya By Ariegunarti · Capstone A26-CS010</span>
       </div>
     </footer>
-
   </div>
 
-  <script>
-    // Inisialisasi ikon Lucide
-    lucide.createIcons();
+  <!-- ============================================================== -->
+  <!-- MODAL POPUP: Pengajuan Berhasil Terkirim ke Admin               -->
+  <!-- ============================================================== -->
+  <div id="modal-success" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in">
+    <div class="bg-white rounded-3xl border border-silk-300 max-w-md w-full p-6 sm:p-8 text-center space-y-5 shadow-2xl">
+      <div class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto border border-emerald-300 shadow-xs">
+        <i data-lucide="check" class="w-8 h-8"></i>
+      </div>
 
-    // Database Kebaya Mockup Sesuai Figma
-    const KEBAYA_DB = {
-      'KBY-001': {
-        kode: 'KBY-001',
-        nama: 'Kebaya Ayu Ivory',
-        kategori: 'Wisuda',
-        koleksi: 'KBY-001 · KOLEKSI WISUDA',
-        ukuran: 'M',
-        ld: 90,
-        tb: 160,
-        harga: 750000,
-        icon: '👘',
-        deskripsi: 'Kebaya bernuansa ivory dengan detail renda elegan dan payet lembut, cocok untuk wisuda atau acara resmi. Termasuk kain jarik batik wiru dan obi pinggang senada.'
+      <div class="space-y-1.5">
+        <div class="text-[10px] tracking-widest uppercase font-bold text-emerald-700">STATUS: PENGAJUAN TERKIRIM</div>
+        <h2 class="font-serif text-2xl font-bold text-charcoal-900">Pengajuan Berhasil Dikirim!</h2>
+        <p class="text-xs text-stone-600 leading-relaxed">
+          Pengajuan Anda dengan kode <strong class="text-charcoal-900" id="modal-id">AG-0261</strong> telah masuk ke sistem antrean admin butik.
+        </p>
+      </div>
+
+      <div class="bg-silk-50 p-4 rounded-2xl border border-silk-200 text-left text-xs space-y-2">
+        <div class="flex justify-between">
+          <span class="text-stone-500">Busana:</span>
+          <span class="font-semibold text-charcoal-900" id="modal-kebaya">Kebaya Ayu Ivory</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-stone-500">Jadwal Pakai:</span>
+          <span class="font-semibold text-charcoal-900" id="modal-date">27 Nov 2026</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-stone-500">Status Awal:</span>
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900">Menunggu admin</span>
+        </div>
+      </div>
+
+      <button onclick="closeSuccessModal()" class="w-full btn-ag-primary py-3 rounded-xl text-xs font-bold tracking-wider uppercase">
+        Lihat di Pengajuan Saya →
+      </button>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- JAVASCRIPT: Interaktivitas Penuh Sesuai Figma Tim              -->
+  <!-- ============================================================== -->
+  <script>
+    // Database Koleksi Kebaya Persis Seperti di Figma Screenshots
+    const KOLEKSI_KEBAYA = [
+      {
+        id: 1,
+        code: "KBY-001",
+        tag: "KBY-001 · Sage · Ukuran M",
+        name: "Kebaya Ayu Ivory",
+        category: "Wisuda",
+        size: "M",
+        price: 750000,
+        priceFormatted: "Rp750.000 / sewa",
+        badge: "KBY-001 · KOLEKSI WISUDA",
+        desc: "Kebaya bernuansa ivory dengan detail renda anggun untuk melengkapi momen wisudamu.",
+        specs: "Lingkar dada 90 cm · Tinggi referensi 160 cm",
+        // Foto real pict mannequin kebaya ivory
+        image: "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=600&q=80"
       },
-      'KBY-002': {
-        kode: 'KBY-002',
-        nama: 'Kebaya Laras Sage',
-        kategori: 'Lamaran',
-        koleksi: 'KBY-002 · KOLEKSI LAMARAN',
-        ukuran: 'S',
-        ld: 86,
-        tb: 158,
-        harga: 650000,
-        icon: '🧕',
-        deskripsi: 'Warna sage pastel anggun dengan sentuhan motif floral kontemporer, sangat cocok untuk prosesi lamaran & tunangan.'
+      {
+        id: 2,
+        code: "KBY-002",
+        tag: "KBY-002 · Sage · Ukuran S",
+        name: "Kebaya Laras Sage",
+        category: "Lamaran",
+        size: "S",
+        price: 650000,
+        priceFormatted: "Rp650.000 / sewa",
+        badge: "KBY-002 · KOLEKSI LAMARAN",
+        desc: "Warna sage pastel lembut dengan aksen brokat premium, pilihan sempurna untuk prosesi lamaran.",
+        specs: "Lingkar dada 84 cm · Tinggi referensi 158 cm",
+        image: "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=600&q=80"
       },
-      'KBY-003': {
-        kode: 'KBY-003',
-        nama: 'Kebaya Kirana Rose',
-        kategori: 'Pernikahan',
-        koleksi: 'KBY-003 · KOLEKSI PERNIKAHAN',
-        ukuran: 'M',
-        ld: 92,
-        tb: 162,
-        harga: 850000,
-        icon: '🌸',
-        deskripsi: 'Kebaya kurung modern warna dusty rose dengan aksen manik mutiara premium, pilihan favorit untuk resepsi dan bridesmaid.'
+      {
+        id: 3,
+        code: "KBY-003",
+        tag: "KBY-003 · Dusty rose · Ukuran M",
+        name: "Kebaya Kirana Rose",
+        category: "Pernikahan",
+        size: "M",
+        price: 850000,
+        priceFormatted: "Rp850.000 / sewa",
+        badge: "KBY-003 · KOLEKSI PERNIKAHAN",
+        desc: "Kebaya kurung modern berhiaskan payet mutiara rose gold yang mewah untuk acara resepsi dan bridesmaid.",
+        specs: "Lingkar dada 88 cm · Tinggi referensi 162 cm",
+        image: "https://images.unsplash.com/photo-1594223274512-ad4803739b7c?auto=format&fit=crop&w=600&q=80"
       }
+    ];
+
+    let currentKebaya = KOLEKSI_KEBAYA[0];
+    let activeCategory = 'Semua';
+
+    // State Pengajuan Aktif
+    let bookingData = {
+      id: "AG-0261",
+      submittedDate: "23 Nov 2026",
+      kebaya: KOLEKSI_KEBAYA[0],
+      customerName: "Siti Rahmawati",
+      customerWa: "0812 3456 7890",
+      ld: 90,
+      tb: 160,
+      bb: 52,
+      tglAmbil: "26 Nov 2026",
+      tglPakai: "27 Nov 2026",
+      tglKembali: "28 Nov 2026",
+      purpose: "Wisuda",
+      status: "pending" // pending, fitting, dp_paid, handed_over, returned
     };
 
-    let selectedKebaya = KEBAYA_DB['KBY-001'];
+    // Render Grid Kartu Katalog Persis Screenshot 1
+    function renderKatalogCards(items) {
+      const grid = document.getElementById('grid-katalog-cards');
+      grid.innerHTML = '';
 
-    // Mode Switcher (Desktop vs Mobile Frame)
+      items.forEach(k => {
+        const card = document.createElement('div');
+        card.className = "bg-white rounded-3xl border border-silk-300 overflow-hidden shadow-xs hover:shadow-md transition flex flex-col justify-between group";
+        card.innerHTML = `
+          <div>
+            <!-- Container Foto Mannequin (Persis Figma) -->
+            <div class="h-64 bg-silk-100 overflow-hidden relative cursor-pointer" onclick="openDetail(${k.id})">
+              <img src="${k.image}" alt="${k.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+            </div>
+
+            <!-- Detail Teks -->
+            <div class="p-5 space-y-1.5">
+              <span class="text-[11px] font-semibold text-stone-500">${k.tag}</span>
+              <h3 class="font-serif font-bold text-xl text-charcoal-900">${k.name}</h3>
+              <div class="font-bold text-xs text-charcoal-900">${k.priceFormatted}</div>
+            </div>
+          </div>
+
+          <div class="px-5 pb-5 pt-1">
+            <button onclick="openDetail(${k.id})" class="text-xs font-bold text-silk-800 hover:text-charcoal-900 flex items-center gap-1 group-hover:underline">
+              <span>Lihat detail</span>
+              <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+
+      lucide.createIcons();
+    }
+
+    // Filter Katalog
+    function applyFilters() {
+      const q = document.getElementById('filter-search').value.toLowerCase();
+      const sz = document.getElementById('filter-size').value;
+
+      let filtered = KOLEKSI_KEBAYA.filter(k => {
+        const matchQ = k.name.toLowerCase().includes(q) || k.code.toLowerCase().includes(q) || k.tag.toLowerCase().includes(q);
+        const matchCat = activeCategory === 'Semua' || k.category === activeCategory;
+        const matchSz = sz === 'Semua' || k.size === sz;
+        return matchQ && matchCat && matchSz;
+      });
+
+      renderKatalogCards(filtered);
+    }
+
+    function setCategoryFilter(cat, btn) {
+      activeCategory = cat;
+      document.querySelectorAll('.cat-pill').forEach(b => {
+        b.className = "cat-pill px-4 py-1.5 rounded-full text-xs font-semibold bg-white border border-silk-300 text-stone-700 hover:bg-silk-100";
+      });
+      btn.className = "cat-pill px-4 py-1.5 rounded-full text-xs font-semibold btn-ag-dark";
+      applyFilters();
+    }
+
+    // Navigasi Layar (Tab)
+    function showScreen(screenId) {
+      const screens = ['beranda', 'katalog', 'detail-kebaya', 'ajukan-sewa', 'pengajuan-saya', 'detail-pengajuan'];
+      screens.forEach(s => {
+        const el = document.getElementById(`screen-${s}`);
+        if (el) el.classList.add('hidden');
+      });
+
+      const target = document.getElementById(`screen-${screenId}`);
+      if (target) target.classList.remove('hidden');
+
+      // Update Nav Style
+      document.getElementById('nav-beranda').className = screenId === 'beranda' ? 'px-4 py-2 rounded-xl text-xs font-semibold btn-ag-primary shadow-xs transition' : 'px-4 py-2 rounded-xl text-xs font-semibold text-stone-600 hover:text-charcoal-900 hover:bg-silk-100 transition';
+      document.getElementById('nav-katalog').className = screenId === 'katalog' ? 'px-4 py-2 rounded-xl text-xs font-semibold btn-ag-primary shadow-xs transition' : 'px-4 py-2 rounded-xl text-xs font-semibold text-stone-600 hover:text-charcoal-900 hover:bg-silk-100 transition';
+      document.getElementById('nav-pengajuan').className = (screenId === 'pengajuan-saya' || screenId === 'detail-pengajuan') ? 'px-4 py-2 rounded-xl text-xs font-semibold btn-ag-primary shadow-xs transition relative flex items-center gap-1.5' : 'px-4 py-2 rounded-xl text-xs font-semibold text-stone-600 hover:text-charcoal-900 hover:bg-silk-100 transition relative flex items-center gap-1.5';
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      lucide.createIcons();
+    }
+
+    // Buka Layar Detail Kebaya (Persis Screenshot 2)
+    function openDetail(kebayaId) {
+      currentKebaya = KOLEKSI_KEBAYA.find(k => k.id === kebayaId) || KOLEKSI_KEBAYA[0];
+
+      document.getElementById('detail-breadcrumb').innerText = currentKebaya.name;
+      document.getElementById('detail-image').src = currentKebaya.image;
+      document.getElementById('detail-code-badge').innerText = currentKebaya.badge;
+      document.getElementById('detail-name').innerText = currentKebaya.name;
+      document.getElementById('detail-price').innerText = currentKebaya.priceFormatted;
+      document.getElementById('detail-desc').innerText = currentKebaya.desc;
+      document.getElementById('detail-size-label').innerText = `Ukuran ${currentKebaya.size}`;
+      document.getElementById('detail-specs').innerText = currentKebaya.specs;
+
+      // Default tanggal 27 November 2026 sesuai screenshot Figma
+      document.getElementById('detail-input-date').value = "2026-11-27";
+
+      showScreen('detail-kebaya');
+    }
+
+    // Masuk ke Layar Ajukan Sewa (Persis Screenshot 3)
+    function goToAjukanSewa() {
+      document.getElementById('form-summary-image').src = currentKebaya.image;
+      document.getElementById('form-summary-name').innerText = currentKebaya.name;
+      document.getElementById('form-summary-code-size').innerText = `${currentKebaya.code} · Ukuran ${currentKebaya.size}`;
+      document.getElementById('form-summary-price').innerText = currentKebaya.priceFormatted;
+
+      const totalFmt = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(currentKebaya.price);
+      const dpFmt = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(currentKebaya.price * 0.5);
+
+      document.getElementById('form-summary-total').innerText = totalFmt;
+      document.getElementById('form-summary-dp').innerText = dpFmt;
+
+      showScreen('ajukan-sewa');
+    }
+
+    // Kirim Pengajuan Sewa -> Tampil Modal Sukses
+    function kirimPengajuanSewa() {
+      const btn = document.getElementById('btn-submit-booking');
+      const loader = document.getElementById('booking-loading');
+
+      btn.classList.add('hidden');
+      loader.classList.remove('hidden');
+
+      setTimeout(() => {
+        loader.classList.add('hidden');
+        btn.classList.remove('hidden');
+
+        // Update data pengajuan aktif
+        bookingData.kebaya = currentKebaya;
+        bookingData.customerName = document.getElementById('form-customer-name').value;
+        bookingData.customerWa = document.getElementById('form-customer-wa').value;
+        bookingData.ld = document.getElementById('form-ld').value;
+        bookingData.tb = document.getElementById('form-tb').value;
+        bookingData.bb = document.getElementById('form-bb').value;
+        bookingData.purpose = document.getElementById('form-purpose').value;
+        bookingData.status = 'pending';
+
+        // Tampilkan Modal Berhasil
+        document.getElementById('modal-id').innerText = bookingData.id;
+        document.getElementById('modal-kebaya').innerText = bookingData.kebaya.name;
+        document.getElementById('modal-date').innerText = bookingData.tglPakai;
+        document.getElementById('modal-success').classList.remove('hidden');
+      }, 700);
+    }
+
+    function closeSuccessModal() {
+      document.getElementById('modal-success').classList.add('hidden');
+      updatePengajuanSayaScreen();
+      showScreen('pengajuan-saya');
+    }
+
+    // Update Tampilan Pengajuan Saya (Persis Screenshot 4)
+    function updatePengajuanSayaScreen() {
+      document.getElementById('my-booking-image').src = bookingData.kebaya.image;
+      document.getElementById('my-booking-name').innerText = bookingData.kebaya.name;
+      document.getElementById('my-booking-meta').innerText = `Ukuran ${bookingData.kebaya.size} · ${bookingData.purpose}`;
+      document.getElementById('my-booking-price').innerText = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(bookingData.kebaya.price);
+
+      updateDetailPengajuanScreen();
+    }
+
+    // Update Layar Detail Pengajuan & Stepper 6 Langkah (Persis Screenshot 5)
+    function updateDetailPengajuanScreen() {
+      document.getElementById('detail-track-image').src = bookingData.kebaya.image;
+      document.getElementById('detail-track-name').innerText = bookingData.kebaya.name;
+      document.getElementById('detail-track-code-size').innerText = `${bookingData.kebaya.code} · Ukuran ${bookingData.kebaya.size}`;
+
+      const totalFmt = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(bookingData.kebaya.price);
+      document.getElementById('detail-track-price').innerText = `Total sewa: ${totalFmt} · ${bookingData.status === 'dp_paid' || bookingData.status === 'handed_over' || bookingData.status === 'returned' ? 'DP sudah dibayar' : 'DP belum dibayar'}`;
+
+      applyStatusToUI(bookingData.status);
+    }
+
+    // Menerapkan Status Alur ke Stepper & Card
+    function applyStatusToUI(status) {
+      const badgeCard = document.getElementById('card-status-badge');
+      const badgeDetail = document.getElementById('detail-status-pill');
+      const actionTitle = document.getElementById('action-box-title');
+      const actionDesc = document.getElementById('action-box-desc');
+      const myStatusText = document.getElementById('my-booking-status-text');
+
+      // Reset Semua Langkah
+      for (let i = 1; i <= 6; i++) {
+        document.getElementById(`step-num-${i}`).className = "w-5 h-5 rounded-full bg-silk-200 text-stone-600 flex items-center justify-center text-[10px] font-bold";
+        document.getElementById(`step-status-${i}`).className = "text-stone-400";
+        document.getElementById(`step-status-${i}`).innerText = "Menunggu tahap sebelumnya";
+      }
+
+      if (status === 'pending') {
+        badgeCard.className = "px-3 py-1 rounded-full text-[11px] font-bold bg-amber-100 text-amber-900 border border-amber-300";
+        badgeCard.innerText = "Menunggu admin";
+        badgeDetail.className = "px-3.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300";
+        badgeDetail.innerText = "Menunggu admin";
+
+        document.getElementById('step-num-1').className = "w-5 h-5 rounded-full bg-silk-800 text-white flex items-center justify-center text-[10px] font-bold";
+        document.getElementById('step-status-1').className = "font-semibold text-silk-800";
+        document.getElementById('step-status-1').innerText = "Sedang ditinjau admin";
+
+        actionTitle.innerText = "Pengajuan sedang ditinjau";
+        actionDesc.innerText = "Belum ada pembayaran yang perlu dilakukan. Admin akan menghubungi Anda untuk konfirmasi ketersediaan dan jadwal fitting.";
+        myStatusText.innerText = "Admin sedang meninjau tanggal dan ketersediaan.";
+      } 
+      else if (status === 'fitting') {
+        badgeCard.className = "px-3 py-1 rounded-full text-[11px] font-bold bg-blue-100 text-blue-900 border border-blue-300";
+        badgeCard.innerText = "Disetujui · Jadwal Fitting";
+        badgeDetail.className = "px-3.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-900 border border-blue-300";
+        badgeDetail.innerText = "Disetujui · Jadwal Fitting";
+
+        document.getElementById('step-num-1').className = "w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-bold";
+        document.getElementById('step-status-1').innerText = "Disetujui";
+        document.getElementById('step-num-2').className = "w-5 h-5 rounded-full bg-silk-800 text-white flex items-center justify-center text-[10px] font-bold";
+        document.getElementById('step-status-2').className = "font-semibold text-silk-800";
+        document.getElementById('step-status-2').innerText = "Dijadwalkan (25 Nov 2026)";
+
+        actionTitle.innerText = "Jadwal Fitting Dikonfirmasi";
+        actionDesc.innerText = "Silakan datang ke butik pada tanggal 25 Nov untuk fitting kebaya agar ukuran pas presisi sebelum pembayaran DP.";
+        myStatusText.innerText = "Jadwal fitting telah dikonfirmasi oleh admin.";
+      }
+      else if (status === 'dp_paid') {
+        badgeCard.className = "px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-900 border border-emerald-300";
+        badgeCard.innerText = "DP Tercatat (Terkunci)";
+        badgeDetail.className = "px-3.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-900 border border-emerald-300";
+        badgeDetail.innerText = "DP Tercatat (Terkunci)";
+
+        document.getElementById('step-num-1').className = "w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-bold";
+        document.getElementById('step-status-1').innerText = "Selesai";
+        document.getElementById('step-num-2').className = "w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-bold";
+        document.getElementById('step-status-2').innerText = "Fitting Selesai (Pas)";
+        document.getElementById('step-num-3').className = "w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-bold";
+        document.getElementById('step-status-3').className = "font-semibold text-emerald-800";
+        document.getElementById('step-status-3').innerText = "DP 50% Lunas (Busana Terkunci)";
+
+        actionTitle.innerText = "Kebaya Resmi Terkunci";
+        actionDesc.innerText = "Pembayaran DP 50% telah diverifikasi admin. Busana Anda terkunci aman dari double-booking dan siap diambil H-1.";
+        myStatusText.innerText = "DP tercatat. Busana aman terkunci untuk tanggal acara Anda.";
+      }
+      else if (status === 'handed_over') {
+        badgeCard.className = "px-3 py-1 rounded-full text-[11px] font-bold bg-purple-100 text-purple-900 border border-purple-300";
+        badgeCard.innerText = "Busana Diserahkan";
+        badgeDetail.className = "px-3.5 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-900 border border-purple-300";
+        badgeDetail.innerText = "Busana Diserahkan";
+
+        for (let i = 1; i <= 5; i++) {
+          document.getElementById(`step-num-${i}`).className = "w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-bold";
+        }
+        document.getElementById('step-status-5').className = "font-semibold text-purple-800";
+        document.getElementById('step-status-5').innerText = "Diserahkan ke Pelanggan";
+
+        actionTitle.innerText = "Busana Sedang Dipakai";
+        actionDesc.innerText = "Busana telah Anda terima dalam kondisi prima. Mohon kembalikan paling lambat tanggal 28 Nov 2026.";
+        myStatusText.innerText = "Busana telah diserahkan dan siap untuk hari H acara.";
+      }
+      else if (status === 'returned') {
+        badgeCard.className = "px-3 py-1 rounded-full text-[11px] font-bold bg-stone-100 text-stone-900 border border-stone-300";
+        badgeCard.innerText = "Selesai Dikembalikan";
+        badgeDetail.className = "px-3.5 py-1 rounded-full text-xs font-bold bg-stone-100 text-stone-900 border border-stone-300";
+        badgeDetail.innerText = "Selesai Dikembalikan";
+
+        for (let i = 1; i <= 6; i++) {
+          document.getElementById(`step-num-${i}`).className = "w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-bold";
+          document.getElementById(`step-status-${i}`).innerText = "Selesai";
+        }
+
+        actionTitle.innerText = "Penyewaan Selesai";
+        actionDesc.innerText = "Terima kasih telah mempercayakan momen spesial Anda kepada Sewa Kebaya By Ariegunarti.";
+        myStatusText.innerText = "Penyewaan selesai dan busana telah diterima kembali.";
+      }
+    }
+
+    // Switcher Demo Status di Top Bar
+    function changeStatusDemo(val) {
+      bookingData.status = val;
+      applyStatusToUI(val);
+    }
+
+    // Direct WhatsApp Hubungi Admin
+    function hubungiAdminWA() {
+      const msg = encodeURIComponent(`Halo Admin Sewa Kebaya by Ariegunarti, saya ingin menanyakan status pengajuan sewa ${bookingData.id} atas nama ${bookingData.customerName} untuk busana ${bookingData.kebaya.name}.`);
+      window.open(`https://wa.me/6281234567890?text=${msg}`, '_blank');
+    }
+
+    // Switcher Mode Layar (Desktop / Ponsel)
     function setMode(mode) {
       const frame = document.getElementById('container-frame');
       const btnDesk = document.getElementById('btn-mode-desktop');
       const btnMob = document.getElementById('btn-mode-mobile');
 
       if (mode === 'desktop') {
-        frame.className = "device-desktop bg-silk-canva min-h-[900px] flex flex-col justify-between transition-all duration-300";
-        btnDesk.className = "px-3 py-1 rounded btn-ag-primary text-white font-medium flex items-center gap-1.5 text-[11px] transition";
-        btnMob.className = "px-3 py-1 rounded bg-stone-800 hover:bg-stone-700 text-stone-300 font-medium flex items-center gap-1.5 text-[11px] transition";
+        frame.className = "device-desktop bg-silk-canva min-h-[920px] flex flex-col justify-between transition-all duration-300";
+        btnDesk.className = "px-2.5 py-1 rounded btn-ag-primary text-white font-medium flex items-center gap-1 text-[11px] transition";
+        btnMob.className = "px-2.5 py-1 rounded bg-stone-800 hover:bg-stone-700 text-stone-300 font-medium flex items-center gap-1 text-[11px] transition";
       } else {
-        frame.className = "device-mobile is-mobile-view bg-silk-canva min-h-[900px] flex flex-col justify-between transition-all duration-300";
-        btnMob.className = "px-3 py-1 rounded btn-ag-primary text-white font-medium flex items-center gap-1.5 text-[11px] transition";
-        btnDesk.className = "px-3 py-1 rounded bg-stone-800 hover:bg-stone-700 text-stone-300 font-medium flex items-center gap-1.5 text-[11px] transition";
+        frame.className = "device-mobile bg-silk-canva min-h-[920px] flex flex-col justify-between transition-all duration-300";
+        btnMob.className = "px-2.5 py-1 rounded btn-ag-primary text-white font-medium flex items-center gap-1 text-[11px] transition";
+        btnDesk.className = "px-2.5 py-1 rounded bg-stone-800 hover:bg-stone-700 text-stone-300 font-medium flex items-center gap-1 text-[11px] transition";
       }
       lucide.createIcons();
     }
 
-    // Nav Tab Switcher
-    function switchTab(tab) {
-      const views = ['view-beranda', 'view-katalog', 'view-detail-kebaya', 'view-ajukan-sewa', 'view-pengajuan-saya', 'view-detail-pengajuan'];
-      views.forEach(v => document.getElementById(v).classList.add('hidden'));
-
-      const tabs = ['nav-tab-beranda', 'nav-tab-katalog', 'nav-tab-pengajuan'];
-      tabs.forEach(t => {
-        const el = document.getElementById(t);
-        if (el) {
-          el.className = "px-2.5 sm:px-4 py-2 rounded-lg text-[11px] sm:text-xs font-semibold transition flex items-center justify-center gap-1 text-charcoal-700 hover:text-charcoal-900 flex-1 sm:flex-none";
-        }
-      });
-
-      if (tab === 'beranda') {
-        document.getElementById('view-beranda').classList.remove('hidden');
-        document.getElementById('nav-tab-beranda').className = "px-2.5 sm:px-4 py-2 rounded-lg text-[11px] sm:text-xs font-semibold transition flex items-center justify-center gap-1 bg-white text-charcoal-900 shadow-xs flex-1 sm:flex-none";
-      } else if (tab === 'katalog') {
-        document.getElementById('view-katalog').classList.remove('hidden');
-        document.getElementById('nav-tab-katalog').className = "px-2.5 sm:px-4 py-2 rounded-lg text-[11px] sm:text-xs font-semibold transition flex items-center justify-center gap-1 bg-white text-charcoal-900 shadow-xs flex-1 sm:flex-none";
-      } else if (tab === 'pengajuan') {
-        document.getElementById('view-pengajuan-saya').classList.remove('hidden');
-        document.getElementById('nav-tab-pengajuan').className = "px-2.5 sm:px-4 py-2 rounded-lg text-[11px] sm:text-xs font-semibold transition flex items-center justify-center gap-1 bg-white text-charcoal-900 shadow-xs flex-1 sm:flex-none";
-      }
-      lucide.createIcons();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    // Buka Detail Kebaya
-    function bukaDetailKebaya(kode) {
-      const data = KEBAYA_DB[kode] || KEBAYA_DB['KBY-001'];
-      selectedKebaya = data;
-
-      document.getElementById('detail-breadcrumb').innerText = data.nama;
-      document.getElementById('detail-icon').innerText = data.icon;
-      document.getElementById('detail-foto-nama').innerText = data.nama;
-      document.getElementById('detail-foto-kode').innerText = `${data.kode} · Foto Real Pict UMKM`;
-      document.getElementById('detail-koleksi').innerText = data.koleksi;
-      document.getElementById('detail-nama').innerText = data.nama;
-      document.getElementById('detail-harga').innerText = `Rp${data.harga.toLocaleString('id-ID')} / sewa`;
-      document.getElementById('detail-deskripsi').innerText = data.deskripsi;
-      document.getElementById('detail-size-badge').innerText = `Ukuran ${data.ukuran}`;
-      document.getElementById('detail-size-desc').innerText = `Lingkar dada ${data.ld} cm · Tinggi referensi ${data.tb} cm`;
-
-      const views = ['view-beranda', 'view-katalog', 'view-detail-kebaya', 'view-ajukan-sewa', 'view-pengajuan-saya', 'view-detail-pengajuan'];
-      views.forEach(v => document.getElementById(v).classList.add('hidden'));
-
-      document.getElementById('view-detail-kebaya').classList.remove('hidden');
-      lucide.createIcons();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    // Buka Form Ajukan Sewa
-    function langsungAjukan(kode) {
-      selectedKebaya = KEBAYA_DB[kode] || KEBAYA_DB['KBY-001'];
-      sinkronSummaryAjukan();
-
-      const views = ['view-beranda', 'view-katalog', 'view-detail-kebaya', 'view-ajukan-sewa', 'view-pengajuan-saya', 'view-detail-pengajuan'];
-      views.forEach(v => document.getElementById(v).classList.add('hidden'));
-
-      document.getElementById('view-ajukan-sewa').classList.remove('hidden');
-      lucide.createIcons();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function lanjutAjukanDariDetail() {
-      langsungAjukan(selectedKebaya.kode);
-    }
-
-    function sinkronSummaryAjukan() {
-      const data = selectedKebaya;
-      document.getElementById('summary-icon').innerText = data.icon;
-      document.getElementById('summary-nama').innerText = data.nama;
-      document.getElementById('summary-kode-ukuran').innerText = `${data.kode} · Ukuran ${data.ukuran}`;
-      document.getElementById('summary-harga').innerText = `Rp${data.harga.toLocaleString('id-ID')} / sewa`;
-      document.getElementById('summary-total').innerText = `Rp${data.harga.toLocaleString('id-ID')}`;
-      const dp = data.harga / 2;
-      document.getElementById('summary-dp').innerText = `Rp${dp.toLocaleString('id-ID')}`;
-    }
-
-    // Sinkronisasi Tanggal H-1 s.d H+1
-    function sinkronJadwal() {
-      const tglPakaiVal = document.getElementById('form-tgl-pakai').value;
-      if (!tglPakaiVal) return;
-
-      const pakai = new Date(tglPakaiVal);
-      const ambil = new Date(pakai);
-      ambil.setDate(ambil.getDate() - 1);
-      const kembali = new Date(pakai);
-      kembali.setDate(kembali.getDate() + 1);
-
-      const opts = { day: 'numeric', month: 'short', year: 'numeric' };
-      document.getElementById('form-tgl-ambil').value = ambil.toLocaleDateString('id-ID', opts);
-      document.getElementById('form-tgl-kembali').value = kembali.toLocaleDateString('id-ID', opts);
-    }
-
-    // Update Nama Customer Secara Dinamis Real-Time
-    function updateNamaCustomer(nama) {
-      const clean = (nama || '').trim();
-      const elHeader = document.getElementById('header-user-name');
-      const elHeaderMobile = document.getElementById('header-user-name-mobile');
-      const elHero = document.getElementById('hero-greeting');
-      if (clean) {
-        if (elHeader) elHeader.innerText = clean;
-        if (elHeaderMobile) elHeaderMobile.innerText = clean;
-        if (elHero) elHero.innerText = `SELAMAT DATANG, ${clean.toUpperCase()}`;
-      } else {
-        if (elHeader) elHeader.innerText = "Tamu Pelanggan";
-        if (elHeaderMobile) elHeaderMobile.innerText = "Tamu";
-        if (elHero) elHero.innerText = "SELAMAT DATANG DI SEWA KEBAYA BY ARIE GUNARTI";
-      }
-    }
-
-    // STATE PESANAN CUSTOMER (Default: null / Belum Pernah Memesan)
-    let pesananAktif = null;
-
-    // Render Tampilan Berdasarkan Status Pesanan (Empty vs Active)
-    function renderStatePengajuan() {
-      const homeActive = document.getElementById('home-active-banner');
-      const homeEmpty = document.getElementById('home-empty-banner');
-      const cardActive = document.getElementById('pengajuan-active-card');
-      const cardEmpty = document.getElementById('pengajuan-empty-state');
-      const badgeNav = document.getElementById('badge-nav-pengajuan');
-      const countAktif = document.getElementById('count-aktif');
-      const btnReset = document.getElementById('btn-demo-reset');
-      const btnMuat = document.getElementById('btn-demo-muat');
-
-      if (!pesananAktif) {
-        // Mode Kosong (Tamu Baru Belum Memesan)
-        if (homeActive) homeActive.classList.add('hidden');
-        if (homeEmpty) homeEmpty.classList.remove('hidden');
-        if (cardActive) cardActive.classList.add('hidden');
-        if (cardEmpty) cardEmpty.classList.remove('hidden');
-        if (badgeNav) badgeNav.classList.add('hidden');
-        if (countAktif) countAktif.innerText = '0';
-        if (btnReset) btnReset.classList.add('hidden');
-        if (btnMuat) btnMuat.classList.remove('hidden');
-      } else {
-        // Mode Ada Pesanan Aktif
-        if (homeActive) homeActive.classList.remove('hidden');
-        if (homeEmpty) homeEmpty.classList.add('hidden');
-        if (cardActive) cardActive.classList.remove('hidden');
-        if (cardEmpty) cardEmpty.classList.add('hidden');
-        if (badgeNav) badgeNav.classList.remove('hidden');
-        if (countAktif) countAktif.innerText = '1';
-        if (btnReset) btnReset.classList.remove('hidden');
-        if (btnMuat) btnMuat.classList.add('hidden');
-
-        // Update Banner Beranda
-        document.getElementById('home-banner-code').innerText = `PENGAJUAN TERBARU · ${pesananAktif.kode}`;
-        document.getElementById('home-banner-title').innerText = `${pesananAktif.namaKebaya} · Menunggu konfirmasi admin`;
-        document.getElementById('home-banner-desc').innerText = `Admin sedang memverifikasi jadwal (${pesananAktif.jadwal}) dan kesiapan busana.`;
-
-        // Update Kartu Pengajuan Saya
-        document.getElementById('order-card-code').innerText = pesananAktif.kode;
-        document.getElementById('order-card-date').innerText = `· Diajukan ${pesananAktif.tglPengajuan}`;
-        document.getElementById('order-card-icon').innerText = pesananAktif.icon;
-        document.getElementById('order-card-nama').innerText = pesananAktif.namaKebaya;
-        document.getElementById('order-card-sub').innerText = `${pesananAktif.kodeKebaya} · Ukuran ${pesananAktif.ukuran} · ${pesananAktif.keperluan}`;
-        document.getElementById('order-card-schedule').innerText = pesananAktif.jadwal;
-        document.getElementById('order-card-price').innerText = pesananAktif.harga;
-
-        // Update Layar Detail Pengajuan
-        document.getElementById('detail-order-breadcrumb').innerText = `Detail Pengajuan ${pesananAktif.kode}`;
-        document.getElementById('detail-order-subtitle').innerText = `${pesananAktif.kode} · Diajukan ${pesananAktif.tglPengajuan}`;
-        document.getElementById('detail-order-icon').innerText = pesananAktif.icon;
-        document.getElementById('detail-order-nama').innerText = pesananAktif.namaKebaya;
-        document.getElementById('detail-order-sub').innerText = `${pesananAktif.kodeKebaya} · Ukuran ${pesananAktif.ukuran} · ${pesananAktif.keperluan}`;
-        document.getElementById('detail-order-schedule').innerText = pesananAktif.jadwal;
-        document.getElementById('detail-order-price').innerText = pesananAktif.harga;
-      }
-      lucide.createIcons();
-    }
-
-    // Submit Form Pengajuan Sewa (Membuat Pesanan Nyata)
-    function submitPengajuanSewa() {
-      const nama = document.getElementById('form-nama').value.trim();
-      const telepon = document.getElementById('form-telepon').value.trim();
-
-      if (!nama || !telepon) {
-        alert('Mohon isi nama lengkap dan nomor WhatsApp.');
-        return;
-      }
-
-      const randomCode = 'AG-' + Math.floor(1000 + Math.random() * 9000);
-      const tglAmbil = document.getElementById('form-tgl-ambil').value;
-      const tglKembali = document.getElementById('form-tgl-kembali').value;
-      const tglPakai = document.getElementById('form-tgl-pakai').value;
-      const keperluan = document.getElementById('form-keperluan').value;
-
-      pesananAktif = {
-        kode: randomCode,
-        namaCustomer: nama,
-        telepon: telepon,
-        namaKebaya: selectedKebaya.nama,
-        kodeKebaya: selectedKebaya.kode,
-        ukuran: selectedKebaya.ukuran,
-        keperluan: keperluan,
-        jadwal: `${tglAmbil} s.d ${tglKembali} (Pakai: ${tglPakai})`,
-        tglPengajuan: 'Hari ini',
-        harga: `Rp${selectedKebaya.harga.toLocaleString('id-ID')}`,
-        icon: selectedKebaya.icon
-      };
-
-      renderStatePengajuan();
-
-      alert(`Pengajuan berhasil dikirim!\nNomor Pengajuan: ${randomCode}\nKebaya: ${selectedKebaya.nama}\n\nData pengajuan kini aktif di tab "Pengajuan Saya".`);
-
-      switchTab('pengajuan');
-    }
-
-    // Muat Contoh Dummy Pesanan (Sesuai Desain Figma AG-0261)
-    function muatContohDummy() {
-      pesananAktif = {
-        kode: 'AG-0261',
-        namaCustomer: 'Siti Rahmawati',
-        telepon: '081234567890',
-        namaKebaya: 'Kebaya Ayu Ivory',
-        kodeKebaya: 'KBY-001',
-        ukuran: 'M',
-        keperluan: 'Wisuda',
-        jadwal: '26–28 Nov 2026 (Pakai: 27 Nov)',
-        tglPengajuan: '23 Nov 2026',
-        harga: 'Rp750.000',
-        icon: '👘'
-      };
-      renderStatePengajuan();
-      alert('Memuat contoh data pesanan AG-0261 (Simulasi Pesanan Aktif).');
-    }
-
-    // Reset ke Kondisi Tamu Baru (Kosong)
-    function resetPengajuan() {
-      pesananAktif = null;
-      renderStatePengajuan();
-      alert('Data pengajuan telah dikosongkan. Kembali ke status Tamu Baru tanpa pesanan.');
-    }
-
-    // Lacak Pesanan Manual
-    function lacakPesananManual() {
-      const input = (document.getElementById('input-lacak-kode').value || '').trim();
-      if (!input) {
-        alert('Mohon masukkan Nomor WhatsApp atau Kode Booking yang ingin dilacak.');
-        return;
-      }
-      if (pesananAktif && (input.toUpperCase().includes(pesananAktif.kode) || input.includes(pesananAktif.telepon))) {
-        bukaDetailPengajuan();
-      } else {
-        muatContohDummy();
-        bukaDetailPengajuan();
-      }
-    }
-
-    // Buka Detail Pengajuan & Stepper Timeline
-    function bukaDetailPengajuan() {
-      if (!pesananAktif) {
-        muatContohDummy();
-      }
-      const views = ['view-beranda', 'view-katalog', 'view-detail-kebaya', 'view-ajukan-sewa', 'view-pengajuan-saya', 'view-detail-pengajuan'];
-      views.forEach(v => document.getElementById(v).classList.add('hidden'));
-
-      document.getElementById('view-detail-pengajuan').classList.remove('hidden');
-      lucide.createIcons();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    // Filter Katalog
-    let currentKategori = 'Semua';
-
-    function setKategori(kat, btn) {
-      currentKategori = kat;
-      document.querySelectorAll('.cat-pill').forEach(b => {
-        b.className = "cat-pill px-3.5 py-1.5 rounded-full font-semibold bg-silk-100 text-charcoal-800 hover:bg-silk-200";
-      });
-      btn.className = "cat-pill px-3.5 py-1.5 rounded-full font-semibold bg-charcoal-900 text-white";
-      filterKatalog();
-    }
-
-    function filterKatalog() {
-      const keyword = (document.getElementById('katalog-search').value || '').toLowerCase().trim();
-      const ukuran = document.getElementById('katalog-ukuran').value;
-
-      const cards = document.querySelectorAll('.kebaya-card');
-      let visibleCount = 0;
-
-      cards.forEach(card => {
-        const cKode = (card.getAttribute('data-kode') || '').toLowerCase();
-        const cNama = (card.getAttribute('data-nama') || '').toLowerCase();
-        const cUkuran = card.getAttribute('data-ukuran');
-        const cKategori = card.getAttribute('data-kategori');
-
-        const matchKeyword = !keyword || cKode.includes(keyword) || cNama.includes(keyword);
-        const matchUkuran = ukuran === 'Semua' || cUkuran === ukuran;
-        const matchKategori = currentKategori === 'Semua' || cKategori === currentKategori;
-
-        if (matchKeyword && matchUkuran && matchKategori) {
-          card.classList.remove('hidden');
-          visibleCount++;
-        } else {
-          card.classList.add('hidden');
-        }
-      });
-
-      document.getElementById('katalog-info-counter').innerText = `Menampilkan ${visibleCount} Koleksi Kebaya`;
-    }
-
-    // Inisialisasi awal
-    sinkronJadwal();
-    sinkronSummaryAjukan();
-    renderStatePengajuan();
+    // Inisialisasi Pertama Kali Buka
+    renderKatalogCards(KOLEKSI_KEBAYA);
+    updatePengajuanSayaScreen();
+    lucide.createIcons();
   </script>
 </body>
 
