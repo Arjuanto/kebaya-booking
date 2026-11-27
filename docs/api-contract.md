@@ -99,10 +99,10 @@ Website (React) ──Axios──▶ Backend Express /api/v1 ──▶ PostgreSQ
 
 | Field | Tipe | Aturan |
 |---|---|---|
-| `code` | string | wajib, unik, maks 20 karakter |
+| `code` | string | wajib, unik, maks 20 karakter. Satu kode untuk satu potong fisik; potong lain dari model yang sama diberi kode sendiri, mis. `KB-012-A` dan `KB-012-B` (§8 no. 3) |
 | `name` | string | wajib, maks 100 |
 | `category` | enum | `kebaya` \| `kemeja_couple` |
-| `size` | enum | `S` \| `M` \| `L` \| `XL` \| `XXL` \| `ALL_SIZE` (XS dan XXXL masih dibahas, §8 no. 7) |
+| `size` | enum | `XS` \| `S` \| `M` \| `L` \| `XL` \| `XXL` \| `XXXL` \| `ALL_SIZE`. Satu ukuran per kebaya; ukuran rentang seperti `S-M` tidak didukung (§8 no. 7) |
 | `photo` | string | hanya di request admin, tidak pernah ada di respons. Isi file foto sebagai data URL base64, mis. `data:image/jpeg;base64,/9j/4AAQ...`. Wajib saat tambah, opsional saat ubah (tidak dikirim berarti foto lama tetap dipakai). Hanya JPEG, PNG, atau WebP, maks 2 MB. Website sebaiknya mengecilkan foto lebih dulu (mis. sisi terpanjang 1200 px) |
 | `photoUrl` | string | hanya di respons, dibuat backend. Jalur foto relatif terhadap base URL backend; website menyambungnya dengan base URL yang sama dengan Axios. `v` adalah `updatedAt` dalam detik, supaya browser memuat ulang foto setelah kebaya diubah |
 | `description` | string | opsional, maks 500 |
@@ -650,11 +650,11 @@ Status per v0.5.
 |---|---|---|
 | 1 | **Kontak customer** untuk fitting dan DP | Diterapkan: field opsional `customerContact` (2.2). Saat demo hanya diisi data contoh; tidak boleh ada kontak pelanggan asli di repositori atau video demo |
 | 2 | **Tabel ukuran** | Owner tidak punya ukuran baku (kabar dari Ilham di review PR #37). Tabelnya asumsi tim berbasis lingkar dada (`tableVersion: "sementara-1"`, §5), diselaraskan dengan dataset final DS |
-| 3 | **Masa sewa & jeda laundry** | Dikonfirmasi owner: `1 / 1 / 2` (kabar dari Ilham di review PR #37). Masih terbuka: di data asli, kode kebaya yang sama tercatat disewa lagi dalam 2–4 hari (49 baris), sedangkan constraint `bookings_no_overlap` per `kebaya_id` akan menolak potong kedua yang sebenarnya tersedia. Perlu diputuskan: tiap potong dicatat sebagai kebaya sendiri, atau ada kolom jumlah stok |
+| 3 | **Masa sewa & jeda laundry** | Dikonfirmasi owner: `1 / 1 / 2` (kabar dari Ilham di review PR #37). Di data asli, kode kebaya yang sama tercatat disewa lagi dalam 2–4 hari (49 baris), padahal constraint `bookings_no_overlap` per `kebaya_id` akan menolak potong kedua. Diputuskan: tiap potong fisik dicatat sebagai kebaya sendiri (mis. `KB-012-A`, `KB-012-B`), tanpa kolom stok, jadi skema dan aturan ketersediaan tidak berubah. Efeknya, kebaya yang punya dua potong tampil dua kali di katalog. Perlu dipastikan ke owner bahwa satu kode memang punya lebih dari satu potong |
 | 4 | **Satuan prediksi** | Diterapkan: model mingguan, dijumlah per bulan; angka per ukuran dibagi dari proporsi historis (§5) |
 | 5 | **Format output analisis DS** | Diterapkan: tetap lewat tabel `analytics_results`, tidak dihitung dari `bookings` (§4) |
 | 6 | **Foto kebaya** | Diubah di v0.5: admin mengunggah file foto (field `photo`), disimpan di database Neon, dan ditampilkan lewat `GET /kebaya/:id/foto`. `schema.sql`, migrasi Neon, dan endpoint katalog admin menyusul |
-| 7 | **Ukuran XS/XXXL dan rentang ukuran** | Belum diputuskan. Tabel ukuran punya XS dan XXXL, tapi enum `size` di 2.1 hanya `S`–`XXL` dan `ALL_SIZE`, jadi customer XS/XXXL tidak pernah mendapat `sizeMatch: true`. Di dataset DS, ukuran kebaya berupa rentang (mis. `S-M`, `M-XL`). Pilihan: tambah XS dan XXXL ke enum, atau `sizeMatch` mengecek rentang |
+| 7 | **Ukuran XS/XXXL dan rentang ukuran** | Diputuskan: XS dan XXXL ditambahkan ke enum `size` (2.1), supaya customer XS/XXXL bisa mendapat `sizeMatch: true` dan perkiraan ukurannya bisa disimpan. Satu ukuran per kebaya. Ukuran rentang di dataset DS (mis. `S-M`) tidak didukung: `sizeMatch` hanya mengurutkan daftar, jadi kebaya S-M yang dicatat M tetap tampil untuk customer S, hanya urutannya lebih bawah. Batasan ini ditulis di README |
 
 ## Riwayat perubahan
 
@@ -664,4 +664,4 @@ Status per v0.5.
 | 0.2 | 2026-11-24 | "Hari ini" dihitung di Asia/Jakarta dan kolom tanggal bertipe `date`; batas percobaan login (`429 TOO_MANY_ATTEMPTS`); format error diseragamkan (`data` opsional, `conflictWith` pindah ke `data`, `AI_QUOTA_EXCEEDED` jadi 503) |
 | 0.3 | 2026-11-24 | Skema database di `backend/db/schema.sql`; constraint anti tumpang tindih di level database |
 | 0.4 | 2026-11-25 | Review AE (Ilham): prediksi mingguan dijumlah per bulan (`totalPredicted`, `sizeBreakdown`, `note`, `model.maeValidasi`); `tableVersion` perkiraan ukuran disimpan di `bookings.size_table_version`; layanan model memakai `/v1/health`, format respons dan kode error-nya ditulis eksplisit, dan diping tiap 10 menit untuk menghindari cold start; `recommendations` hanya untuk data asli; filter `from`/`to` analisis dihapus; aturan `sizeMatch` untuk `ALL_SIZE`; field opsional `customerContact`; status pertanyaan terbuka diperbarui |
-| 0.5 | 2026-11-26 | Foto kebaya diunggah admin sebagai data URL base64 (field `photo`, JPEG/PNG/WebP, maks 2 MB) dan disimpan di database (`kebaya.photo` dan `kebaya.photo_type`, menggantikan `photo_url`); `photoUrl` kini dibuat backend dan menunjuk ke endpoint baru `GET /kebaya/:id/foto`. Layanan model, dari review PR #20: `sizeBreakdown` `tidak_tersedia` dengan baris `TOTAL`, dan `503 MODEL_UNAVAILABLE`. Review AE (Ilham) di PR #37: contoh `/v1/health` disesuaikan dengan kode, tabel ukuran adalah asumsi tim, masa sewa `1 / 1 / 2` dikonfirmasi owner, dan dua pertanyaan terbuka baru (stok per kode kebaya, ukuran XS/XXXL dan rentang ukuran) |
+| 0.5 | 2026-11-26 | Foto kebaya diunggah admin sebagai data URL base64 (field `photo`, JPEG/PNG/WebP, maks 2 MB) dan disimpan di database (`kebaya.photo` dan `kebaya.photo_type`, menggantikan `photo_url`); `photoUrl` kini dibuat backend dan menunjuk ke endpoint baru `GET /kebaya/:id/foto`. Layanan model, dari review PR #20: `sizeBreakdown` `tidak_tersedia` dengan baris `TOTAL`, dan `503 MODEL_UNAVAILABLE`. Review AE (Ilham) di PR #37: contoh `/v1/health` disesuaikan dengan kode, tabel ukuran adalah asumsi tim, masa sewa `1 / 1 / 2` dikonfirmasi owner, dan dua pertanyaan terbuka baru yang langsung diputuskan: satu kode kebaya untuk satu potong fisik, serta ukuran XS dan XXXL tanpa ukuran rentang |
