@@ -7,14 +7,21 @@ Memenuhi checklist AI nomor 2, 3, dan 6:
 
 Pemilihan model dilakukan MANUAL (tanpa AutoML), sesuai larangan jalur AI.
 
-Setelah model terbaik dipilih dari evaluasi pada data uji, konfigurasi yang sama
-dilatih ulang pada SEMUA minggu sebelum disimpan, supaya model yang di-deploy juga
-belajar dari minggu terbaru. Angka maeValidasi tetap berasal dari evaluasi sebelum
-pelatihan ulang. Gunakan --tanpa-refit untuk menyimpan model versi evaluasi saja.
+Evaluasi BERGULIR: untuk setiap minggu uji (data asli, mulai --cutoff), model dilatih
+pada semua minggu sebelum minggu itu, lalu memprediksi minggu itu. Dengan data asli
+yang hanya sekitar 23 minggu, cara ini memberi lebih banyak titik uji daripada satu kali
+pemisahan, dan tidak pernah memakai data masa depan.
 
-Contoh pemakaian:
-    python -m src.train --data data/raw/dataset.csv --cutoff 2026-10-01
-    python -m src.train --data data/raw/dataset.csv --cutoff 2026-10-01 --sumber semua
+Dua pembanding wajib ikut dihitung: rata-rata minggu sebelumnya dan "sama dengan minggu
+lalu". Model yang tidak mengalahkan keduanya harus dilaporkan apa adanya di README.
+
+Setelah model terbaik dipilih, konfigurasi yang sama dilatih ulang pada SEMUA minggu
+sebelum disimpan, supaya model yang di-deploy juga belajar dari minggu terbaru. Angka
+maeValidasi tetap berasal dari evaluasi bergulir. --tanpa-refit menyimpan model yang
+hanya dilatih sampai cutoff.
+
+Contoh pemakaian (cutoff 2026-08-10 memberi sekitar 13 minggu uji):
+    python -m src.train --data ../data/raw/dataset.csv --cutoff 2026-08-10
 """
 
 from __future__ import annotations
@@ -41,7 +48,6 @@ from src.preprocessing import (
     add_features,
     load_bookings,
     load_event_weeks,
-    time_split,
     to_weekly,
 )
 
@@ -49,19 +55,33 @@ ROOT = Path(__file__).resolve().parents[1]
 MODEL_PATH = ROOT / "models" / "model.joblib"
 METRICS_PATH = ROOT / "models" / "metrics.json"
 
+BASELINES = ("baseline_rata_rata", "baseline_minggu_lalu")
+
 
 def build_preprocessor() -> ColumnTransformer:
     """Preprocessing yang dipelajari HANYA dari data latih.
 
     - bulan diperlakukan sebagai kategori (Januari bukan "lebih kecil" dari Desember),
-    - sisanya diskalakan agar Ridge tidak timpang antar fitur.
+    - penanda minggu acara diskalakan agar Ridge tidak timpang antar fitur.
     """
     return ColumnTransformer(
         transformers=[
             ("bulan", OneHotEncoder(handle_unknown="ignore"), ["bulan"]),
-            ("numerik", StandardScaler(), ["minggu_ke", "is_event_week"]),
+            ("numerik", StandardScaler(), ["is_event_week"]),
         ]
     )
+
+
+def build_candidates() -> dict[str, Pipeline]:
+    return {
+        "ridge": Pipeline([("pra", build_preprocessor()), ("model", Ridge(alpha=1.0))]),
+        "random_forest": Pipeline(
+            [
+                ("pra", build_preprocessor()),
+                ("model", RandomForestRegressor(n_estimators=300, random_state=42)),
+            ]
+        ),
+    }
 
 
 def evaluate(y_true: np.ndarray, y_pred: np.ndarray) -> dict:
@@ -70,10 +90,48 @@ def evaluate(y_true: np.ndarray, y_pred: np.ndarray) -> dict:
     return {"mae": round(float(mae), 3), "rmse": round(rmse, 3)}
 
 
+def rolling_evaluation(
+    weekly_asli: pd.DataFrame,
+    train_pool: pd.DataFrame,
+    cutoff: pd.Timestamp,
+    candidates: dict[str, Pipeline],
+) -> tuple[dict[str, dict], int]:
+    """Evaluasi bergulir satu minggu ke depan, selalu dinilai pada data asli."""
+    test_weeks = weekly_asli[weekly_asli["week_start"] >= cutoff]
+    if test_weeks.empty:
+        raise SystemExit("Tidak ada minggu uji setelah --cutoff. Pilih tanggal lebih awal.")
+
+    preds: dict[str, list[float]] = {name: [] for name in (*BASELINES, *candidates)}
+    for _, row in test_weeks.iterrows():
+        week = row["week_start"]
+        hist_asli = weekly_asli[weekly_asli["week_start"] < week]
+        pool = train_pool[train_pool["week_start"] < week]
+        if hist_asli.empty or pool.empty:
+            raise SystemExit("Tidak ada data latih sebelum minggu uji pertama. Pilih --cutoff lebih akhir.")
+
+        # Pembanding memakai riwayat data asli, supaya adil terhadap usaha UMKM.
+        preds["baseline_rata_rata"].append(float(hist_asli[TARGET_COLUMN].mean()))
+        preds["baseline_minggu_lalu"].append(float(hist_asli[TARGET_COLUMN].iloc[-1]))
+
+        X_query = row[FEATURE_COLUMNS].to_frame().T.astype(pool[FEATURE_COLUMNS].dtypes.to_dict())
+        for name, pipe in candidates.items():
+            fitted = clone(pipe).fit(pool[FEATURE_COLUMNS], pool[TARGET_COLUMN])
+            # Jumlah pemesanan tidak mungkin negatif.
+            preds[name].append(max(0.0, float(fitted.predict(X_query)[0])))
+
+    y_true = test_weeks[TARGET_COLUMN].to_numpy()
+    results = {name: evaluate(y_true, np.array(p)) for name, p in preds.items()}
+    return results, len(test_weeks)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Latih dan bandingkan model prediksi permintaan.")
     parser.add_argument("--data", required=True, help="CSV dataset per baris pemesanan")
-    parser.add_argument("--cutoff", required=True, help="Tanggal awal data uji, contoh 2026-10-01")
+    parser.add_argument(
+        "--cutoff",
+        required=True,
+        help="Minggu uji pertama untuk evaluasi bergulir, contoh 2026-08-10",
+    )
     parser.add_argument(
         "--sumber",
         choices=["asli", "semua"],
@@ -92,33 +150,31 @@ def main() -> None:
     )
     parser.add_argument("--out", default=str(MODEL_PATH))
     args = parser.parse_args()
+    cutoff = pd.Timestamp(args.cutoff)
 
     bookings = load_bookings(args.data)
     events = load_event_weeks()
 
     # Evaluasi selalu pada data asli: angka dari data contoh tidak mewakili usaha UMKM.
     weekly_asli = add_features(to_weekly(bookings, only_origin="asli"), events)
-    _, test = time_split(weekly_asli, args.cutoff)
 
     if args.sumber == "asli":
-        train, _ = time_split(weekly_asli, args.cutoff)
         weekly_full = weekly_asli
         data_source = "asli"
         data_note = "Dilatih dan dievaluasi dari data asli UMKM saja."
         baris_latih = bookings[bookings["asal_data"] == "asli"]
     else:
-        weekly_semua = add_features(to_weekly(bookings), events)
-        train, _ = time_split(weekly_semua, args.cutoff)
-        weekly_full = weekly_semua
+        weekly_full = add_features(to_weekly(bookings), events)
         data_source = "campuran"
         data_note = (
             "Dilatih dari data asli ditambah data contoh berlabel, dievaluasi pada data asli. "
             "Lihat README untuk sumber dan cara pembuatan data contoh."
         )
         baris_latih = bookings
+
     # Baris yang dipelajari model final: semua baris, atau sampai cutoff jika --tanpa-refit.
     if args.tanpa_refit:
-        baris_final = baris_latih[baris_latih["tanggal_pemakaian"] < pd.Timestamp(args.cutoff)]
+        baris_final = baris_latih[baris_latih["tanggal_pemakaian"] < cutoff]
     else:
         baris_final = baris_latih
 
@@ -138,51 +194,29 @@ def main() -> None:
         size_proportions = {}
         print(f"PERHATIAN: kolom '{args.kolom_ukuran}' tidak ada; prediksi tidak dipecah per ukuran.")
 
-    if train.empty or test.empty:
-        raise SystemExit("Data latih atau data uji kosong. Periksa nilai --cutoff.")
+    candidates = build_candidates()
+    results, n_uji = rolling_evaluation(weekly_asli, weekly_full, cutoff, candidates)
+    n_latih_awal = int((weekly_full["week_start"] < cutoff).sum())
 
-    X_train, y_train = train[FEATURE_COLUMNS], train[TARGET_COLUMN]
-    X_test, y_test = test[FEATURE_COLUMNS], test[TARGET_COLUMN]
-
-    results: dict[str, dict] = {}
-
-    # Baseline: selalu menebak rata-rata data latih. Tanpa pembanding ini,
-    # angka MAE model tidak punya arti.
-    baseline_pred = np.full(len(y_test), float(y_train.mean()))
-    results["baseline_rata_rata"] = evaluate(y_test, baseline_pred)
-
-    candidates = {
-        "ridge": Pipeline(
-            [("pra", build_preprocessor()), ("model", Ridge(alpha=1.0, random_state=None))]
-        ),
-        "random_forest": Pipeline(
-            [
-                ("pra", build_preprocessor()),
-                ("model", RandomForestRegressor(n_estimators=300, random_state=42)),
-            ]
-        ),
-    }
-
-    fitted = {}
-    for name, pipe in candidates.items():
-        pipe.fit(X_train, y_train)  # pipeline belajar hanya dari data latih
-        results[name] = evaluate(y_test, pipe.predict(X_test))
-        fitted[name] = pipe
-
-    best_name = min(fitted, key=lambda n: results[n]["mae"])
+    best_name = min(candidates, key=lambda n: results[n]["mae"])
+    pembanding_terbaik = min(BASELINES, key=lambda n: results[n]["mae"])
 
     if args.tanpa_refit:
-        final = fitted[best_name]
-        n_minggu_final = len(train)
+        awal = weekly_full[weekly_full["week_start"] < cutoff]
+        final = clone(candidates[best_name]).fit(awal[FEATURE_COLUMNS], awal[TARGET_COLUMN])
+        n_minggu_final = len(awal)
     else:
-        # Konfigurasi terpilih dilatih ulang dari nol pada semua minggu. Evaluasi di atas
-        # sudah selesai, jadi data uji boleh ikut dipelajari model yang akan di-deploy.
+        # Konfigurasi terpilih dilatih ulang dari nol pada semua minggu. Evaluasi sudah
+        # selesai, jadi minggu uji boleh ikut dipelajari model yang akan di-deploy.
         final = clone(candidates[best_name]).fit(
             weekly_full[FEATURE_COLUMNS], weekly_full[TARGET_COLUMN]
         )
         n_minggu_final = len(weekly_full)
 
-    print(f"\nMinggu latih: {len(train)} | minggu uji: {len(test)} | sumber latih: {args.sumber}\n")
+    print(
+        f"\nEvaluasi bergulir: {n_uji} minggu uji, latih awal {n_latih_awal} minggu, "
+        f"sumber latih: {args.sumber}\n"
+    )
     print("| Model | MAE | RMSE |")
     print("|---|---|---|")
     for name, m in results.items():
@@ -192,10 +226,10 @@ def main() -> None:
         print(f"Model disimpan TANPA pelatihan ulang ({n_minggu_final} minggu sampai cutoff).")
     else:
         print(f"Model final dilatih ulang pada semua {n_minggu_final} minggu.")
-    if results[best_name]["mae"] >= results["baseline_rata_rata"]["mae"]:
+    if results[best_name]["mae"] >= results[pembanding_terbaik]["mae"]:
         print(
-            "PERHATIAN: model belum mengalahkan baseline. Laporkan apa adanya di README "
-            "beserta penjelasan sebabnya; itu temuan yang sah."
+            f"PERHATIAN: model belum mengalahkan {pembanding_terbaik}. Laporkan apa adanya "
+            "di README beserta penjelasan sebabnya; itu temuan yang sah."
         )
 
     meta = {
@@ -203,14 +237,15 @@ def main() -> None:
         "version": "1.0.0",
         "mae_validasi": results[best_name]["mae"],
         "rmse_validasi": results[best_name]["rmse"],
+        "metode_evaluasi": "bergulir: latih semua minggu sebelumnya, prediksi 1 minggu berikutnya",
         "data_note": data_note,
         "data_source": data_source,
         "size_proportions": size_proportions,
         "kolom_ukuran": args.kolom_ukuran,
         "sumber_latih": args.sumber,
         "cutoff": args.cutoff,
-        "n_minggu_latih": int(len(train)),
-        "n_minggu_uji": int(len(test)),
+        "n_minggu_latih_awal": n_latih_awal,
+        "n_minggu_uji": int(n_uji),
         "refit_semua_data": not args.tanpa_refit,
         "n_minggu_final": int(n_minggu_final),
         "bulan_data_asli": bulan_data_asli,

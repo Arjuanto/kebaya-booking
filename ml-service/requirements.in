@@ -1,0 +1,10 @@
+# Dependensi yang dipakai layanan (dipasang juga oleh Render).
+# Jangan pasang dari berkas ini langsung; pakai requirements.txt yang versinya sudah dikunci.
+pandas
+numpy<2.5  # numpy 2.5 tidak lagi mendukung Python 3.11 (versi Python di laptop)
+scikit-learn
+joblib
+fastapi
+uvicorn[standard]
+pydantic
+python-dotenv

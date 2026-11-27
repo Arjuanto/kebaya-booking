@@ -14,6 +14,11 @@ Catatan keputusan yang perlu ditulis ulang di README:
   informasi apa pun.
 - Minggu dengan lonjakan besar TIDAK dibuang. Itu pola asli hari acara, dan membuang
   data tanpa alasan yang bisa dipertanggungjawabkan dilarang oleh aturan Asah.
+- "Minggu ke-" (nomor minggu dalam setahun) TIDAK dipakai sebagai fitur. Data asli hanya
+  sampai minggu ke-45 dan lonjakan terbesar ada di ujungnya, sehingga model membaca
+  minggu-minggu sesudahnya sebagai kelanjutan lonjakan. Saat diuji, prediksi Desember 2026
+  melambung ke sekitar 200 pemesanan pada Ridge maupun Random Forest, kira-kira dua kali
+  bulan tersibuk di data asli. Lihat notebooks/eksplorasi_permintaan.ipynb.
 """
 
 from __future__ import annotations
@@ -26,7 +31,7 @@ import pandas as pd
 CONFIG_DIR = Path(__file__).resolve().parents[1] / "config"
 
 #: Kolom fitur yang dipakai model. Dipakai juga saat melayani permintaan prediksi.
-FEATURE_COLUMNS = ["bulan", "minggu_ke", "is_event_week"]
+FEATURE_COLUMNS = ["bulan", "is_event_week"]
 TARGET_COLUMN = "n_bookings"
 
 
@@ -75,11 +80,8 @@ def to_weekly(
     counts = (
         data.set_index("tanggal_pemakaian")
         .resample("W-MON", label="left", closed="left")
-        .size()
+        .size()  # minggu tanpa pemesanan otomatis bernilai 0
     )
-    # Isi minggu yang tidak punya pemesanan sama sekali dengan 0.
-    full_index = pd.date_range(counts.index.min(), counts.index.max(), freq="W-MON")
-    counts = counts.reindex(full_index, fill_value=0)
 
     return (
         counts.rename(TARGET_COLUMN)
@@ -96,7 +98,6 @@ def add_features(
     out = weekly.copy()
     weeks = pd.to_datetime(out["week_start"])
     out["bulan"] = weeks.dt.month
-    out["minggu_ke"] = weeks.dt.isocalendar().week.astype(int)
     events = event_weeks or set()
     out["is_event_week"] = weeks.dt.normalize().isin(events).astype(int)
     return out

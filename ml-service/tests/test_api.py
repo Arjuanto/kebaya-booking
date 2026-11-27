@@ -1,4 +1,4 @@
-"""Uji layanan model terhadap docs/api-contract.md v0.4 bagian 5.
+"""Uji layanan model terhadap docs/api-contract.md v0.5 bagian 5.
 
 Jalankan dari folder ml-service: pytest -q
 Mencakup skenario Rencana Pengujian di Project Plan: input valid, input tidak
@@ -13,11 +13,14 @@ import app.main as main_mod
 from app.main import NOTE_BULAN_TANPA_DATA_ASLI, app
 
 
+KUNCI_UJI = "kunci-uji"
+
+
 @pytest.fixture
 def client(monkeypatch):
-    # Tanpa API_KEY, pemeriksaan kunci dilewati (mode pengembangan lokal).
-    monkeypatch.delenv("API_KEY", raising=False)
-    with TestClient(app) as c:
+    # Kunci dipasang lewat variabel lingkungan dan dikirim otomatis di setiap permintaan.
+    monkeypatch.setenv("API_KEY", KUNCI_UJI)
+    with TestClient(app, headers={"X-API-Key": KUNCI_UJI}) as c:
         yield c
 
 
@@ -57,7 +60,14 @@ def test_size_dalam_tabel(client):
     assert body["tableVersion"]
 
 
-@pytest.mark.parametrize("ld,ukuran", [(83, "XS"), (84, "S"), (88, "S"), (89, "M"), (124, "XXXL")])
+@pytest.mark.parametrize(
+    "ld,ukuran",
+    [
+        (83, "XS"), (84, "S"), (88, "S"), (89, "M"), (124, "XXXL"),
+        # Desimal dibulatkan setengah ke atas, jadi tidak jatuh di celah antar-ukuran.
+        (83.5, "S"), (88.5, "M"), (94.5, "L"), (100.5, "XL"), (88.4, "S"), (124.4, "XXXL"),
+    ],
+)
 def test_size_nilai_batas(client, ld, ukuran):
     r = client.post("/v1/size-estimate", json={"ld": ld, "tb": 160, "bb": 55})
     assert r.status_code == 200
@@ -149,6 +159,27 @@ def test_api_key_salah_401(monkeypatch):
         assert r_ok.status_code == 200
 
 
+def test_api_key_kosong_di_server_menolak_401(monkeypatch):
+    """Lupa mengisi API_KEY di Render tidak boleh membuat layanan terbuka."""
+    monkeypatch.delenv("API_KEY", raising=False)
+    with TestClient(app) as c:
+        for headers in ({}, {"X-API-Key": ""}, {"X-API-Key": "apa-saja"}):
+            r = c.post("/v1/size-estimate", json={"ld": 92, "tb": 160, "bb": 55}, headers=headers)
+            assert r.status_code == 401
+            assert_format_error(r.json(), "UNAUTHORIZED")
+        r = c.post("/v1/predict/demand", json={"targetMonth": "2026-12"})
+        assert r.status_code == 401
+        # /v1/health tetap bisa dipanggil untuk membangunkan layanan.
+        assert c.get("/v1/health").status_code == 200
+
+
+def test_api_key_tidak_dikirim_401(client):
+    r = client.post(
+        "/v1/size-estimate", json={"ld": 92, "tb": 160, "bb": 55}, headers={"X-API-Key": ""}
+    )
+    assert r.status_code == 401
+
+
 def test_health_tanpa_kunci_tetap_bisa(monkeypatch):
     """Backend memakai /health untuk membangunkan layanan, jadi tidak perlu kunci."""
     monkeypatch.setenv("API_KEY", "kunci-benar")
@@ -208,3 +239,26 @@ def test_predict_note_null_untuk_bulan_yang_ada_di_data_asli(client_model):
 def test_predict_note_terisi_untuk_bulan_tanpa_data_asli(client_model):
     body = client_model.post("/v1/predict/demand", json={"targetMonth": "2026-12"}).json()
     assert body["note"] == NOTE_BULAN_TANPA_DATA_ASLI
+
+
+# ---------- berkas model rusak ----------
+
+def test_model_rusak_tidak_mematikan_layanan(monkeypatch, tmp_path):
+    """Berkas model rusak (atau dari versi scikit-learn lain) hanya mematikan prediksi."""
+    rusak = tmp_path / "model.joblib"
+    rusak.write_bytes(b"bukan berkas joblib")
+    monkeypatch.setattr(main_mod, "MODEL_PATH", rusak)
+    monkeypatch.setenv("API_KEY", KUNCI_UJI)
+    with TestClient(app, headers={"X-API-Key": KUNCI_UJI}) as c:
+        assert c.get("/v1/health").json()["models"]["demand"] == "gagal-dimuat"
+        r = c.post("/v1/size-estimate", json={"ld": 92, "tb": 160, "bb": 55})
+        assert r.status_code == 200 and r.json()["size"] == "M"
+
+        monkeypatch.setattr(main_mod, "ALLOW_STUB", False)
+        r = c.post("/v1/predict/demand", json={"targetMonth": "2026-12"})
+        assert r.status_code == 503
+        assert_format_error(r.json(), "MODEL_UNAVAILABLE", status="error")
+
+        monkeypatch.setattr(main_mod, "ALLOW_STUB", True)
+        body = c.post("/v1/predict/demand", json={"targetMonth": "2026-12"}).json()
+        assert body["sizeBreakdown"] == "tiruan"

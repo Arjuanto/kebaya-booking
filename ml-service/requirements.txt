@@ -1,12 +1,90 @@
-# Jalankan: pip install -r requirements.txt
-# Setelah lingkungan stabil, kunci versi pastinya dengan: pip freeze > requirements.lock.txt
-pandas>=2.2
-numpy>=1.26
-scikit-learn>=1.5
-joblib>=1.4
-fastapi>=0.115
-uvicorn[standard]>=0.30
-pydantic>=2.8
-python-dotenv>=1.0
-httpx>=0.27
-pytest>=8.0
+# Library layanan model, versi dikunci. Dipasang oleh Render dan di laptop.
+# Jangan ubah manual. Ubah requirements.in, lalu buat ulang (Python 3.11):
+#   uv pip compile requirements.in --universal --python-version 3.11 -o requirements.txt
+# Di laptop pakai requirements-dev.txt, yang sudah mencakup berkas ini.
+annotated-doc==0.0.7
+    # via fastapi
+annotated-types==0.8.0
+    # via pydantic
+anyio==4.16.0
+    # via
+    #   fastapi
+    #   starlette
+    #   watchfiles
+click==8.5.1
+    # via uvicorn
+cloudpickle==3.1.3
+    # via joblib
+fastapi==0.165.0
+    # via -r requirements.in
+h11==0.16.0
+    # via uvicorn
+httptools==0.9.0
+    # via uvicorn
+idna==3.20
+    # via anyio
+joblib==1.6.0
+    # via
+    #   -r requirements.in
+    #   scikit-learn
+narwhals==2.29.0
+    # via scikit-learn
+numpy==2.4.6
+    # via
+    #   -r requirements.in
+    #   pandas
+    #   scikit-learn
+    #   scipy
+opentelemetry-api==1.45.2
+    # via fastapi
+pandas==3.1.1
+    # via -r requirements.in
+pydantic==2.14.4
+    # via
+    #   -r requirements.in
+    #   fastapi
+pydantic-core==2.50.5
+    # via pydantic
+python-dateutil==4.0.0
+    # via pandas
+python-dotenv==1.2.4
+    # via
+    #   -r requirements.in
+    #   uvicorn
+pyyaml==6.0.4
+    # via uvicorn
+scikit-learn==1.9.1
+    # via -r requirements.in
+scipy==1.17.1 ; python_full_version < '3.12'
+    # via scikit-learn
+scipy==1.18.1 ; python_full_version >= '3.12'
+    # via scikit-learn
+starlette==1.10.0
+    # via fastapi
+threadpoolctl==3.8.0
+    # via scikit-learn
+typing-extensions==4.16.0
+    # via
+    #   anyio
+    #   fastapi
+    #   opentelemetry-api
+    #   pydantic
+    #   pydantic-core
+    #   starlette
+    #   typing-inspection
+typing-inspection==0.4.5
+    # via
+    #   fastapi
+    #   pydantic
+tzdata==2026.6
+    # via
+    #   pandas
+    #   python-dateutil
+uvicorn==0.54.0
+    # via -r requirements.in
+uvloop==0.23.0 ; platform_python_implementation != 'PyPy' and sys_platform != 'cygwin' and sys_platform != 'win32'
+    # via uvicorn
+watchfiles==1.3.0
+    # via uvicorn
+websockets==17.4
+    # via uvicorn

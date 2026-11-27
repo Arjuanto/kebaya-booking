@@ -1,4 +1,4 @@
-"""Skema request dan response, mengikuti docs/api-contract.md v0.4 bagian 5.
+"""Skema request dan response, mengikuti docs/api-contract.md v0.5 bagian 5.
 
 Nama field di JSON memakai camelCase sesuai konvensi kontrak (bagian 1). Di kode
 Python tetap snake_case; konversinya diurus alias generator Pydantic.

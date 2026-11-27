@@ -1,6 +1,6 @@
 """Layanan model (FastAPI) untuk Capstone A26-CS010.
 
-Mengikuti docs/api-contract.md v0.4 bagian 5. Dipanggil HANYA oleh backend Express,
+Mengikuti docs/api-contract.md v0.5 bagian 5. Dipanggil HANYA oleh backend Express,
 dilindungi header X-API-Key.
 
     GET  /v1/health             cek layanan hidup (tanpa kunci)
@@ -17,8 +17,11 @@ Dokumentasi otomatis: http://127.0.0.1:8000/docs
 
 from __future__ import annotations
 
+import logging
 import os
+import warnings
 from contextlib import asynccontextmanager
+from dataclasses import asdict
 from pathlib import Path
 
 import joblib
@@ -64,18 +67,50 @@ NOTE_BULAN_TANPA_DATA_ASLI = (
     "atau data contoh. Anggap sebagai gambaran kasar, bukan perkiraan yang bisa diandalkan."
 )
 
-state: dict = {"pipeline": None, "meta": None, "size_table": None, "event_weeks": set()}
+log = logging.getLogger("ml-service")
+
+state: dict = {
+    "pipeline": None,
+    "meta": None,
+    "model_gagal": False,
+    "size_table": None,
+    "event_weeks": set(),
+}
+
+
+def load_model(path: Path) -> None:
+    """Muat model prediksi. Kalau gagal, layanan tetap menyala tanpa model.
+
+    Perkiraan ukuran tidak membutuhkan model, jadi berkas model yang rusak atau dibuat
+    dengan versi scikit-learn lain tidak boleh ikut mematikan /v1/size-estimate.
+    """
+    state["pipeline"], state["meta"], state["model_gagal"] = None, None, False
+    if not path.exists():
+        log.warning("Berkas model %s tidak ada; prediksi memakai %s.", path, "jawaban tiruan" if ALLOW_STUB else "503")
+        return
+    try:
+        with warnings.catch_warnings(record=True) as peringatan:
+            warnings.simplefilter("always")
+            bundle = joblib.load(path)
+            pipeline, meta = bundle["pipeline"], bundle["meta"]
+        for w in peringatan:
+            # Misalnya InconsistentVersionWarning: model dilatih dengan scikit-learn versi lain.
+            log.warning("Peringatan saat memuat model: %s", w.message)
+    except Exception:
+        log.exception("Model gagal dimuat dari %s; layanan berjalan tanpa model prediksi.", path)
+        state["model_gagal"] = True
+        return
+    state["pipeline"], state["meta"] = pipeline, meta
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Model dimuat sekali saat layanan menyala, bukan setiap permintaan.
-    if MODEL_PATH.exists():
-        bundle = joblib.load(MODEL_PATH)
-        state["pipeline"] = bundle["pipeline"]
-        state["meta"] = bundle["meta"]
+    load_model(MODEL_PATH)
     state["size_table"] = SizeTable()
     state["event_weeks"] = load_event_weeks()
+    if not os.getenv("API_KEY"):
+        log.error("API_KEY belum diisi; semua endpoint selain /v1/health akan menjawab 401.")
     yield
     state.clear()
 
@@ -97,11 +132,13 @@ register_error_handlers(app)
 # Render yang lama (/health) tidak gagal; pemanggil baru memakai /v1/health.
 @app.get("/health", response_model=HealthResponse, include_in_schema=False)
 async def health() -> HealthResponse:
-    """Cek layanan hidup. Backend memanggilnya saat menyala dan tiap 10 menit (kontrak v0.4 bagian 5)."""
+    """Cek layanan hidup. Backend memanggilnya saat menyala dan tiap 10 menit (kontrak v0.5 bagian 5)."""
     meta = state.get("meta") or {}
     table: SizeTable | None = state.get("size_table")
     if state.get("pipeline") is not None:
         demand = meta.get("version", "1.0.0")
+    elif state.get("model_gagal"):
+        demand = "gagal-dimuat"
     else:
         demand = "stub" if ALLOW_STUB else "belum-ada-model"
     return HealthResponse(
@@ -126,7 +163,7 @@ async def size_estimate(req: SizeRequest) -> SizeResponse:
     """
     table: SizeTable = state["size_table"]
     hasil = table.estimate(req.ld, req.tb, req.bb)
-    return SizeResponse(**hasil.to_dict())
+    return SizeResponse(**asdict(hasil))
 
 
 @app.post(
@@ -177,7 +214,7 @@ async def predict_demand(req: PredictRequest) -> PredictResponse:
         predictions = [PredictionItem(size="TOTAL", predicted_count=round(total, 1))]
         breakdown = "tidak_tersedia"
 
-    # Kontrak v0.4: note hanya diisi bila ada hal yang perlu diketahui admin, selain itu null.
+    # Kontrak v0.5: note hanya diisi bila ada hal yang perlu diketahui admin, selain itu null.
     note = None
     bulan_asli = meta.get("bulan_data_asli")
     if bulan_asli is not None and int(req.target_month[5:7]) not in bulan_asli:

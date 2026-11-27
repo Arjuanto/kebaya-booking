@@ -2,12 +2,13 @@
 
 PENTING: ini aturan berbasis tabel, BUKAN model yang dilatih. Tulis begitu di README
 supaya tidak terbaca sebagai klaim AI. Tabelnya disimpan di config/size_table.json
-agar bisa diganti tanpa menyentuh kode begitu owner memberikan tabel resminya.
+agar rentangnya bisa diganti tanpa menyentuh kode.
 """
 
 from __future__ import annotations
 
 import json
+import math
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -20,14 +21,6 @@ class SizeEstimate:
     in_range: bool
     message: str
     table_version: str
-
-    def to_dict(self) -> dict:
-        return {
-            "size": self.size,
-            "in_range": self.in_range,
-            "message": self.message,
-            "table_version": self.table_version,
-        }
 
 
 class SizeTable:
@@ -45,10 +38,15 @@ class SizeTable:
 
         tb_cm dan bb_kg diterima dan divalidasi di lapisan API, tetapi belum dipakai
         pada tabel versi ini. Keduanya tetap ada di kontrak supaya bentuk request tidak
-        berubah ketika tabel resmi owner nanti memakainya.
+        berubah ketika tabel versi berikutnya memakainya.
         """
+        # Batas tabel berupa cm bulat, sedangkan input boleh desimal. Tanpa pembulatan,
+        # 88,5 jatuh di celah antara S (84-88) dan M (89-94) lalu dianggap di luar tabel.
+        # Dibulatkan setengah ke atas; round() bawaan Python memakai pembulatan ke genap,
+        # sehingga round(88.5) menjadi 88.
+        ld_bulat = math.floor(ld_cm + 0.5)
         for row in self.ranges:
-            if row["ld_min"] <= ld_cm <= row["ld_max"]:
+            if row["ld_min"] <= ld_bulat <= row["ld_max"]:
                 ukuran = row["size"]
                 return SizeEstimate(
                     ukuran, True, f"Perkiraan ukuran {ukuran} berdasarkan tabel ukuran", self.version
