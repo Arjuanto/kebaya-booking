@@ -90,6 +90,12 @@ describe('katalog admin dengan PostgreSQL', { skip: !testDb && 'TEST_DATABASE_UR
     assert.equal((await dup.json()).code, 'DUPLICATE_CODE');
   });
 
+  test('ukuran XS dan XXXL lolos constraint database', async () => {
+    for (const [code, size] of [['KB-030', 'XS'], ['KB-031', 'XXXL']]) {
+      assert.equal((await api('POST', '', { ...input, code, size })).status, 201, size);
+    }
+  });
+
   test('PUT tanpa isActive -> status nonaktif tetap, updated_at diperbarui trigger', async () => {
     const res = await api('PUT', '/1', input);
     assert.equal(res.status, 200);

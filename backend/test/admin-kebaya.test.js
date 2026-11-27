@@ -162,11 +162,16 @@ test('POST kode huruf kecil -> dikirim ke database dalam huruf besar', async () 
   assert.equal(queries[0][0], 'KB-013');
 });
 
+test('POST ukuran XS dan XXXL -> diterima (tabel ukuran tim, kontrak v0.5)', async () => {
+  reply = () => ({ rows: [row] });
+  for (const size of ['XS', 'XXXL']) assert.equal((await api('POST', '', { ...input, size })).status, 201, size);
+});
+
 test('POST tidak valid -> 400 per field dengan pesan bahasa Indonesia', async () => {
   const res = await api('POST', '', {
     code: 'K'.repeat(21),
     category: 'gaun',
-    size: 'XS',
+    size: 'XXXXL',
     photo: 'javascript:alert(1)',
     description: 'd'.repeat(501),
     isActive: 'ya',
@@ -228,6 +233,22 @@ test('POST foto lebih dari 2 MB -> 400; body di atas batas 3 MB juga 400 field p
   assert.equal(queries.length, 0);
 });
 
+test('POST tanpa token dengan body besar -> 401, body tidak diproses dulu', async () => {
+  // Di atas batas 3 MB: kalau body dibaca sebelum token dicek, jawabannya 400 "terlalu besar".
+  const huge = await api('POST', '', { ...input, photo: `data:image/jpeg;base64,${'A'.repeat(3.5 * 1024 * 1024)}` }, {});
+  assert.equal(huge.status, 401);
+  assert.equal((await huge.json()).code, 'UNAUTHORIZED');
+
+  // JSON rusak di atas 100 KB: kalau body di-parse sebelum token dicek, jawabannya 400 "Format JSON tidak valid".
+  const broken = await fetch(base, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: `{${'x'.repeat(200 * 1024)}`,
+  });
+  assert.equal(broken.status, 401);
+  assert.equal((await broken.json()).code, 'UNAUTHORIZED');
+});
+
 test('PUT valid -> 200; tanpa isActive, parameternya null (status aktif tidak diubah)', async () => {
   reply = () => ({ rows: [row] });
   const res = await api('PUT', '/12', input);
@@ -249,7 +270,7 @@ test('PUT tanpa foto -> parameter foto null, jadi foto lama tetap dipakai', asyn
 });
 
 test('PUT tidak valid -> 400, id tidak ada -> 404, kode bentrok -> 409', async () => {
-  const invalid = await api('PUT', '/12', { ...input, size: 'XS' });
+  const invalid = await api('PUT', '/12', { ...input, size: 'XXXXL' });
   assert.equal(invalid.status, 400);
   assert.deepEqual(await errorFields(invalid), ['size']);
 
