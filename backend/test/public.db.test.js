@@ -203,7 +203,7 @@ describe('endpoint publik dengan PostgreSQL', { skip: !testDb && 'TEST_DATABASE_
       const failures = [
         ['error 500', () => (ml.reply = () => [500, { status: 'error', code: 'INTERNAL_ERROR', message: 'x' }])],
         ['401 (ML_API_KEY salah)', () => (ml.reply = () => [401, { status: 'fail', code: 'UNAUTHORIZED', message: 'x' }])],
-        ['ukuran di luar enum kebaya', () => (ml.reply = () => [200, estimate('XS')])],
+        ['ukuran di luar enum kebaya', () => (ml.reply = () => [200, estimate('XXXXL')])],
         ['tanpa tableVersion', () => (ml.reply = () => [200, { ...estimate('M'), tableVersion: undefined }])],
         ['bukan JSON', () => (ml.reply = () => [200, undefined])],
         [
@@ -354,7 +354,7 @@ describe('endpoint publik dengan PostgreSQL', { skip: !testDb && 'TEST_DATABASE_
       t.mock.method(console, 'error', () => {});
       for (const [label, answer, size, version] of [
         ['error 500', [500, { status: 'error' }], null, null],
-        ['ukuran di luar enum kebaya', [200, estimate('XXXL')], null, null],
+        ['ukuran di luar enum kebaya', [200, estimate('XXXXL')], null, null],
         ['di luar tabel ukuran: versi tabel tetap dicatat', [200, OUT_OF_TABLE], null, 'sementara-1'],
       ]) {
         ml.reply = () => answer;

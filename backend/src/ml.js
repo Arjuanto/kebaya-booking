@@ -1,8 +1,8 @@
 const Joi = require('joi');
 const { SIZES } = require('./routes/admin-kebaya');
 
-// Jawaban POST /v1/size-estimate (kontrak 5). Ukuran di luar enum kebaya (mis. XS dari tabel sementara) dianggap
-// gagal: kolom bookings.estimated_size dibatasi CHECK yang sama, jadi pengajuan tidak akan bisa disimpan.
+// Jawaban POST /v1/size-estimate (kontrak 5). Ukuran di luar enum kebaya dianggap gagal: kolom
+// bookings.estimated_size dibatasi CHECK yang sama, jadi pengajuan tidak akan bisa disimpan.
 const estimateSchema = Joi.object({
   size: Joi.string()
     .valid(...SIZES)
