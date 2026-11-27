@@ -162,11 +162,16 @@ test('POST kode huruf kecil -> dikirim ke database dalam huruf besar', async () 
   assert.equal(queries[0][0], 'KB-013');
 });
 
+test('POST ukuran XS dan XXXL -> diterima (tabel ukuran tim, kontrak v0.5)', async () => {
+  reply = () => ({ rows: [row] });
+  for (const size of ['XS', 'XXXL']) assert.equal((await api('POST', '', { ...input, size })).status, 201, size);
+});
+
 test('POST tidak valid -> 400 per field dengan pesan bahasa Indonesia', async () => {
   const res = await api('POST', '', {
     code: 'K'.repeat(21),
     category: 'gaun',
-    size: 'XS',
+    size: 'XXXXL',
     photo: 'javascript:alert(1)',
     description: 'd'.repeat(501),
     isActive: 'ya',
@@ -265,7 +270,7 @@ test('PUT tanpa foto -> parameter foto null, jadi foto lama tetap dipakai', asyn
 });
 
 test('PUT tidak valid -> 400, id tidak ada -> 404, kode bentrok -> 409', async () => {
-  const invalid = await api('PUT', '/12', { ...input, size: 'XS' });
+  const invalid = await api('PUT', '/12', { ...input, size: 'XXXXL' });
   assert.equal(invalid.status, 400);
   assert.deepEqual(await errorFields(invalid), ['size']);
 

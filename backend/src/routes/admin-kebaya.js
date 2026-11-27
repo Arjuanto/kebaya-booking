@@ -4,7 +4,7 @@ const db = require('../db');
 const { AppError, validate } = require('../errors');
 
 const CATEGORIES = ['kebaya', 'kemeja_couple'];
-const SIZES = ['S', 'M', 'L', 'XL', 'XXL', 'ALL_SIZE'];
+const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL', 'ALL_SIZE'];
 
 // Pesan Joi berbahasa Indonesia; {#label} = nama field yang ramah pengguna.
 const prefs = {
