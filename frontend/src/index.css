@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+}
+
+.font-serif, h1, h2, h3, .serif-heading {
+  font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+}
+
+/* Background canvas silk khas UMKM */
+.bg-silk-canva {
+  background-color: #F8F3EC;
+  background-image:
+    radial-gradient(at 10% 15%, rgba(255, 255, 255, 0.8) 0px, transparent 50%),
+    radial-gradient(at 90% 25%, rgba(228, 211, 192, 0.5) 0px, transparent 50%),
+    radial-gradient(at 30% 80%, rgba(255, 255, 255, 0.85) 0px, transparent 55%),
+    linear-gradient(145deg, #FAF7F2 0%, #F4EBE0 50%, #ECE0D1 100%);
+}
+
+.btn-ag-primary {
+  background: linear-gradient(135deg, #BAA591 0%, #A48D77 100%);
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(164, 141, 119, 0.28);
+  transition: all 0.2s ease;
+}
+
+.btn-ag-primary:hover {
+  background: linear-gradient(135deg, #AF9983 0%, #947E69 100%);
+  transform: translateY(-1px);
+}
