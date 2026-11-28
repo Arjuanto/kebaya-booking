@@ -1,0 +1,8 @@
+# Tambahan untuk pengembangan di laptop: menjalankan tes dan notebook.
+# Tidak dipasang di Render. Berkas ini sudah mencakup semua isi requirements.in.
+-r requirements.in
+-c requirements.txt
+pytest
+httpx
+matplotlib
+notebook

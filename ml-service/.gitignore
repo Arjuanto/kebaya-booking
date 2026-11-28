@@ -1,0 +1,13 @@
+# Berlaku untuk folder ml-service saja.
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.env
+.pytest_cache/
+# Model final DI-commit karena Render mengambil kode dari GitHub. Isinya hanya angka
+# mingguan dan koefisien model, tanpa data pribadi. Berkas latih coba-coba tetap diabaikan.
+models/*
+!models/.gitkeep
+!models/model.joblib
+!models/metrics.json

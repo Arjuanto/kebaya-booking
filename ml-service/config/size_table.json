@@ -1,0 +1,42 @@
+{
+  "table_version": "sementara-1",
+  "sumber": "ASUMSI TIM. Owner menyatakan tidak memiliki ukuran baku. Rentang lingkar dada disusun tim dan cocok dengan kolom perkiraan_ukuran pada dataset draf tim Data Science.",
+  "catatan": "Selaraskan dengan dataset final tim Data Science (python -m src.check_dataset membandingkannya). Kalau rentang berubah, naikkan table_version agar pengajuan lama tetap bisa dikenali.",
+  "ranges": [
+    {
+      "ld_min": 80,
+      "ld_max": 83,
+      "size": "XS"
+    },
+    {
+      "ld_min": 84,
+      "ld_max": 88,
+      "size": "S"
+    },
+    {
+      "ld_min": 89,
+      "ld_max": 94,
+      "size": "M"
+    },
+    {
+      "ld_min": 95,
+      "ld_max": 100,
+      "size": "L"
+    },
+    {
+      "ld_min": 101,
+      "ld_max": 108,
+      "size": "XL"
+    },
+    {
+      "ld_min": 109,
+      "ld_max": 116,
+      "size": "XXL"
+    },
+    {
+      "ld_min": 117,
+      "ld_max": 124,
+      "size": "XXXL"
+    }
+  ]
+}

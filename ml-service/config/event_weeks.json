@@ -1,0 +1,5 @@
+{
+  "sumber": "BELUM DIISI. Daftar minggu wisuda atau acara besar, format tanggal Senin awal minggu.",
+  "catatan": "Hanya isi jika jadwalnya berasal dari sumber nyata (owner atau jadwal kampus). Jadwal karangan tim tidak boleh dipakai. Kalau kosong, fitur is_event_week bernilai 0 untuk semua minggu.",
+  "event_weeks": []
+}
