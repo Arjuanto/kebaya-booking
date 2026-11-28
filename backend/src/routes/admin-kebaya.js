@@ -1,26 +1,10 @@
 const express = require('express');
 const Joi = require('joi');
 const db = require('../db');
-const { AppError, validate } = require('../errors');
+const { AppError, checkId, validate } = require('../errors');
 
 const CATEGORIES = ['kebaya', 'kemeja_couple'];
 const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL', 'ALL_SIZE'];
-
-// Pesan Joi berbahasa Indonesia; {#label} = nama field yang ramah pengguna.
-const prefs = {
-  errors: { wrap: { label: false, array: false } },
-  messages: {
-    'object.base': 'Data harus berupa objek JSON',
-    'any.required': '{#label} wajib diisi',
-    'string.empty': '{#label} wajib diisi',
-    'string.base': '{#label} harus berupa teks',
-    'string.max': '{#label} maksimal {#limit} karakter',
-    'string.uri': '{#label} harus berupa URL http/https yang valid',
-    'string.uriCustomScheme': '{#label} harus berupa URL http/https yang valid',
-    'any.only': '{#label} harus salah satu dari: {#valids}',
-    'boolean.base': '{#label} harus bernilai true atau false',
-  },
-};
 
 // Kontrak 2.1: foto dikirim sebagai data URL base64, hanya JPEG/PNG/WebP, maks 2 MB setelah di-decode.
 const MAX_PHOTO_BYTES = 2 * 1024 * 1024;
@@ -56,21 +40,21 @@ const kebayaSchema = Joi.object({
   }),
   description: Joi.string().trim().max(500).allow(null).empty('').default(null).label('Deskripsi'),
   isActive: Joi.boolean().label('Status aktif'),
-}).prefs(prefs);
+});
 
 // PUT: foto opsional, tidak dikirim berarti foto lama tetap dipakai (kontrak bagian 4).
 const kebayaUpdateSchema = kebayaSchema.fork('photo', (s) => s.optional());
 
 const activeSchema = Joi.object({
   isActive: Joi.boolean().required().label('Status aktif'),
-}).prefs(prefs);
+});
 
 // Nilai kosong (mis. ?category=) berarti tanpa filter.
 const listSchema = Joi.object({
   isActive: Joi.boolean().empty('').label('Filter status'),
   category: Joi.string().valid(...CATEGORIES).empty('').label('Filter kategori'),
   q: Joi.string().trim().max(100).empty('').label('Kata kunci'),
-}).prefs(prefs);
+});
 
 const notFound = () => new AppError(404, 'NOT_FOUND', 'Kebaya tidak ditemukan');
 
@@ -102,11 +86,7 @@ const toKebaya = (r) => ({
 function adminKebayaRoutes() {
   const router = express.Router();
 
-  // id yang bukan integer Postgres pasti tidak ada; tanpa cek ini database melempar error (500).
-  router.param('id', (req, res, next, id) => {
-    if (!/^\d{1,10}$/.test(id) || Number(id) > 2147483647) return next(notFound());
-    next();
-  });
+  router.param('id', checkId(notFound));
 
   router.get('/', async (req, res) => {
     const { isActive = null, category = null, q = null } = validate(listSchema, req.query);

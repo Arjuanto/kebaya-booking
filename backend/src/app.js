@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const { authRoutes } = require('./routes/auth');
 const { adminKebayaRoutes } = require('./routes/admin-kebaya');
+const { adminBookingRoutes } = require('./routes/admin-bookings');
 const { kebayaFotoRoutes } = require('./routes/kebaya-foto');
 const { requireAdmin } = require('./middleware/auth');
 const { AppError, errorHandler } = require('./errors');
@@ -21,6 +22,7 @@ function createApp() {
   app.use('/api/v1/auth', authRoutes());
   app.use('/api/v1/kebaya', kebayaFotoRoutes());
   app.use('/api/v1/admin/kebaya', adminKebayaRoutes());
+  app.use('/api/v1/admin/bookings', adminBookingRoutes());
 
   app.use((req, res, next) => next(new AppError(404, 'NOT_FOUND', 'Endpoint tidak ditemukan')));
   app.use(errorHandler);
