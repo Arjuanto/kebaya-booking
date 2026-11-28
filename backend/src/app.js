@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const { publicRoutes } = require('./routes/public');
 const { authRoutes } = require('./routes/auth');
 const { adminKebayaRoutes } = require('./routes/admin-kebaya');
 const { adminBookingRoutes } = require('./routes/admin-bookings');
@@ -19,6 +20,7 @@ function createApp() {
   app.use('/api/v1/admin/kebaya', express.json({ limit: '3mb' }));
   app.use(express.json());
 
+  app.use('/api/v1', publicRoutes()); // kontrak 3: tanpa token
   app.use('/api/v1/auth', authRoutes());
   app.use('/api/v1/kebaya', kebayaFotoRoutes());
   app.use('/api/v1/admin/kebaya', adminKebayaRoutes());

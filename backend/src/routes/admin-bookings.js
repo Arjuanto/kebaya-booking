@@ -1,7 +1,7 @@
 const express = require('express');
 const Joi = require('joi');
 const db = require('../db');
-const { AppError, checkId, validate } = require('../errors');
+const { AppError, checkId, isDate, validate } = require('../errors');
 
 // Kontrak 2.3: label status di UI dan transisi yang sah.
 const LABEL = {
@@ -24,11 +24,7 @@ const NEXT = {
 const BLOCKING = ['dp_paid', 'paid_off', 'handed_over', 'returned'];
 const MAX_INT = 2147483647;
 
-// YYYY-MM-DD yang ada di kalender. Date JS menggeser 2026-02-30 jadi 2 Maret, jadi hasilnya dibandingkan ulang;
-// tahun 0000 juga ditolak karena Postgres tidak mengenalnya (500).
-const dateOnly = Joi.string().custom((v, h) =>
-  /^[1-9]\d{3}-\d{2}-\d{2}$/.test(v) && new Date(`${v}T00:00:00Z`).toJSON()?.startsWith(v) ? v : h.error('date.base'),
-);
+const dateOnly = Joi.string().custom((v, h) => (isDate(v) ? v : h.error('date.base')));
 // Tidak dikirim = catatan lama tetap; kosong atau null = catatan dihapus.
 const adminNote = Joi.string().trim().max(500).allow(null, '').label('Catatan admin');
 
@@ -273,4 +269,4 @@ function adminBookingRoutes() {
   return router;
 }
 
-module.exports = { adminBookingRoutes };
+module.exports = { adminBookingRoutes, BLOCKING };
