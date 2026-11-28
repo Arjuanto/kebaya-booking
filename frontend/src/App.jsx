@@ -19,7 +19,7 @@ export default function App() {
   return (
     <div className="flex flex-col min-h-screen bg-[#FAF7F2]">
       <Navbar />
-      
+
       <main className="flex-1 max-w-6xl w-full mx-auto p-4 sm:p-6 md:p-8">
         <Routes>
           {/* Rute Halaman Customer */}
