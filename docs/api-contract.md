@@ -1,6 +1,6 @@
 # Kontrak API — Sewa Kebaya By Ariegunarti (A26-CS010)
 
-Status: **DRAFT v0.5** — perlu disepakati FS (Arjuanto, Diva, David) dan AE (Ilham) sebelum pengembangan, sesuai jadwal Minggu 1 (23–29 Nov 2026).
+Status: **DRAFT v0.6** — perlu disepakati FS (Arjuanto, Diva, David) dan AE (Ilham) sebelum pengembangan, sesuai jadwal Minggu 1 (23–29 Nov 2026).
 
 Dokumen ini mencakup dua kontrak:
 
@@ -117,11 +117,11 @@ Website (React) ──Axios──▶ Backend Express /api/v1 ──▶ PostgreSQ
   "customerContact": "0812-0000-0000",
   "useDate": "2026-12-20",
   "eventPurpose": "wisuda",
-  "ld": 88,
+  "ld": 93,
   "tb": 158,
   "bb": 52,
   "estimatedSize": "M",
-  "sizeTableVersion": "sementara-1",
+  "sizeTableVersion": "owner-1",
   "kebaya": { "id": 12, "code": "KB-012", "name": "Kebaya Kutubaru Hijau Sage" },
   "status": "pending",
   "needsFitting": null,
@@ -176,7 +176,7 @@ Transisi selain panah di atas → `409 INVALID_STATUS_TRANSITION`.
 
 - `rentalPeriod.start = useDate − RENTAL_DAYS_BEFORE` (default 1 hari)
 - `rentalPeriod.end   = useDate + RENTAL_DAYS_AFTER + LAUNDRY_DAYS` (default 1 + 2 hari)
-- Ketiga angka adalah **variabel lingkungan** backend (asumsi sampai dikonfirmasi owner).
+- Ketiga angka adalah **variabel lingkungan** backend. Dikonfirmasi owner (28 Nov 2026): kebaya diambil H-1 dan dikembalikan H+1, laundry dan cek 2–3 hari. `LAUNDRY_DAYS` memakai batas bawah (2) supaya sistem tidak menolak tanggal yang masih bisa dilayani; kalau laundry ternyata butuh 3 hari, admin menolak pengajuan yang terlalu mepet secara manual.
 - Kebaya **tidak tersedia** untuk `useDate` X jika ada pengajuan berstatus pemblokir pada kebaya yang sama yang `rentalPeriod`-nya tumpang tindih dengan `rentalPeriod` dari X (`startA <= endB AND startB <= endA`).
 - **Pengajuan ganda**: dua atau lebih pengajuan `pending` untuk kebaya yang sama dengan periode tumpang tindih → `hasDuplicate: true`, `duplicateWith` berisi ID pengajuan lainnya.
 - Saat DP dicatat, backend memeriksa ulang tumpang tindih **di dalam satu transaksi database** (dengan row lock pada kebaya), sehingga dua pencatatan DP bersamaan tidak bisa sama-sama berhasil.
@@ -206,7 +206,7 @@ Daftar kebaya tersedia pada tanggal pemakaian + perkiraan ukuran.
 | Param | Wajib | Contoh |
 |---|---|---|
 | `useDate` | ya | `2026-12-20` |
-| `ld` | ya | `88` |
+| `ld` | ya | `93` |
 | `tb` | ya | `158` |
 | `bb` | ya | `52` |
 | `category` | tidak | `kebaya` |
@@ -276,7 +276,7 @@ Kirim pengajuan pemesanan.
   "customerContact": "0812-0000-0000",
   "useDate": "2026-12-20",
   "eventPurpose": "wisuda",
-  "ld": 88,
+  "ld": 93,
   "tb": 158,
   "bb": 52,
   "kebayaId": 12
@@ -440,13 +440,13 @@ Hasil analisis riwayat pemesanan dari tim DS: baris terbaru di tabel `analytics_
     "period": { "from": "2026-06-01", "to": "2026-11-08" },
     "topKebaya": [ { "code": "KB-012", "name": "Kebaya Kutubaru Hijau Sage", "count": 18 } ],
     "busyPeriods": [ { "label": "Wisuda Oktober", "month": "2026-10", "count": 41 } ],
-    "recommendations": [ "Siapkan ukuran M dan L lebih banyak menjelang wisuda Oktober" ],
+    "recommendations": [ "Buka pemesanan lebih awal menjelang wisuda Oktober" ],
     "generatedAt": "2026-12-05T08:00:00+07:00"
   }
 }
 ```
 - `dataSource`: `asli` \| `contoh` \| `campuran` — wajib tampil di UI (aturan label data).
-- `recommendations` hanya diisi jika `dataSource` = `asli`; selain itu `[]`. Rekomendasi bisnis tidak boleh disusun dari data buatan tim (aturan Asah).
+- `recommendations` hanya diisi jika `dataSource` = `asli`; selain itu `[]`. Rekomendasi bisnis tidak boleh disusun dari data buatan tim (aturan Asah). Ini termasuk ukuran, karena lingkar dada di dataset dibuat tim DS (§8 no. 4).
 
 #### `GET /admin/predictions?targetMonth=2026-12`
 
@@ -458,20 +458,18 @@ Backend meneruskan ke layanan model `POST /v1/predict/demand` dan mengembalikan 
   "status": "success",
   "data": {
     "targetMonth": "2026-12",
-    "model": { "name": "random_forest", "version": "1.0.0", "maeValidasi": 6.8 },
-    "dataSource": "campuran",
-    "totalPredicted": 31.0,
-    "sizeBreakdown": "proporsi_historis",
-    "note": null,
+    "model": { "name": "random_forest", "version": "1.0.0", "maeValidasi": 7.2 },
+    "dataSource": "asli",
+    "totalPredicted": 121.8,
+    "sizeBreakdown": "tidak_tersedia",
+    "note": "Bulan ini di luar periode data asli UMKM. Angkanya dihitung dari pola minggu biasa ditambah wisuda yang sudah diketahui dari owner: Wisuda Poltekkes (2 Desember), Wisuda Stipol (12 Desember), Wisuda Unmuh (29 Desember). Wisuda lain yang belum tercatat tidak ikut terhitung. Anggap sebagai gambaran kasar.",
     "predictions": [
-      { "size": "S", "predictedCount": 6.2 },
-      { "size": "M", "predictedCount": 14.0 },
-      { "size": "L", "predictedCount": 10.8 }
+      { "size": "TOTAL", "predictedCount": 121.8 }
     ]
   }
 }
 ```
-Halaman admin menampilkan angka ini sebagai perkiraan, bukan angka pasti: `totalPredicted` bersama `maeValidasi` (mis. "sekitar 31 pemesanan, rata-rata meleset ±7 per minggu"), label `dataSource`, isi `note` jika ada, dan keterangan bahwa angka per ukuran dibagi dari proporsi historis.
+Halaman admin menampilkan angka ini sebagai perkiraan, bukan angka pasti: `totalPredicted` bersama `maeValidasi` (mis. "sekitar 122 pemesanan, rata-rata meleset ±7 per minggu"), label `dataSource`, dan isi `note`, yang wajib tampil jika tidak `null`. Tidak ada angka per ukuran (`sizeBreakdown` `tidak_tersedia`, §5), jadi baris `TOTAL` tidak ditampilkan sebagai ukuran.
 **502 ML_SERVICE_ERROR / 504 ML_TIMEOUT** — halaman admin tetap terbuka dan menampilkan `message` ("Prediksi sedang tidak tersedia").
 
 #### `POST /admin/ai-summaries`
@@ -541,28 +539,37 @@ Backend tidak meneruskan kode-kode ini ke website. Semua kegagalan layanan model
 
 Tanpa `X-API-Key`.
 ```json
-{ "status": "ok", "models": { "sizeEstimator": "sementara-1", "demand": "1.0.0" } }
+{ "status": "ok", "models": { "sizeEstimator": "owner-1", "demand": "1.0.0" } }
 ```
 `sizeEstimator` berisi versi tabel ukuran yang dipakai. `demand` berisi versi model prediksi, atau `stub` / `belum-ada-model` kalau model belum dilatih, dan `gagal-dimuat` kalau file model rusak. Backend cukup memeriksa bahwa layanan membalas (`mlService` di §3), tidak membaca nilai-nilai ini.
 
 ### `POST /v1/size-estimate`
 
-Berbasis aturan tabel ukuran, bukan model terlatih. Owner tidak punya ukuran baku, jadi tabelnya asumsi tim (§8 no. 2).
+Berbasis aturan tabel ukuran dari owner (§8 no. 2), bukan model terlatih. Yang dipakai hanya lingkar dada:
+
+| Ukuran | Lingkar dada (cm) |
+|---|---|
+| `S` | 82–90 |
+| `M` | 91–98 |
+| `L` | 99–105 |
+| `XL` | di atas 105 (106–150) |
+
+LD dibulatkan setengah ke atas ke cm bulat sebelum dicocokkan (mis. 90,5 jadi 91, yaitu `M`). LD di bawah 82 berada di luar tabel. `tb` dan `bb` tetap divalidasi tapi tidak dipakai tabel ini.
 
 **Request**
 ```json
-{ "ld": 88, "tb": 158, "bb": 52 }
+{ "ld": 93, "tb": 158, "bb": 52 }
 ```
 
 **200**
 ```json
-{ "size": "M", "inRange": true, "message": "Perkiraan ukuran M berdasarkan tabel ukuran", "tableVersion": "sementara-1" }
+{ "size": "M", "inRange": true, "message": "Perkiraan ukuran M berdasarkan tabel ukuran", "tableVersion": "owner-1" }
 ```
 Di luar tabel:
 ```json
-{ "size": null, "inRange": false, "message": "Ukuran di luar tabel, silakan hubungi admin untuk fitting", "tableVersion": "sementara-1" }
+{ "size": null, "inRange": false, "message": "Ukuran di luar tabel, silakan hubungi admin untuk fitting", "tableVersion": "owner-1" }
 ```
-`tableVersion` adalah versi tabel ukuran yang dipakai, saat ini rentang lingkar dada buatan tim (`sementara-1`). Backend menyimpan nilainya di `bookings.size_table_version`, supaya pengajuan yang dihitung dengan tabel lama bisa dikenali.
+`tableVersion` adalah versi tabel ukuran yang dipakai: `owner-1` untuk tabel owner di atas, sedangkan `sementara-1` adalah tabel asumsi tim sebelum v0.6. Backend menyimpan nilainya di `bookings.size_table_version`, supaya pengajuan yang dihitung dengan tabel lama bisa dikenali.
 
 **400 VALIDATION_ERROR** jika nilai kosong, bukan angka, atau di luar rentang kewajaran di 2.2.
 
@@ -573,23 +580,21 @@ Di luar tabel:
 { "targetMonth": "2026-12" }
 ```
 
-**Cara angka dihitung.** Data asli hanya mencakup 1 Jun–8 Nov 2026: per bulan hanya ±5 titik data, per minggu 23. Karena itu model dilatih **per minggu** (minggu mulai Senin). Angka bulanan adalah jumlah prediksi mingguan untuk minggu-minggu yang Seninnya jatuh di `targetMonth`. Angka per ukuran **bukan** keluaran model: total bulanan dipecah memakai proporsi ukuran historis dari data latih.
+**Cara angka dihitung.** Data asli hanya mencakup 1 Jun–8 Nov 2026: per bulan hanya ±5 titik data, per minggu 23. Karena itu model dilatih **per minggu** (minggu mulai Senin), hanya dengan data asli. Data contoh tidak dipakai melatih karena membuat MAE naik dari 7,2 ke 24. Angka bulanan adalah jumlah prediksi mingguan untuk minggu-minggu yang **hari Kamisnya** jatuh di `targetMonth`, sehingga tiap minggu terhitung tepat sekali, di bulan yang memuat sebagian besar harinya. Contoh: wisuda Poltekkes 2 Des 2026 jatuh di minggu 30 Nov–6 Des. Dengan aturan Senin minggu itu masuk November, padahal sebagian besar harinya di Desember. Angka per ukuran tidak disediakan, hanya total: lingkar dada di semua baris dataset, termasuk baris asli, dibuat tim DS, jadi pecahan per ukuran hanya simulasi (§8 no. 4).
 
-Bentuk request boleh bertambah, bentuk response di bawah dipertahankan. Kalender minggu acara (jika dipakai model) disimpan di layanan model sebagai berkas konfigurasi, jadi request tetap seperti di atas.
+Bentuk request boleh bertambah, bentuk response di bawah dipertahankan. Fitur model adalah jumlah hari wisuda dalam minggu itu, dari kalender wisuda yang dikonfirmasi owner. Kalender ini disimpan di layanan model (`ml-service/config/event_days.json`: 7 tanggal historis dan 4 jadwal mendatang), jadi request tetap hanya `targetMonth`.
 
 **200**
 ```json
 {
   "targetMonth": "2026-12",
-  "model": { "name": "random_forest", "version": "1.0.0", "maeValidasi": 6.8 },
-  "dataSource": "campuran",
-  "totalPredicted": 31.0,
-  "sizeBreakdown": "proporsi_historis",
-  "note": null,
+  "model": { "name": "random_forest", "version": "1.0.0", "maeValidasi": 7.2 },
+  "dataSource": "asli",
+  "totalPredicted": 121.8,
+  "sizeBreakdown": "tidak_tersedia",
+  "note": "Bulan ini di luar periode data asli UMKM. Angkanya dihitung dari pola minggu biasa ditambah wisuda yang sudah diketahui dari owner: Wisuda Poltekkes (2 Desember), Wisuda Stipol (12 Desember), Wisuda Unmuh (29 Desember). Wisuda lain yang belum tercatat tidak ikut terhitung. Anggap sebagai gambaran kasar.",
   "predictions": [
-    { "size": "S", "predictedCount": 6.2 },
-    { "size": "M", "predictedCount": 14.0 },
-    { "size": "L", "predictedCount": 10.8 }
+    { "size": "TOTAL", "predictedCount": 121.8 }
   ]
 }
 ```
@@ -599,8 +604,8 @@ Bentuk request boleh bertambah, bentuk response di bawah dipertahankan. Kalender
 | `totalPredicted`, `predictedCount` | Perkiraan jumlah pemesanan pada bulan itu, desimal 1 digit |
 | `model.maeValidasi` | Rata-rata selisih prediksi **mingguan** pada data uji. `null` jika belum ada model terlatih |
 | `dataSource` | Asal data latih: `asli` \| `contoh` \| `campuran` |
-| `sizeBreakdown` | `proporsi_historis`: angka per ukuran dibagi dari proporsi historis. `tidak_tersedia`: data latih tidak punya kolom ukuran, jadi `predictions` hanya berisi satu baris `{ "size": "TOTAL", ... }` yang ditampilkan sebagai total, bukan sebagai ukuran. `tiruan`: model belum dilatih dan angkanya contoh, tidak boleh dipakai saat demo |
-| `note` | Keterangan untuk ditampilkan ke admin, mis. bahwa bulan target hanya berisi data contoh. `null` jika tidak ada |
+| `sizeBreakdown` | `tidak_tersedia`: angka tidak dipecah per ukuran, jadi `predictions` hanya berisi satu baris `{ "size": "TOTAL", ... }` yang ditampilkan sebagai total, bukan sebagai ukuran. Sejak v0.6 model selalu memakai nilai ini (§8 no. 4). `proporsi_historis`: angka per ukuran dibagi dari proporsi ukuran di data latih; tidak dipakai selama lingkar dada di dataset buatan tim DS. `tiruan`: model belum dilatih dan angkanya contoh, tidak boleh dipakai saat demo |
+| `note` | Untuk bulan di luar periode data asli: wisuda mana yang ikut dihitung, atau bahwa belum ada jadwal wisuda yang diketahui. `null` untuk bulan di dalam periode data asli. Saat `sizeBreakdown` = `tiruan`, berisi peringatan jawaban tiruan. Halaman admin wajib menampilkannya |
 
 ---
 
@@ -644,17 +649,17 @@ Tidak ada API key di kode atau repositori.
 
 ## 8. Pertanyaan terbuka
 
-Status per v0.5.
+Status per v0.6.
 
 | No | Pertanyaan | Status |
 |---|---|---|
 | 1 | **Kontak customer** untuk fitting dan DP | Diterapkan: field opsional `customerContact` (2.2). Saat demo hanya diisi data contoh; tidak boleh ada kontak pelanggan asli di repositori atau video demo |
-| 2 | **Tabel ukuran** | Owner tidak punya ukuran baku (kabar dari Ilham di review PR #37). Tabelnya asumsi tim berbasis lingkar dada (`tableVersion: "sementara-1"`, §5), diselaraskan dengan dataset final DS |
-| 3 | **Masa sewa & jeda laundry** | Dikonfirmasi owner: `1 / 1 / 2` (kabar dari Ilham di review PR #37). Di data asli, kode kebaya yang sama tercatat disewa lagi dalam 2–4 hari (49 baris), padahal constraint `bookings_no_overlap` per `kebaya_id` akan menolak potong kedua. Diputuskan: tiap potong fisik dicatat sebagai kebaya sendiri (mis. `KB-012-A`, `KB-012-B`), tanpa kolom stok, jadi skema dan aturan ketersediaan tidak berubah. Efeknya, kebaya yang punya dua potong tampil dua kali di katalog. Perlu dipastikan ke owner bahwa satu kode memang punya lebih dari satu potong |
-| 4 | **Satuan prediksi** | Diterapkan: model mingguan, dijumlah per bulan; angka per ukuran dibagi dari proporsi historis (§5) |
+| 2 | **Tabel ukuran** | Dijawab owner (28 Nov 2026): lingkar dada S 82–90, M 91–98, L 99–105, XL di atas 105 cm. Diterapkan sebagai `tableVersion: "owner-1"` (§5), menggantikan tabel asumsi tim `sementara-1`. Kolom `perkiraan_ukuran` di dataset final DS (28 Nov) sudah dihitung ulang dengan tabel owner dan sudah dicek AE: rentangnya persis sama |
+| 3 | **Masa sewa & jeda laundry** | Dijawab owner (28 Nov 2026): diambil H-1, dikembalikan H+1, laundry dan cek 2–3 hari; satu kode = satu potong, dan kebaya tidak bisa disewa lagi sebelum dilaundry. Dipakai `1 / 1 / 2` (§2.4). Di data asli, 49 baris (26 pasang, semuanya 4–8 Nov) mencatat kode yang sama disewa lagi dalam 2–4 hari. Menurut owner itu salah catat: kebaya ditukar saat pengambilan, tapi catatannya tidak diperbarui. Jadi constraint `bookings_no_overlap` per `kebaya_id` sesuai kenyataan. Diputuskan: tiap potong fisik dicatat sebagai kebaya sendiri (mis. `KB-012-A`, `KB-012-B`), tanpa kolom stok, jadi skema dan aturan ketersediaan tidak berubah. Efeknya, kebaya yang punya dua potong tampil dua kali di katalog |
+| 4 | **Satuan prediksi** | Diterapkan: model mingguan, dijumlah per bulan (§5). Sejak v0.6, minggu masuk ke bulan tempat hari Kamisnya jatuh, dan fitur model adalah jumlah hari wisuda per minggu dari kalender wisuda owner. Angka per ukuran tidak disediakan (`sizeBreakdown: "tidak_tersedia"`): lingkar dada di semua baris dataset, termasuk baris asli, dibuat tim DS (README data DS), jadi pecahan per ukuran hanya simulasi |
 | 5 | **Format output analisis DS** | Diterapkan: tetap lewat tabel `analytics_results`, tidak dihitung dari `bookings` (§4) |
 | 6 | **Foto kebaya** | Diubah di v0.5: admin mengunggah file foto (field `photo`), disimpan di database Neon, dan ditampilkan lewat `GET /kebaya/:id/foto`. `schema.sql`, migrasi Neon, dan endpoint katalog admin menyusul |
-| 7 | **Ukuran XS/XXXL dan rentang ukuran** | Diputuskan: XS dan XXXL ditambahkan ke enum `size` (2.1), supaya customer XS/XXXL bisa mendapat `sizeMatch: true` dan perkiraan ukurannya bisa disimpan. Satu ukuran per kebaya. Ukuran rentang di dataset DS (mis. `S-M`) tidak didukung: `sizeMatch` hanya mengurutkan daftar, jadi kebaya S-M yang dicatat M tetap tampil untuk customer S, hanya urutannya lebih bawah. Batasan ini ditulis di README |
+| 7 | **Ukuran XS/XXXL dan rentang ukuran** | Diputuskan: XS dan XXXL ditambahkan ke enum `size` (2.1), supaya customer XS/XXXL bisa mendapat `sizeMatch: true` dan perkiraan ukurannya bisa disimpan. Satu ukuran per kebaya. Ukuran rentang di dataset DS (mis. `S-M`) tidak didukung: `sizeMatch` hanya mengurutkan daftar, jadi kebaya S-M yang dicatat M tetap tampil untuk customer S, hanya urutannya lebih bawah. Batasan ini ditulis di README. Sejak v0.6, tabel owner hanya menghasilkan perkiraan S–XL; XS, XXL, dan XXXL tetap boleh dipakai sebagai ukuran kebaya |
 
 ## Riwayat perubahan
 
@@ -665,3 +670,4 @@ Status per v0.5.
 | 0.3 | 2026-11-24 | Skema database di `backend/db/schema.sql`; constraint anti tumpang tindih di level database |
 | 0.4 | 2026-11-25 | Review AE (Ilham): prediksi mingguan dijumlah per bulan (`totalPredicted`, `sizeBreakdown`, `note`, `model.maeValidasi`); `tableVersion` perkiraan ukuran disimpan di `bookings.size_table_version`; layanan model memakai `/v1/health`, format respons dan kode error-nya ditulis eksplisit, dan diping tiap 10 menit untuk menghindari cold start; `recommendations` hanya untuk data asli; filter `from`/`to` analisis dihapus; aturan `sizeMatch` untuk `ALL_SIZE`; field opsional `customerContact`; status pertanyaan terbuka diperbarui |
 | 0.5 | 2026-11-26 | Foto kebaya diunggah admin sebagai data URL base64 (field `photo`, JPEG/PNG/WebP, maks 2 MB) dan disimpan di database (`kebaya.photo` dan `kebaya.photo_type`, menggantikan `photo_url`); `photoUrl` kini dibuat backend dan menunjuk ke endpoint baru `GET /kebaya/:id/foto`. Layanan model, dari review PR #20: `sizeBreakdown` `tidak_tersedia` dengan baris `TOTAL`, dan `503 MODEL_UNAVAILABLE`. Review AE (Ilham) di PR #37: contoh `/v1/health` disesuaikan dengan kode, tabel ukuran adalah asumsi tim, masa sewa `1 / 1 / 2` dikonfirmasi owner, dan dua pertanyaan terbuka baru yang langsung diputuskan: satu kode kebaya untuk satu potong fisik, serta ukuran XS dan XXXL tanpa ukuran rentang |
+| 0.6 | 2026-11-28 | Jawaban owner: tabel ukuran berbasis lingkar dada (S 82–90, M 91–98, L 99–105, XL di atas 105) menggantikan tabel asumsi tim, dengan `tableVersion` `owner-1`; masa sewa diambil H-1 dan dikembalikan H+1, laundry 2–3 hari, `LAUNDRY_DAYS` tetap 2; satu kode = satu potong, dan 49 baris tumpang tindih di data asli adalah salah catat. Review AE (Ilham) di PR #40: bulan prediksi dihitung dari hari Kamis; fitur jumlah hari wisuda per minggu dari kalender owner (`event_days.json`); contoh respons dari model final (`random_forest`, MAE 7,2, data asli); arti `note` diperjelas; prediksi hanya total (`tidak_tersedia`) karena lingkar dada di dataset dibuat tim DS, sehingga contoh `recommendations` juga tidak lagi memakai ukuran |
