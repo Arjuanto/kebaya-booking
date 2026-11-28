@@ -460,16 +460,16 @@ Backend meneruskan ke layanan model `POST /v1/predict/demand` dan mengembalikan 
     "targetMonth": "2026-12",
     "model": { "name": "random_forest", "version": "1.0.0", "maeValidasi": 7.2 },
     "dataSource": "asli",
-    "totalPredicted": 31.0,
+    "totalPredicted": 121.8,
     "sizeBreakdown": "tidak_tersedia",
     "note": "Bulan ini di luar periode data asli UMKM. Angkanya dihitung dari pola minggu biasa ditambah wisuda yang sudah diketahui dari owner: Wisuda Poltekkes (2 Desember), Wisuda Stipol (12 Desember), Wisuda Unmuh (29 Desember). Wisuda lain yang belum tercatat tidak ikut terhitung. Anggap sebagai gambaran kasar.",
     "predictions": [
-      { "size": "TOTAL", "predictedCount": 31.0 }
+      { "size": "TOTAL", "predictedCount": 121.8 }
     ]
   }
 }
 ```
-Halaman admin menampilkan angka ini sebagai perkiraan, bukan angka pasti: `totalPredicted` bersama `maeValidasi` (mis. "sekitar 31 pemesanan, rata-rata meleset ±7 per minggu"), label `dataSource`, dan isi `note`, yang wajib tampil jika tidak `null`. Tidak ada angka per ukuran (`sizeBreakdown` `tidak_tersedia`, §5), jadi baris `TOTAL` tidak ditampilkan sebagai ukuran.
+Halaman admin menampilkan angka ini sebagai perkiraan, bukan angka pasti: `totalPredicted` bersama `maeValidasi` (mis. "sekitar 122 pemesanan, rata-rata meleset ±7 per minggu"), label `dataSource`, dan isi `note`, yang wajib tampil jika tidak `null`. Tidak ada angka per ukuran (`sizeBreakdown` `tidak_tersedia`, §5), jadi baris `TOTAL` tidak ditampilkan sebagai ukuran.
 **502 ML_SERVICE_ERROR / 504 ML_TIMEOUT** — halaman admin tetap terbuka dan menampilkan `message` ("Prediksi sedang tidak tersedia").
 
 #### `POST /admin/ai-summaries`
@@ -590,11 +590,11 @@ Bentuk request boleh bertambah, bentuk response di bawah dipertahankan. Fitur mo
   "targetMonth": "2026-12",
   "model": { "name": "random_forest", "version": "1.0.0", "maeValidasi": 7.2 },
   "dataSource": "asli",
-  "totalPredicted": 31.0,
+  "totalPredicted": 121.8,
   "sizeBreakdown": "tidak_tersedia",
   "note": "Bulan ini di luar periode data asli UMKM. Angkanya dihitung dari pola minggu biasa ditambah wisuda yang sudah diketahui dari owner: Wisuda Poltekkes (2 Desember), Wisuda Stipol (12 Desember), Wisuda Unmuh (29 Desember). Wisuda lain yang belum tercatat tidak ikut terhitung. Anggap sebagai gambaran kasar.",
   "predictions": [
-    { "size": "TOTAL", "predictedCount": 31.0 }
+    { "size": "TOTAL", "predictedCount": 121.8 }
   ]
 }
 ```
